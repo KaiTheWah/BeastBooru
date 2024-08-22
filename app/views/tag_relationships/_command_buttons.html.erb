@@ -13,7 +13,7 @@
   <% end %>
   <% if tag_relation.editable_by?(CurrentUser.user) %>
     <% links.push(link_to("Edit", { controller: send("#{tag_relation.model_name.route_key}_path"), id: tag_relation.id, action: :edit })) %>
-    <% links.push link_to("Flip", send("#{tag_relation.model_name.route_key.singularize}_path", id: tag_relation.id, "#{tag_relation.model_name.route_key.singularize}": { antecedent_name: tag_relation.consequent_name, consequent_name: tag_relation.antecedent_name }), method: :patch) %>
+    <% links.push(link_to("Flip", send("#{tag_relation.model_name.route_key.singularize}_path", id: tag_relation.id, "#{tag_relation.model_name.route_key.singularize}": { antecedent_name: tag_relation.consequent_name, consequent_name: tag_relation.antecedent_name }), method: :patch)) %>
   <% end %>
   <%= safe_join(links, " | ") %>
 </span>

@@ -1,5 +1,6 @@
-import {SendQueue} from "./send_queue";
+import { SendQueue } from "./send_queue";
 import LStorage from "./utility/storage";
+import Post from "./posts";
 
 let PostSet = {};
 
@@ -94,7 +95,7 @@ PostSet.remove_post = function (set_id, post_id, successNotice) {
   if (removePostTimeout) window.clearTimeout(removePostTimeout);
   removePostTimeout = window.setTimeout(() => {
     for (const [setID, posts] of Object.entries(removePostCache)) {
-      PostSet.remove_many_posts(setID, [...posts]);
+      PostSet.remove_many_posts(setID, [...posts], successNotice);
       delete removePostCache[setID];
     }
     removePostTimeout = null;
@@ -106,7 +107,7 @@ PostSet.remove_post = function (set_id, post_id, successNotice) {
  * @param {number} set_id Set ID
  * @param {number[]} posts Array of post IDs
  */
-PostSet.remove_many_posts = function (set_id, posts = []) {
+PostSet.remove_many_posts = function (set_id, posts = [], successNotice = undefined) {
   if (!set_id) {
     $(window).trigger("danbooru:error", "Error: No set specified");
     return;

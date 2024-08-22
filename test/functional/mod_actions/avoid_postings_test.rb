@@ -19,7 +19,7 @@ module ModActions
 
         assert_matches(
           actions:     %w[avoid_posting_create],
-          text:        "Created avoid posting for artist \"#{@avoid_posting.artist_name}\":#{show_or_new_artists_path(name: @avoid_posting.artist_name)}",
+          text:        "Created avoid posting ##{@avoid_posting.id} for [[#{@avoid_posting.artist_name}]]",
           subject:     @avoid_posting,
           artist_name: @avoid_posting.artist_name,
         )
@@ -30,7 +30,7 @@ module ModActions
 
         assert_matches(
           actions:     %w[avoid_posting_delete],
-          text:        "Deleted avoid posting for artist \"#{@avoid_posting.artist_name}\":#{show_or_new_artists_path(name: @avoid_posting.artist_name)}",
+          text:        "Deleted avoid posting ##{@avoid_posting.id} for [[#{@avoid_posting.artist_name}]]",
           subject:     @avoid_posting,
           artist_name: @avoid_posting.artist_name,
         )
@@ -41,7 +41,7 @@ module ModActions
 
         assert_matches(
           actions:     %w[avoid_posting_destroy],
-          text:        "Destroyed avoid posting for artist \"#{@avoid_posting.artist_name}\":#{show_or_new_artists_path(name: @avoid_posting.artist_name)}",
+          text:        "Destroyed avoid posting ##{@avoid_posting.id} for [[#{@avoid_posting.artist_name}]]",
           subject:     @avoid_posting,
           artist_name: @avoid_posting.artist_name,
         )
@@ -53,7 +53,7 @@ module ModActions
 
         assert_matches(
           actions:     %w[avoid_posting_undelete],
-          text:        "Undeleted avoid posting for artist \"#{@avoid_posting.artist_name}\":#{show_or_new_artists_path(name: @avoid_posting.artist_name)}",
+          text:        "Undeleted avoid posting ##{@avoid_posting.id} for [[#{@avoid_posting.artist_name}]]",
           subject:     @avoid_posting,
           artist_name: @avoid_posting.artist_name,
         )
@@ -64,7 +64,7 @@ module ModActions
 
         assert_matches(
           actions:     %w[avoid_posting_update],
-          text:        "Updated avoid posting for artist \"#{@avoid_posting.artist_name}\":#{show_or_new_artists_path(name: @avoid_posting.artist_name)}",
+          text:        "Updated avoid posting ##{@avoid_posting.id} for [[#{@avoid_posting.artist_name}]]",
           subject:     @avoid_posting,
           artist_name: @avoid_posting.artist_name,
         )

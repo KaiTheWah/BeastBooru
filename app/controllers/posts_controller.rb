@@ -299,6 +299,11 @@ class PostsController < ApplicationController
         response_params.compact_blank!
         redirect_to(post_path(post, response_params))
       end
+
+      format.json do
+        return render_expected_error(422, post.errors.full_messages.join("; ")) if post.errors.any?
+        render(json: post)
+      end
     end
   end
 

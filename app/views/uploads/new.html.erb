@@ -38,6 +38,7 @@
     allowRatingLock: <%= policy(Upload).can_use_attribute?(:locked_rating).to_json %>,
     allowUploadAsPending: <%= policy(Upload).can_use_attribute?(:as_pending).to_json %>,
     maxFileSize: <%= FemboyFans.config.max_file_size %>,
+    maxFileSizeMap: <%= sanitize(FemboyFans.config.max_file_sizes.to_json) %>,
   };
   Danbooru.Uploader.init();
 <% end -%>

@@ -74,16 +74,18 @@ export default class Filter {
    */
   update ($post) {
     if ($post.length == 0) return false;
-    else if (Array.isArray($post))
-      $post = $post[0]; // Deferred posts return an array
-    else if ($post.length > 1) {
-      // Batch update
+    else if (Array.isArray($post)) { // Deferred posts return an array
       for (const $one of $post)
+        this.update($one);
+      return;
+    } else if ($post.length > 1) { // More than one matched
+      for (const $one of $post.get())
         this.update($($one));
       return;
     }
 
     const post = PostCache.fromThumbnail($post);
+    if (this.matchIDs.has(post.id)) return;
 
     // Check if the post matches the filter
     let tokensMatch = true;

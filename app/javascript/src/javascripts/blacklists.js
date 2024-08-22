@@ -1,4 +1,5 @@
 import Filter from "./models/Filter";
+import PostCache from "./models/PostCache";
 import Utility from "./utility";
 import LStorage from "./utility/storage";
 
@@ -61,7 +62,7 @@ Blacklist.init_blacklist_editor = function () {
 
     // Start from scratch
     Blacklist.regenerate_filters();
-    Blacklist.add_posts($(".blacklistable"));
+    Blacklist.add_posts(PostCache.sample());
     Blacklist.update_visibility();
   });
 
@@ -107,6 +108,39 @@ Blacklist.regenerate_filters = function () {
   }
 };
 
+/** Hides all comments created by blacklisted users */
+Blacklist.init_comment_blacklist = function () {
+  if (Utility.meta("blacklist-users") !== "true") return;
+
+  // This is extraordinarily silly
+  // We need a proper user ignoring system
+  for (const filter of Object.values(Blacklist.filters)) {
+
+    // Only the first token is accepted
+    // If the user is trying something wackier, that's their fault
+    if (!filter.tokens.length) continue;
+    const token = filter.tokens[0];
+
+    switch (token.type) {
+      case "user": {
+        if (token.value.startsWith("!")) {
+          $(`article[data-creator-id="${token.value.slice(1)}"]`).hide();
+          continue;
+        }
+        // falls through
+      }
+      case "username": {
+        $(`article[data-creator="${token.value}"]`).hide();
+        continue;
+      }
+      case "userid": {
+        $(`article[data-creator-id="${token.value}"]`).hide();
+        continue;
+      }
+    }
+  }
+};
+
 /** Build the sidebar and inline blacklist toggles */
 Blacklist.init_blacklist_toggles = function () {
   if (Blacklist.ui.length) return;
@@ -121,6 +155,8 @@ Blacklist.init_blacklist_toggles = function () {
  * @param {JQuery<HTMLElement> | JQuery<HTMLElement>[]} $posts Posts to register
  */
 Blacklist.add_posts = function ($posts) {
+  PostCache.register($posts);
+
   for (const filter of Object.values(Blacklist.filters))
     filter.update($posts);
 };
@@ -151,13 +187,13 @@ Blacklist.update_visibility = function () {
   // Apply / remove classes
   // TODO: Cache the post elements to avoid repeat lookups
   for (const postID of added)
-    $(`.blacklistable[data-id="${postID}"]`)
-      .addClass("blacklisted")
-      .trigger("blk:hide");
+    PostCache.apply(postID, ($element) => {
+      $element.addClass("blacklisted").trigger("blk:hide");
+    });
   for (const postID of removed)
-    $(`.blacklistable[data-id="${postID}"]`)
-      .removeClass("blacklisted")
-      .trigger("blk:show");
+    PostCache.apply(postID, ($element) => {
+      $element.removeClass("blacklisted").trigger("blk:show");
+    });
 };
 
 $(() => {
@@ -170,6 +206,7 @@ $(() => {
   Blacklist.update_visibility();
   $("#blacklisted-hider").remove();
 
+  Blacklist.init_comment_blacklist();
   Blacklist.init_blacklist_toggles();
 
   // Pause videos when blacklisting

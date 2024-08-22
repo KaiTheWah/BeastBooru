@@ -55,7 +55,7 @@ PostModeMenu.initialize_selector = function () {
 };
 
 PostModeMenu.initialize_preview_link = function () {
-  $(".post-preview a").on("click.danbooru", PostModeMenu.click);
+  $(".post-preview").on("click.danbooru", PostModeMenu.click);
 };
 
 PostModeMenu.initialize_edit_form = function () {
@@ -168,7 +168,7 @@ PostModeMenu.open_edit = function (post_id) {
 
 PostModeMenu.click = function (e) {
   const mode = $("#mode-box-mode").val();
-  const post_id = $(e.target).closest("article").data("id");
+  const post_id = $(e.currentTarget).data("id");
 
   switch (mode) {
     case "add-fav": Favorite.create(post_id); break;
@@ -177,8 +177,8 @@ PostModeMenu.click = function (e) {
     case "vote-down": Post.vote(post_id, -1, true); break;
     case "vote-up": Post.vote(post_id, 1, true); break;
     case "remove-vote": Post.unvote(post_id); break;
-    case "add-to-set": PostSet.add_post($("#set-id").val(), post_id, true); break;
-    case "remove-from-set": PostSet.remove_post($("#set-id").val(), post_id, undefined, true); break;
+    case "add-to-set": PostSet.add_post($("#set-id").val(), post_id); break;
+    case "remove-from-set": PostSet.remove_post($("#set-id").val(), post_id, undefined); break;
     case "rating-s": Post.update(post_id, { "post[rating]": "s"}); break;
     case "rating-q": Post.update(post_id, { "post[rating]": "q"}); break;
     case "rating-e": Post.update(post_id, { "post[rating]": "e"}); break;

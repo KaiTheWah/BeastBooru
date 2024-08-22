@@ -111,21 +111,21 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         @post.update_column(:framecount, 0)
         put_auth post_path(@post), @admin, params: { post: { thumbnail_frame: 1 }, format: :json }
         assert_response :unprocessable_entity
-        assert_same_elements(["cannot be used on posts without a framecount"], @response.parsed_body.dig(:errors, :thumbnail_frame))
+        assert_same_elements(["Thumbnail frame cannot be used on posts without a framecount"], @response.parsed_body[:message]&.split("; "))
       end
 
       should "not allow setting thumbnail_frame greater than framecount" do
         @post.update_column(:framecount, 10)
         put_auth post_path(@post), @admin, params: { post: { thumbnail_frame: 11 }, format: :json }
         assert_response :unprocessable_entity
-        assert_same_elements(["must be between 1 and 10"], @response.parsed_body.dig(:errors, :thumbnail_frame))
+        assert_same_elements(["Thumbnail frame must be between 1 and 10"], @response.parsed_body[:message]&.split("; "))
       end
 
       should "not allow setting thumbnail_frame further than 10% from the start if framecount is greater than 1000" do
         @post.update_column(:framecount, 1500)
         put_auth post_path(@post), @admin, params: { post: { thumbnail_frame: 2000 }, format: :json }
         assert_response :unprocessable_entity
-        assert_same_elements(["must be between 1 and 150", "must be in first 10% of video"], @response.parsed_body.dig(:errors, :thumbnail_frame))
+        assert_same_elements(["Thumbnail frame must be between 1 and 150", "Thumbnail frame must be in first 10% of video"], @response.parsed_body[:message]&.split("; "))
       end
 
       should "restrict access" do

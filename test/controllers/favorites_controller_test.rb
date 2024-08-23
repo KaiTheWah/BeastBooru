@@ -69,5 +69,31 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
         assert_access(User::Levels::MEMBER, success_response: :redirect) { |user| delete_auth favorite_path(@post), user }
       end
     end
+
+    context "clear action" do
+      setup do
+        @post = create(:post)
+        FavoriteManager.add!(user: @user, post: @post)
+      end
+
+      should "work" do
+        assert_difference("Favorite.count", -1) do
+          put_auth clear_favorites_path, @user
+          assert_redirected_to(favorites_path)
+          perform_enqueued_jobs(only: ClearUserFavoritesJob)
+        end
+      end
+
+      should "limit to once a week" do
+        put_auth clear_favorites_path, @user
+        assert_redirected_to(favorites_path)
+        put_auth clear_favorites_path, @user
+        assert_response 429
+      end
+
+      should "restrict access" do
+        assert_access(User::Levels::MEMBER, success_response: :redirect) { |user| put_auth clear_favorites_path, user }
+      end
+    end
   end
 end

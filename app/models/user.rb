@@ -1082,13 +1082,20 @@ class User < ApplicationRecord
   end
 
   def can_admin_edit?(user)
+    # owners can edit anyone
     return true if user.is_owner?
+    # no one else can edit admins
     return false if is_admin?
+    # admins can edit anyone else
     user.is_admin?
   end
 
   def validate_prefs
     errors.add(:can_manage_aibur, "Members cannot have the \"Manage Tag Change Requests\" permission") if level == Levels::MEMBER && can_manage_aibur?
     errors.add(:no_aibur_voting, "User cannot have both \"Manage Tag Change Requests\" & \"No AIBUR Voting\"") if can_manage_aibur? && no_aibur_voting?
+  end
+
+  def clear_favorites
+    ClearUserFavoritesJob.perform_later(self)
   end
 end

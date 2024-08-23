@@ -42,6 +42,12 @@ class FavoriteManager
     end
   end
 
+  def self.remove_all!(user:)
+    Favorite.for_user(user.id).find_each do |favorite|
+      remove!(user: user, post: favorite.post)
+    end
+  end
+
   def self.give_to_parent!(post)
     # TODO: Much better and more intelligent logic can exist for this
     parent = post.parent

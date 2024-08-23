@@ -130,30 +130,31 @@
 
   <div class="section" style="width:450px;">
     <ul class="link-page">
-      <li>» <%= link_to "Sign out", session_path, method: :delete %></li>
-      <li>» <%= link_to "Settings", edit_users_path %></li>
-      <li>» <%= link_to "Change password", edit_user_password_path(CurrentUser.user) %></li>
-      <li>» <%= link_to "Manage API Access", user_api_keys_path(CurrentUser.user) %></li>
-      <li>» <%= link_to "Change username", new_user_name_change_request_path %></li>
+      <li>» <%= link_to("Sign out", session_path, method: :delete) %></li>
+      <li>» <%= link_to("Settings", edit_users_path) %></li>
+      <li>» <%= link_to("Change password", edit_user_password_path(CurrentUser.user)) %></li>
+      <li>» <%= link_to("Manage API Access", user_api_keys_path(CurrentUser.user)) %></li>
+      <li>» <%= link_to("Change username", new_user_name_change_request_path) %></li>
       <% if FemboyFans.config.enable_email_verification? && !CurrentUser.user.is_verified? %>
-        <li>» <%= link_to "Resend activation email", resend_confirmation_email_path %></li>
+        <li>» <%= link_to("Resend activation email", resend_confirmation_email_path) %></li>
       <% end %>
+      <li>» <%= link_to("Clear favorites", clear_favorites_path) %></li>
       <br>
-      <li>» <%= link_to "My profile", user_path(CurrentUser.user) %></li>
-      <li>» <%= link_to "My messages", dmails_path %></li>
-      <li>» <%= link_to "My favorites", favorites_path %></li>
-      <li>» <%= link_to "My recommendations", post_recommendations_path(search: { user_id: CurrentUser.id }) %></li>
-      <li>» <%= link_to "My blocked users", user_blocks_path(CurrentUser.user) %></li>
-      <li>» <%= link_to "My notifications", notifications_path %></li>
-      <li>» <%= link_to "My followed tags", followed_tags_path %></li>
+      <li>» <%= link_to("My profile", user_path(CurrentUser.user)) %></li>
+      <li>» <%= link_to("My messages", dmails_path) %></li>
+      <li>» <%= link_to("My favorites", favorites_path) %></li>
+      <li>» <%= link_to("My recommendations", post_recommendations_path(search: { user_id: CurrentUser.id })) %></li>
+      <li>» <%= link_to("My blocked users", user_blocks_path(CurrentUser.user)) %></li>
+      <li>» <%= link_to("My notifications", notifications_path) %></li>
+      <li>» <%= link_to("My followed tags", followed_tags_path) %></li>
       <br>
-      <li>» <%= link_to "My sets", post_sets_path(search: { creator_id: CurrentUser.id }) %></li>
-      <li>» <%= link_to "Sets I maintain", post_sets_path(search: { maintainer_id: CurrentUser.id }) %></li>
-      <li>» <%= link_to "Set maintainer invites", post_set_maintainers_path %></li>
+      <li>» <%= link_to("My sets", post_sets_path(search: { creator_id: CurrentUser.id })) %></li>
+      <li>» <%= link_to("Sets I maintain", post_sets_path(search: { maintainer_id: CurrentUser.id })) %></li>
+      <li>» <%= link_to("Set maintainer invites", post_set_maintainers_path) %></li>
       <br>
-      <li>» <%= link_to "Search for myself in comments", comments_path(group_by: :comment, search: { body_matches: CurrentUser.name }) %></li>
-      <li>» <%= link_to "Search for myself in forums", forum_posts_path(search: { body_matches: CurrentUser.pretty_name }) %></li>
-      <li>» <%= link_to "Comments on my posts", comments_path(group_by: :comment, search: { poster_id: CurrentUser.id }) %></li>
+      <li>» <%= link_to("Search for myself in comments", comments_path(group_by: :comment, search: { body_matches: CurrentUser.name })) %></li>
+      <li>» <%= link_to("Search for myself in forums", forum_posts_path(search: { body_matches: CurrentUser.pretty_name })) %></li>
+      <li>» <%= link_to("Comments on my posts", comments_path(group_by: :comment, search: { poster_id: CurrentUser.id })) %></li>
     </ul>
   </div>
 <% end %>

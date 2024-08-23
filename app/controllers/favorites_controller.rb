@@ -46,4 +46,17 @@ class FavoritesController < ApplicationController
   rescue Favorite::Error => e
     render_expected_error(422, e.message)
   end
+
+  def clear
+    authorize(Favorite)
+    return if request.get? # will render the confirmation page
+    if RateLimiter.check_limit("clear_favorites:#{CurrentUser.user.id}", 1, 7.days)
+      return render_expected_error(429, "You can only clear your favorites once per week")
+    end
+    RateLimiter.hit("clear_favorites:#{CurrentUser.user.id}", 7.days)
+    CurrentUser.user.clear_favorites
+    respond_to do |format|
+      format.html { redirect_to(favorites_path, notice: "Your favorites are being cleared. Give it some time if you have a lot") }
+    end
+  end
 end

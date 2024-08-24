@@ -86,7 +86,7 @@ module Admin
 
         context "when updating the verification of emails" do
           should "allow setting to true" do
-            user = create(:user, email_verification_key: "1")
+            user = create(:user, email_verified: false)
             put_auth admin_user_path(user), @admin, params: { user: { verified: "true" } }
 
             assert_predicate user.reload, :is_verified?

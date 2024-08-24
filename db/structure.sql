@@ -2563,7 +2563,6 @@ CREATE TABLE public.users (
     name character varying NOT NULL,
     password_hash character varying NOT NULL,
     email character varying,
-    email_verification_key character varying,
     level integer DEFAULT 10 NOT NULL,
     base_upload_limit integer DEFAULT 10 NOT NULL,
     last_logged_in_at timestamp without time zone,
@@ -5205,6 +5204,7 @@ ALTER TABLE ONLY public.staff_notes
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240824173724'),
 ('20240804065554'),
 ('20240709134926'),
 ('20240706061122'),

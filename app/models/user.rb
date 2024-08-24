@@ -82,6 +82,7 @@ class User < ApplicationRecord
     GO_TO_RECENT_FORUM_POST          = pref(1 << 25)
     DISABLE_COLORS                   = pref(1 << 26)
     NO_AIBUR_VOTING                  = pref(1 << 27, settable: false, private: false)
+    EMAIL_VERIFIED                   = pref(1 << 28, settable: false, public: true)
 
     def self.map
       constants.to_h { |name| [name.to_s.downcase, const_get(name)] }
@@ -420,15 +421,15 @@ class User < ApplicationRecord
 
   module EmailMethods
     def is_verified?
-      id.present? && email_verification_key.nil?
+      id.present? && email_verified?
     end
 
     def mark_unverified!
-      update_attribute(:email_verification_key, "1")
+      update(email_verified: false)
     end
 
     def mark_verified!
-      update_attribute(:email_verification_key, nil)
+      update(email_verified: true)
     end
 
     def enable_email_verification?
@@ -1097,5 +1098,13 @@ class User < ApplicationRecord
 
   def clear_favorites
     ClearUserFavoritesJob.perform_later(self)
+  end
+
+  def self.email_verified
+    where("bit_prefs & :value = :value", { value: Preferences::EMAIL_VERIFIED })
+  end
+
+  def self.email_not_verified
+    where("bit_prefs & :value != :value", { value: Preferences::EMAIL_VERIFIED })
   end
 end

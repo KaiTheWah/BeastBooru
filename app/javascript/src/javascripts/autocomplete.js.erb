@@ -109,6 +109,9 @@ Autocomplete.initialize_tag_autocomplete = function() {
       case "flagger":
       case "upvote":
       case "downvote":
+      case "voted":
+      case "votedup":
+      case "voteddown":
         Autocomplete.user_source(term, resp, metatag + ":");
         break;
       case "pool":

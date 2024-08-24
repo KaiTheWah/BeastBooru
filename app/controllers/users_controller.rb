@@ -66,7 +66,7 @@ class UsersController < ApplicationController
     User.transaction do
       @user = User.new(permitted_attributes(User).merge({ last_ip_addr: request.remote_ip }))
       @user.validate_email_format = true
-      @user.email_verification_key = "1" if FemboyFans.config.enable_email_verification?
+      @user.email_verified = false if FemboyFans.config.enable_email_verification?
       if !FemboyFans.config.enable_recaptcha? || verify_recaptcha(model: @user)
         @user.save
         if @user.errors.empty?

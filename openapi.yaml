@@ -3248,6 +3248,7 @@ components:
         - unrestricted_uploads
         - disable_user_dmails
         - can_manage_aibur
+        - email_verified
       properties:
         id:
           type: number
@@ -3277,6 +3278,8 @@ components:
         disable_user_dmails:
           type: boolean
         can_manage_aibur:
+          type: boolean
+        email_verified:
           type: boolean
     UserBlock:
       type: object

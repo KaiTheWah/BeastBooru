@@ -13,6 +13,7 @@ FactoryBot.define do
     level { User::Levels::MEMBER }
     created_at { Time.now }
     last_logged_in_at { Time.now }
+    email_verified { true }
 
     factory(:anonymous_user) do
       level { User::Levels::ANONYMOUS }

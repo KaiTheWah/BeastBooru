@@ -33,17 +33,16 @@ class UserDeletion
 
   def clear_user_settings
     user.update_columns(
-      recent_tags:            "",
-      favorite_tags:          "",
-      blacklisted_tags:       "",
-      time_zone:              FemboyFans.config.default_user_timezone,
-      email:                  "",
-      email_verification_key: "1",
-      avatar_id:              nil,
-      profile_about:          "",
-      profile_artinfo:        "",
-      custom_style:           "",
-      level:                  User::Levels::MEMBER,
+      recent_tags:      "",
+      favorite_tags:    "",
+      blacklisted_tags: "",
+      time_zone:        FemboyFans.config.default_user_timezone,
+      email:            "",
+      avatar_id:        nil,
+      profile_about:    "",
+      profile_artinfo:  "",
+      custom_style:     "",
+      level:            User::Levels::MEMBER,
     )
   end
 

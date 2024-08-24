@@ -7,7 +7,10 @@ let Blacklist = {};
 
 Blacklist.isAnonymous = false;
 Blacklist.filters = {};
+
 Blacklist.hiddenPosts = new Set();
+Blacklist.matchedPosts = new Set();
+
 Blacklist.ui = [];
 
 /** Import the anonymous blacklist from the LocalStorage */
@@ -29,10 +32,12 @@ Blacklist.init_anonymous_blacklist = function () {
 
 /** Set up the modal dialogue with the blacklist editor */
 Blacklist.init_blacklist_editor = function () {
+  let windowWidth = $(window).width(),
+    windowHeight = $(window).height();
   $("#blacklist-edit-dialog").dialog({
     autoOpen: false,
-    width: $(window).width() > 400 ? 400 : "auto",
-    height: 400,
+    width: windowWidth > 400 ? 400 : windowWidth,
+    height: windowHeight > 400 ? 400 : windowHeight,
   });
 
   $("#blacklist-cancel").on("click", function () {
@@ -196,6 +201,24 @@ Blacklist.update_visibility = function () {
     });
 };
 
+/**
+ * Adds a `filter-matches` class to any thumbnails that match any of the filters,
+ * including disabled ones. Only needs to run after new posts get added to the page.
+ */
+Blacklist.update_styles = function () {
+  let allPosts = [];
+  for (const filter of Object.values(Blacklist.filters))
+    allPosts = allPosts.concat(Array.from(filter.matchIDs));
+  Blacklist.matchedPosts = new Set(allPosts);
+  console.log("matched", Blacklist.matchedPosts);
+
+  $(".filter-matches").removeClass("filter-matches");
+  for (const postID of Blacklist.matchedPosts)
+    PostCache.apply(postID, ($element) => {
+      $element.addClass("filter-matches");
+    });
+};
+
 $(() => {
   Blacklist.init_anonymous_blacklist();
   Blacklist.init_blacklist_editor();
@@ -203,6 +226,7 @@ $(() => {
 
   Blacklist.regenerate_filters();
   Blacklist.add_posts($(".blacklistable"));
+  Blacklist.update_styles();
   Blacklist.update_visibility();
   $("#blacklisted-hider").remove();
 

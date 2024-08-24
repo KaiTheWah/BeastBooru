@@ -380,8 +380,8 @@ class Artist < ApplicationRecord
 
   module LockMethods
     def propagate_locked
-      if wiki_page.present?
-        wiki_page.update_column(:is_locked, is_locked?)
+      if wiki_page.present? && (wiki_page.protection_level.blank? || wiki_page.protection_level < User::Levels.min_staff_level)
+        wiki_page.update_column(:protection_level, User::Levels.min_staff_level)
       end
     end
 
@@ -399,8 +399,6 @@ class Artist < ApplicationRecord
     end
 
     def wiki_page_not_locked
-      return if CurrentUser.is_janitor?
-
       if @notes.present? && is_note_locked? && wiki_page&.body != @notes
         errors.add(:base, "Wiki page is locked")
         throw(:abort)
@@ -545,8 +543,7 @@ class Artist < ApplicationRecord
   end
 
   def is_note_locked?
-    return false if CurrentUser.is_janitor?
-    wiki_page&.is_locked? || false
+    wiki_page.try(:is_restricted?) || false
   end
 
   def update_posts_index

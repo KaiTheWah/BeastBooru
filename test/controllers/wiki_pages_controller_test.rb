@@ -107,6 +107,11 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "respect protections" do
+        @wiki_page.update_column(:protection_level, User::Levels::ADMIN)
+        assert_access(User::Levels::ADMIN) { |user| get_auth edit_wiki_page_path(@wiki_page), user }
+      end
+
       should "restrict access" do
         assert_access(User::Levels::MEMBER) { |user| get_auth edit_wiki_page_path(@wiki_page), user }
       end
@@ -148,6 +153,11 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_equal("bar", @wiki_page.reload.title)
       end
 
+      should "respect protections" do
+        @wiki_page.update_column(:protection_level, User::Levels::ADMIN)
+        assert_access(User::Levels::ADMIN, success_response: :redirect) { |user| put_auth wiki_page_path(@wiki_page), user, params: { wiki_page: { body: SecureRandom.hex(6) } } }
+      end
+
       should "restrict access" do
         assert_access(User::Levels::MEMBER, success_response: :redirect) { |user| put_auth wiki_page_path(@wiki_page), user, params: { wiki_page: { body: SecureRandom.hex(6) } } }
       end
@@ -165,10 +175,14 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_raises(ActiveRecord::RecordNotFound) { @wiki_page.reload }
       end
 
+      should "respect protections" do
+        as(create(:owner_user)) { @wiki_pages = create_list(:wiki_page, User::Levels.constants.length, protection_level: User::Levels::OWNER) }
+        assert_access(User::Levels::OWNER, success_response: :redirect) { |user| delete_auth wiki_page_path(@wiki_pages.shift), user }
+      end
+
       should "restrict access" do
-        skip("Doesn't work due to properties attempting to be set after the record is destroyed")
         as(@user) { @wiki_pages = create_list(:wiki_page, User::Levels.constants.length) }
-        assert_access(User::Levels::ADMIN) { |user| delete_auth wiki_page_path(@wiki_pages.shift), user }
+        assert_access(User::Levels::ADMIN, success_response: :redirect) { |user| delete_auth wiki_page_path(@wiki_pages.shift), user }
       end
     end
 
@@ -203,6 +217,11 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
 
         assert_not_equal(@wiki_page.body, @wiki_page2.body)
         assert_response :missing
+      end
+
+      should "respect protections" do
+        @wiki_page.update_column(:protection_level, User::Levels::ADMIN)
+        assert_access(User::Levels::ADMIN, success_response: :redirect) { |user| put_auth revert_wiki_page_path(@wiki_page), user, params: { version_id: @wiki_page.versions.first.id } }
       end
 
       should "restrict access" do

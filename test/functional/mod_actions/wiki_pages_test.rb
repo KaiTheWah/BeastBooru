@@ -25,14 +25,16 @@ module ModActions
         )
       end
 
-      should "format wiki_page_lock correctly" do
-        @wiki.update!(is_locked: true)
+      should "format wiki_page_protect correctly" do
+        level = User::Levels::ADMIN
+        @wiki.update!(protection_level: level)
 
         assert_matches(
-          actions:         %w[wiki_page_lock],
-          text:            "Locked wiki page [[#{@wiki.title}]]",
-          subject:         @wiki,
-          wiki_page_title: @wiki.title,
+          actions:          %w[wiki_page_protect],
+          text:             "Restricted editing [[#{@wiki.title}]] to [#{User::Levels.id_to_name(level)}](/help/accounts##{User::Levels.id_to_name(level).downcase}) users",
+          subject:          @wiki,
+          wiki_page_title:  @wiki.title,
+          protection_level: level,
         )
       end
 
@@ -49,15 +51,16 @@ module ModActions
         )
       end
 
-      should "format wiki_page_unlock correctly" do
-        @wiki.update_columns(is_locked: true)
-        @wiki.update!(is_locked: false)
+      should "format wiki_page_unprotect correctly" do
+        @wiki.update_columns(protection_level: User::Levels::ADMIN)
+        @wiki.update!(protection_level: nil)
 
         assert_matches(
-          actions:         %w[wiki_page_unlock],
-          text:            "Unlocked wiki page [[#{@wiki.title}]]",
-          subject:         @wiki,
-          wiki_page_title: @wiki.title,
+          actions:          %w[wiki_page_unprotect],
+          text:             "Removed editing restrictions for [[#{@wiki.title}]]",
+          subject:          @wiki,
+          wiki_page_title:  @wiki.title,
+          protection_level: nil,
         )
       end
     end

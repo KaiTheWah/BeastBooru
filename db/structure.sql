@@ -2638,11 +2638,11 @@ CREATE TABLE public.wiki_page_versions (
     updater_ip_addr inet NOT NULL,
     title character varying NOT NULL,
     body text NOT NULL,
-    is_locked boolean NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     reason character varying,
-    parent character varying
+    parent character varying,
+    protection_level integer
 );
 
 
@@ -2675,11 +2675,11 @@ CREATE TABLE public.wiki_pages (
     creator_id integer NOT NULL,
     title character varying NOT NULL,
     body text NOT NULL,
-    is_locked boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     updater_id integer,
-    parent character varying
+    parent character varying,
+    protection_level integer
 );
 
 
@@ -5204,6 +5204,7 @@ ALTER TABLE ONLY public.staff_notes
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240824192520'),
 ('20240824173724'),
 ('20240804065554'),
 ('20240709134926'),

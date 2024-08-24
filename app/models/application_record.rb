@@ -381,7 +381,7 @@ class ApplicationRecord < ActiveRecord::Base
       def belongs_to_updater(options = {})
         class_eval do
           belongs_to(:updater, **options.merge(class_name: "User"))
-          before_validation do |rec|
+          before_validation(unless: :destroyed?) do |rec|
             rec.updater_id = CurrentUser.id
             rec.updater_ip_addr = CurrentUser.ip_addr if rec.respond_to?(:updater_ip_addr=)
           end

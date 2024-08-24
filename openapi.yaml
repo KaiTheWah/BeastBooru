@@ -74,9 +74,9 @@ x-constants:
     - user_feedback_delete
     - user_feedback_update
     - wiki_page_delete
-    - wiki_page_lock
+    - wiki_page_protect
     - wiki_page_rename
-    - wiki_page_unlock
+    - wiki_page_unprotect
     - rule_create
     - rule_delete
     - rules_reorder
@@ -1379,7 +1379,7 @@ components:
         wiki_page_title:
           type: string
           description: |
-            Valid for: `wiki_page_delete`, `wiki_page_lock`, `wiki_page_rename`, `wiki_page_unlock`, `help_create`, `help_delete`, `help_update`
+            Valid for: `wiki_page_delete`, `wiki_page_protect`, `wiki_page_rename`, `wiki_page_unprotect`, `help_create`, `help_delete`, `help_update`
         wiki_page_id:
           type: integer
           description: |
@@ -1416,6 +1416,10 @@ components:
           type: number
           description: |
             Valid for: `comment_delete`
+        protection_level:
+          type: string
+          description: |
+            Valid for:`wiki_page_protect`, `wiki_page_unprotect`
     NewsUpdate:
       type: object
       required:

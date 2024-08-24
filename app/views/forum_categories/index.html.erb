@@ -17,8 +17,8 @@
       <td><%= link_to cat.name, forum_category_path(cat) %></td>
       <td>
         <ul>
-          <li>View: <b><%= User.level_string(cat.can_view) %></b></li>
-          <li>Create: <b><%= User.level_string(cat.can_create) %></b></li>
+          <li>View: <b><%= User::Levels.id_to_name(cat.can_view) %></b></li>
+          <li>Create: <b><%= User::Levels.id_to_name(cat.can_create) %></b></li>
         </ul>
       </td>
       <% if policy(cat).all?(:update?, :destroy?) %>

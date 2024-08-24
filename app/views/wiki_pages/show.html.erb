@@ -3,15 +3,14 @@
 
 <section id="content">
   <h1 id="wiki-page-title">
-
     <%= link_to wiki_content.pretty_title_with_category, posts_path(tags: wiki_content.title), class: "tag-type-#{wiki_content.category_id}" %>
-
-    <% if wiki_content.is_locked? %>
-      (locked)
-    <% end %>
   </h1>
   <% if @wiki_redirect.present? %>
     <div class="wiki-page-redirect"><i class="fa-solid fa-turn-up fa-rotate-90"></i> <%= @wiki_page.title %></div>
+  <% end %>
+  <% if @wiki_page.protection_level.present? %>
+    <% name = User::Levels.id_to_name(@wiki_page.protection_level) %>
+    <div class="wiki-page-protection">Edited are restricted to <%= link_to(name.titlecase, help_page_path(id: "accounts", anchor: name.downcase), class: "#{User::Levels.level_class(name)} with-style") %> users and above.</div>
   <% end %>
 
   <div id="wiki-page-body" class="dtext-container">

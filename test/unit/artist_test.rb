@@ -355,7 +355,7 @@ class ArtistTest < ActiveSupport::TestCase
 
         assert_equal("abababab", @artist.wiki_page.body)
 
-        @artist.wiki_page.update_column(:is_locked, true)
+        @artist.wiki_page.update_columns(protection_level: User::Levels::JANITOR)
 
         @artist.notes = "babababa"
         assert_no_difference(-> { ArtistVersion.count }) do

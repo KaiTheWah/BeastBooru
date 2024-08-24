@@ -4,18 +4,18 @@ require "test_helper"
 
 class WikiPageTest < ActiveSupport::TestCase
   context "A wiki page" do
-    context "that is locked" do
+    context "that is protected" do
       should "not be editable by a member" do
         CurrentUser.user = create(:moderator_user)
-        @wiki_page = create(:wiki_page, is_locked: true)
+        @wiki_page = create(:wiki_page, protection_level: User::Levels::JANITOR)
         CurrentUser.user = create(:user)
         @wiki_page.update(body: "hello")
-        assert_equal(["Is locked and cannot be updated"], @wiki_page.errors.full_messages)
+        assert_equal(["Is protected and cannot be updated"], @wiki_page.errors.full_messages)
       end
 
       should "be editable by a moderator" do
         CurrentUser.user = create(:moderator_user)
-        @wiki_page = create(:wiki_page, is_locked: true)
+        @wiki_page = create(:wiki_page, protection_level: User::Levels::JANITOR)
         CurrentUser.user = create(:moderator_user)
         @wiki_page.update(body: "hello")
         assert_equal([], @wiki_page.errors.full_messages)
@@ -29,10 +29,10 @@ class WikiPageTest < ActiveSupport::TestCase
         @wiki_page = create(:wiki_page)
       end
 
-      should "allow the is_locked attribute to be updated" do
-        @wiki_page.update(is_locked: true)
+      should "allow the protection_level attribute to be updated" do
+        @wiki_page.update(protection_level: User::Levels::JANITOR)
         @wiki_page.reload
-        assert_equal(true, @wiki_page.is_locked?)
+        assert_equal(User::Levels::JANITOR, @wiki_page.protection_level)
       end
     end
 
@@ -41,13 +41,6 @@ class WikiPageTest < ActiveSupport::TestCase
         @user = create(:user)
         CurrentUser.user = @user
         @wiki_page = create(:wiki_page, title: "HOT POTATO")
-      end
-
-      should "not allow the is_locked attribute to be updated" do
-        @wiki_page.update(is_locked: true)
-        assert_equal(["Is locked and cannot be updated"], @wiki_page.errors.full_messages)
-        @wiki_page.reload
-        assert_equal(false, @wiki_page.is_locked?)
       end
 
       should "normalize its title" do

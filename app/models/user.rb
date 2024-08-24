@@ -30,10 +30,33 @@ class User < ApplicationRecord
     ADMIN        = 40
     OWNER        = 50
 
-    def self.level_name(level)
+    def self.id_to_name(level)
       name = constants.find { |c| const_get(c) == level }.to_s.titleize
       return "Unknown: #{level}" if name.blank?
       name
+    end
+
+    def self.name_to_id(name)
+      const_get(name.upcase)
+    rescue NameError
+      nil
+    end
+
+    def self.hash
+      constants.to_h { |key| [key.to_s.titleize, const_get(key)] }.sort_by { |_name, level| level }.to_h
+    end
+
+    def self.staff_hash
+      hash.select { |_name, level| level >= min_staff_level }
+    end
+
+    def self.min_staff_level
+      JANITOR
+    end
+
+    def self.level_class(level)
+      level = id_to_name(level) if level.is_a?(Integer)
+      "user-#{level.downcase}"
     end
   end
 
@@ -347,14 +370,6 @@ class User < ApplicationRecord
       def owner
         User.find_by!(level: Levels::OWNER)
       end
-
-      def level_hash
-        Levels.constants.to_h { |key| [key.to_s.titleize, Levels.const_get(key)] }.sort_by { |_name, level| level }.to_h
-      end
-
-      def level_string(value)
-        level_hash.invert[value] || ""
-      end
     end
 
     def promote_to!(new_level, options = {})
@@ -378,7 +393,7 @@ class User < ApplicationRecord
     end
 
     def level_string(value = nil)
-      User.level_string(value || level)
+      User::Levels.id_to_name(value || level)
     end
 
     def level_string_pretty
@@ -403,7 +418,7 @@ class User < ApplicationRecord
     end
 
     def is_staff?
-      is_janitor?
+      level >= Levels.min_staff_level
     end
 
     def is_approver?
@@ -415,7 +430,7 @@ class User < ApplicationRecord
     end
 
     def level_css_class
-      "user-#{level_string.parameterize}"
+      Levels.level_class(level)
     end
   end
 

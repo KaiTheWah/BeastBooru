@@ -26,8 +26,8 @@ module ModActions
               actions:             %w[forum_category_create],
               text:                <<~TEXT.strip,
                 Created forum category ##{@category.id} (#{@category.name})
-                Restricted viewing topics to #{User.level_string(@category.can_view)}
-                Restricted creating topics to #{User.level_string(@category.can_create)}
+                Restricted viewing topics to #{User::Levels.id_to_name(@category.can_view)}
+                Restricted creating topics to #{User::Levels.id_to_name(@category.can_create)}
               TEXT
               subject:             @category,
               creator:             @admin,
@@ -166,7 +166,7 @@ module ModActions
                 actions:                 %w[forum_category_update],
                 text:                    <<~TEXT.strip,
                   Updated forum category ##{@category.id} (#{@category.name})
-                  Restricted viewing topics to #{User.level_string(@category.can_view)} (Previously #{User.level_string(@original.can_view)})
+                  Restricted viewing topics to #{User::Levels.id_to_name(@category.can_view)} (Previously #{User::Levels.id_to_name(@original.can_view)})
                 TEXT
                 subject:                 @category,
                 creator:                 @admin,
@@ -203,7 +203,7 @@ module ModActions
                 actions:                 %w[forum_category_update],
                 text:                    <<~TEXT.strip,
                   Updated forum category ##{@category.id} (#{@category.name})
-                  Restricted creating topics to #{User.level_string(@category.can_create)} (Previously #{User.level_string(@original.can_create)})
+                  Restricted creating topics to #{User::Levels.id_to_name(@category.can_create)} (Previously #{User::Levels.id_to_name(@original.can_create)})
                 TEXT
                 subject:                 @category,
                 creator:                 @admin,
@@ -241,8 +241,8 @@ module ModActions
                 text:                    <<~TEXT.strip,
                   Updated forum category ##{@category.id} (#{@category.name})
                   Changed name from "#{@original.name}" to "#{@category.name}"
-                  Restricted viewing topics to #{User.level_string(@category.can_view)} (Previously #{User.level_string(@original.can_view)})
-                  Restricted creating topics to #{User.level_string(@category.can_create)} (Previously #{User.level_string(@original.can_create)})
+                  Restricted viewing topics to #{User::Levels.id_to_name(@category.can_view)} (Previously #{User::Levels.id_to_name(@original.can_view)})
+                  Restricted creating topics to #{User::Levels.id_to_name(@category.can_create)} (Previously #{User::Levels.id_to_name(@original.can_create)})
                 TEXT
                 subject:                 @category,
                 creator:                 @admin,

@@ -32,7 +32,7 @@ class ModAction < ApplicationRecord
     pool_name
     pattern old_pattern note hidden
     type old_type
-    wiki_page wiki_page_title old_title wiki_page_id
+    wiki_page wiki_page_title old_title wiki_page_id protection_level
     category_name old_category_name
     prompt old_prompt title
     artist_name
@@ -179,8 +179,8 @@ class ModAction < ApplicationRecord
         text = "Created forum category ##{mod.subject_id}"
         return text unless CurrentUser.user.level >= mod.can_view
         text += " (#{mod.forum_category_name})"
-        text += "\nRestricted viewing topics to #{User.level_string(mod.can_view)}"
-        text += "\nRestricted creating topics to #{User.level_string(mod.can_create)}"
+        text += "\nRestricted viewing topics to #{User::Levels.id_to_name(mod.can_view)}"
+        text += "\nRestricted creating topics to #{User::Levels.id_to_name(mod.can_create)}"
         text
       end,
       json: ->(mod, _user) do
@@ -207,8 +207,8 @@ class ModAction < ApplicationRecord
         return text unless CurrentUser.user.level >= mod.can_view
         text += " (#{mod.forum_category_name})"
         text += "\nChanged name from \"#{mod.old_forum_category_name}\" to \"#{mod.forum_category_name}\"" if mod.forum_category_name != mod.old_forum_category_name
-        text += "\nRestricted viewing topics to #{User.level_string(mod.can_view)} (Previously #{User.level_string(mod.old_can_view)})" if mod.can_view != mod.old_can_view
-        text += "\nRestricted creating topics to #{User.level_string(mod.can_create)} (Previously #{User.level_string(mod.old_can_create)})" if mod.can_create != mod.old_can_create
+        text += "\nRestricted viewing topics to #{User::Levels.id_to_name(mod.can_view)} (Previously #{User::Levels.id_to_name(mod.old_can_view)})" if mod.can_view != mod.old_can_view
+        text += "\nRestricted creating topics to #{User::Levels.id_to_name(mod.can_create)} (Previously #{User::Levels.id_to_name(mod.old_can_create)})" if mod.can_create != mod.old_can_create
         text
       end,
       json: ->(mod, _user) do
@@ -473,17 +473,17 @@ class ModAction < ApplicationRecord
       text: ->(mod, _user) { "Deleted wiki page [[#{mod.wiki_page_title}]]" },
       json: %i[wiki_page_title],
     },
-    wiki_page_lock:                             {
-      text: ->(mod, _user) { "Locked wiki page [[#{mod.wiki_page_title}]]" },
-      json: %i[wiki_page_title],
+    wiki_page_protect:                          {
+      text: ->(mod, _user) { "Restricted editing [[#{mod.wiki_page_title}]] to [#{User::Levels.id_to_name(mod.protection_level)}](/help/accounts##{User::Levels.id_to_name(mod.protection_level).downcase}) users" },
+      json: %i[wiki_page_title protection_level],
     },
     wiki_page_rename:                           {
       text: ->(mod, _user) { "Renamed wiki page ([[#{mod.old_title}]] -> [[#{mod.wiki_page_title}]])" },
       json: %i[wiki_page_title old_title],
     },
-    wiki_page_unlock:                           {
-      text: ->(mod, _user) { "Unlocked wiki page [[#{mod.wiki_page_title}]]" },
-      json: %i[wiki_page_title],
+    wiki_page_unprotect:                        {
+      text: ->(mod, _user) { "Removed editing restrictions for [[#{mod.wiki_page_title}]]" },
+      json: %i[wiki_page_title protection_level],
     },
 
     ### Rule ###

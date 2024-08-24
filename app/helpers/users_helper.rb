@@ -13,7 +13,7 @@ module UsersHelper
   end
 
   def user_levels_for_select(min_level = User::Levels::MEMBER)
-    User.level_hash.reject { |_name, level| level < min_level }
+    User::Levels.hash.reject { |_name, level| level < min_level }
   end
 
   def user_level_select_tag(name, min_level = User::Levels::MEMBER, options = {})

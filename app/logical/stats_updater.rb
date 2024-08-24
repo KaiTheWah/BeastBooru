@@ -42,7 +42,7 @@ class StatsUpdater
     ### Users ###
 
     stats[:total_users] = User.count
-    User.level_hash.each do |name, level|
+    User::Levels.hash.each do |name, level|
       stats[:"#{name.downcase}_users"] = User.where(level: level).count
     end
     stats[:unactivated_users] = User.email_not_verified.count

@@ -9,7 +9,12 @@
     }
   }
 
-  .wiki-redirect-history {
+  .wiki-page-protection, .wiki-page-protection-history {
+    color: var(--color-text-muted);
+    margin-bottom: 1em;
+  }
+
+  .wiki-page-redirect-history {
     color: var(--color-text-muted);
     margin-bottom: 1em;
   }

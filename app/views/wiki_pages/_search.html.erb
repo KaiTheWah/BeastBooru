@@ -5,4 +5,5 @@
   <%= f.input(:parent, label: "Redirects to", autocomplete: "wiki-page") %>
   <%= f.input(:hide_deleted, collection: %w[Yes No]) %>
   <%= f.input(:order, collection: [%w[Name title], %w[Date time], %w[Posts post_count]]) %>
+  <%= f.input(:protection_level, label: "Protection Level", collection: user_levels_for_select(User::Levels::TRUSTED)) %>
 <% end %>

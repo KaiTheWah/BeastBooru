@@ -52,6 +52,18 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "update action" do
+      should "work" do
+        put_auth artist_path(@artist), @user, params: { artist: { notes: "xyz" } }
+        @artist.reload
+        assert_equal("xyz", @artist.notes)
+      end
+
+      should "restrict access" do
+        assert_access(User::Levels::MEMBER, success_response: :redirect) { |user| put_auth artist_path(@artist), user, params: { artist: { notes: "xyz" } } }
+      end
+    end
+
     context "show action" do
       should "render" do
         get artist_path(@artist)
@@ -149,6 +161,30 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("bbb", @wiki_page.title)
           assert_equal("more testing", @wiki_page.body)
         end
+      end
+
+      should "propagate is_locked" do
+        put_auth artist_path(@artist), @user, params: { artist: { is_locked: true } }
+        @artist.reload
+        @wiki_page.reload
+        assert_equal(true, @artist.is_locked?)
+        assert_equal(User::Levels.min_staff_level, @wiki_page.protection_level)
+      end
+
+      should "not lower the protection level" do
+        @wiki_page.update_column(:protection_level, User::Levels::ADMIN)
+        put_auth artist_path(@artist), @user, params: { artist: { is_locked: true } }
+        @artist.reload
+        @wiki_page.reload
+        assert_equal(true, @artist.is_locked?)
+        assert_equal(User::Levels::ADMIN, @wiki_page.protection_level)
+      end
+
+      should "enforce protections" do
+        @wiki_page.update_column(:protection_level, User::Levels::ADMIN)
+        put_auth artist_path(@artist), @user, params: { artist: { notes: "xxx" } }
+        @artist.reload
+        assert_equal("testing", @artist.notes)
       end
     end
 

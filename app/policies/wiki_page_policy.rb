@@ -5,8 +5,12 @@ class WikiPagePolicy < ApplicationPolicy
     index?
   end
 
+  def update?
+    unbanned? && unrestricted?
+  end
+
   def destroy?
-    user.is_admin?
+    user.is_admin? && unrestricted?
   end
 
   def revert?
@@ -16,7 +20,7 @@ class WikiPagePolicy < ApplicationPolicy
   def permitted_attributes
     attr = %i[body skip_post_count_rename_check edit_reason]
     attr += %i[parent] if user.is_trusted?
-    attr += %i[is_locked] if user.is_janitor?
+    attr += %i[protection_level] if user.is_janitor?
     attr
   end
 
@@ -31,6 +35,12 @@ class WikiPagePolicy < ApplicationPolicy
   end
 
   def permitted_search_params
-    super + %i[title title_matches body_matches creator_id creator_name is_locked]
+    super + %i[title title_matches body_matches creator_id creator_name protection_level]
+  end
+
+  private
+
+  def unrestricted?
+    !record.is_a?(WikiPage) || !record.is_restricted?(user)
   end
 end

@@ -6,9 +6,10 @@ class WikiPage < ApplicationRecord
   INTERNAL_PREFIXES = %w[internal: help:].freeze
 
   after_initialize :set_parent_props
-  before_validation :normalize_title
-  before_validation :normalize_parent
-  before_validation :ensure_internal_locked
+  before_validation :normalize_title, unless: :destroyed?
+  before_validation :normalize_parent, unless: :destroyed?
+  before_validation :normalize_protection_level, unless: :destroyed?
+  before_validation :ensure_internal_protected, unless: :destroyed?
   after_update :log_update
   before_destroy :validate_not_used_as_help_page
   after_destroy :log_delete
@@ -19,11 +20,12 @@ class WikiPage < ApplicationRecord
   validates :body, presence: { unless: -> { parent.present? } }
   validates :title, length: { minimum: 1, maximum: 100 }
   validates :body, length: { maximum: FemboyFans.config.wiki_page_max_size }
+  validates :protection_level, inclusion: { in: User::Levels.hash.values }, if: -> { protection_level.present? }
   validate :validate_name_not_restricted, on: :create
   validate :user_not_limited
   validate :validate_rename
   validate :validate_redirect
-  validate :validate_not_locked
+  validate :validate_not_restricted
 
   after_save :log_save
   after_save :update_help_page, if: :saved_change_to_title?
@@ -39,8 +41,8 @@ class WikiPage < ApplicationRecord
 
   module LogMethods
     def log_save
-      if saved_change_to_is_locked?
-        ModAction.log!(is_locked? ? :wiki_page_lock : :wiki_page_unlock, self, wiki_page_title: title)
+      if saved_change_to_protection_level?
+        ModAction.log!(protection_level.blank? ? :wiki_page_unprotect : :wiki_page_protect, self, wiki_page_title: title, protection_level: protection_level)
       end
     end
 
@@ -78,9 +80,8 @@ class WikiPage < ApplicationRecord
       q = q.attribute_matches(:body, params[:body_matches])
       q = q.attribute_matches(:title, params[:title_matches])
       q = q.where_user(:creator_id, :creator, params)
-      q = q.attribute_matches(:is_locked, params[:is_locked])
+      q = q.attribute_matches(:protection_level, params[:protection_level])
       q = q.attribute_matches(:parent, params[:parent].try(:tr, " ", "_"))
-      q = q.attribute_matches(:is_locked, params[:is_locked])
 
       case params[:order]
       when "title"
@@ -114,13 +115,20 @@ class WikiPage < ApplicationRecord
     end
   end
 
+  module RestrictionMethods
+    def is_restricted?(user = CurrentUser.user)
+      protection_level.present? && protection_level > user.level
+    end
+  end
+
   include ApiMethods
   include HelpPageMethods
   include LogMethods
+  include RestrictionMethods
   extend SearchMethods
 
   def user_not_limited
-    allowed = CurrentUser.can_wiki_edit_with_reason
+    allowed = CurrentUser.user.can_wiki_edit_with_reason
     if allowed != true
       errors.add(:base, "User #{User.throttle_reason(allowed)}.")
       false
@@ -128,9 +136,9 @@ class WikiPage < ApplicationRecord
     true
   end
 
-  def validate_not_locked
-    if is_locked? && !CurrentUser.is_janitor?
-      errors.add(:is_locked, "and cannot be updated")
+  def validate_not_restricted
+    if is_restricted?
+      errors.add(:base, "Is protected and cannot be updated")
       false
     end
   end
@@ -160,9 +168,9 @@ class WikiPage < ApplicationRecord
     end
   end
 
-  def ensure_internal_locked
+  def ensure_internal_protected
     if INTERNAL_PREFIXES.any? { |prefix| title.starts_with?(prefix) }
-      self.is_locked = true
+      self.protection_level = User::Levels.min_staff_level
     end
   end
 
@@ -186,7 +194,6 @@ class WikiPage < ApplicationRecord
     self.title = version.title
     self.body = version.body
     self.parent = version.parent
-    self.parent = version.parent
   end
 
   def revert_to!(version)
@@ -205,6 +212,10 @@ class WikiPage < ApplicationRecord
   def normalize_parent
     self.parent = nil if parent == ""
     set_parent_props
+  end
+
+  def normalize_protection_level
+    self.protection_level = nil if protection_level.present? && protection_level <= User::Levels::MEMBER
   end
 
   def set_parent_props
@@ -236,18 +247,18 @@ class WikiPage < ApplicationRecord
   end
 
   def wiki_page_changed?
-    saved_change_to_title? || saved_change_to_body? || saved_change_to_is_locked? || saved_change_to_parent?
+    saved_change_to_title? || saved_change_to_body? || saved_change_to_protection_level? || saved_change_to_parent?
   end
 
   def create_new_version
     versions.create(
-      updater_id:      CurrentUser.user.id,
-      updater_ip_addr: CurrentUser.ip_addr,
-      title:           title,
-      body:            body,
-      is_locked:       is_locked,
-      parent:          parent,
-      reason:          edit_reason,
+      updater_id:       CurrentUser.user.id,
+      updater_ip_addr:  CurrentUser.ip_addr,
+      title:            title,
+      body:             body,
+      protection_level: protection_level,
+      parent:           parent,
+      reason:           edit_reason,
     )
   end
 

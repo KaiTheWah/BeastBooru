@@ -14,6 +14,7 @@ class WikiPagesController < ApplicationController
       redirect_to(wiki_page_path(@wiki_page))
     end
     @wiki_pages = WikiPage.search(search_params(WikiPage)).paginate(params[:page], limit: params[:limit])
+    # TODO: remove the below behavior
     respond_with(@wiki_pages) do |format|
       format.html do
         if params[:page].nil? || params[:page].to_i == 1
@@ -66,7 +67,6 @@ class WikiPagesController < ApplicationController
       end
     end
     authorize(@wiki_page)
-    ensure_can_edit(@wiki_page, CurrentUser.user)
     respond_with(@wiki_page)
   end
 
@@ -82,7 +82,6 @@ class WikiPagesController < ApplicationController
 
   def update
     @wiki_page = authorize(WikiPage.find(params[:id]))
-    ensure_can_edit(@wiki_page, CurrentUser.user)
     @wiki_page.update(permitted_attributes(@wiki_page))
     respond_with(@wiki_page)
   end
@@ -96,7 +95,6 @@ class WikiPagesController < ApplicationController
 
   def revert
     @wiki_page = authorize(WikiPage.find(params[:id]))
-    ensure_can_edit(@wiki_page, CurrentUser.user)
     @version = @wiki_page.versions.find(params[:version_id])
     @wiki_page.revert_to!(@version)
     notice("Page was reverted")
@@ -111,12 +109,5 @@ class WikiPagesController < ApplicationController
       @wiki_page = WikiPage.new(title: params[:title])
       respond_with(@wiki_page)
     end
-  end
-
-  private
-
-  def ensure_can_edit(page, user)
-    return if user.is_janitor?
-    raise(User::PrivilegeError, "Wiki page is locked.") if page.is_locked?
   end
 end

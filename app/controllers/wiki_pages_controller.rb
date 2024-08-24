@@ -14,22 +14,7 @@ class WikiPagesController < ApplicationController
       redirect_to(wiki_page_path(@wiki_page))
     end
     @wiki_pages = WikiPage.search(search_params(WikiPage)).paginate(params[:page], limit: params[:limit])
-    # TODO: remove the below behavior
-    respond_with(@wiki_pages) do |format|
-      format.html do
-        if params[:page].nil? || params[:page].to_i == 1
-          if @wiki_pages.length == 1
-            redirect_to(wiki_page_path(@wiki_pages.first))
-          elsif @wiki_pages.empty? && params[:search][:title].present? && params[:search][:title] !~ /\*/
-            redirect_to(wiki_pages_path(search: { title: "*#{params[:search][:title]}*" }))
-          end
-        end
-      end
-      format.json do
-        render(json: @wiki_pages.to_json)
-        expires_in(params[:expiry].to_i.days) if params[:expiry]
-      end
-    end
+    respond_with(@wiki_pages)
   end
 
   def show

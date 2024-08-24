@@ -25,16 +25,6 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "list all wiki_pages (with search)" do
-        get wiki_pages_path, params: { search: { title: "abc" } }
-        assert_redirected_to(wiki_page_path(@wiki_page_abc))
-      end
-
-      should "list wiki_pages without tags with order=post_count" do
-        get wiki_pages_path, params: { search: { title: "abc", order: "post_count" } }
-        assert_redirected_to(wiki_page_path(@wiki_page_abc))
-      end
-
       should "restrict access" do
         assert_access(User::Levels::ANONYMOUS) { |user| get_auth wiki_pages_path, user }
       end

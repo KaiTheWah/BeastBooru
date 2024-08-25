@@ -10,4 +10,9 @@ module TagsHelper
     end
     html
   end
+
+  def tag_class(tag)
+    return nil if tag.blank?
+    "tag-type-#{tag.category}"
+  end
 end

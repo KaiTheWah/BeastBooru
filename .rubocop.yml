@@ -205,3 +205,6 @@ Lint/StructNewOverride:
   Enabled: true
   Exclude:
     - app/logical/moderator/dashboard/queries/*.rb
+
+Style/RedundantAssignment:
+  Enabled: false

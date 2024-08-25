@@ -144,6 +144,12 @@ class Tag < ApplicationRecord
                         is_locked: is_locked?,
                         reason:    reason || "")
     end
+
+    TagCategory.categories.map(&:name).each do |category|
+      define_method("#{category}?") do
+        self.category == TagCategory.value_for(category)
+      end
+    end
   end
 
   module NameMethods
@@ -406,5 +412,9 @@ class Tag < ApplicationRecord
 
   def serializable_hash(*)
     super.merge(related_tags: related_tag_array.map { |r| { tag: r[0], count: r[1].to_i } })
+  end
+
+  def empty?
+    post_count <= 0
   end
 end

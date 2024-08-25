@@ -79,6 +79,21 @@ class WikiPageTest < ActiveSupport::TestCase
         version = WikiPageVersion.last
         assert_not_equal(@wiki_page.creator_id, version.updater_id)
       end
+
+      should "update its dtext links" do
+        @wiki_page.update!(body: "[[long hair]]")
+        assert_equal(1, @wiki_page.dtext_links.size)
+        assert_equal("wiki_link", @wiki_page.dtext_links.first.link_type)
+        assert_equal("long_hair", @wiki_page.dtext_links.first.link_target)
+
+        @wiki_page.update!(body: "https://www.google.com")
+        assert_equal(1, @wiki_page.dtext_links.size)
+        assert_equal("external_link", @wiki_page.dtext_links.first.link_type)
+        assert_equal("https://www.google.com", @wiki_page.dtext_links.first.link_target)
+
+        @wiki_page.update!(body: "nothing")
+        assert_equal(0, @wiki_page.dtext_links.size)
+      end
     end
 
     context "for a help page" do

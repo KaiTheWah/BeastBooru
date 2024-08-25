@@ -38,7 +38,7 @@ module ApplicationHelper
   end
 
   def dtext_ragel(text, **)
-    parsed = DText.parse(text, **)
+    parsed = DTextHelper.parse(text, **)
     return raw("") if parsed.nil?
     deferred_post_ids.merge(parsed[:post_ids]) if parsed[:post_ids].present?
     raw(parsed[:dtext])

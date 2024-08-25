@@ -449,6 +449,7 @@ class ApplicationRecord < ActiveRecord::Base
     @warnings ||= ActiveModel::Errors.new(self)
   end
 
+  include HasDtextLinks
   include ApiMethods
 
   def self.override_route_key(value)

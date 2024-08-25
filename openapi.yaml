@@ -813,6 +813,40 @@ components:
           type: string
         file_url:
           type: string
+    DTextLink:
+      type: object
+      required:
+        - id
+        - model_type
+        - model_id
+        - link_type
+        - link_target
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: number
+        model_type:
+          type: string
+          enum:
+            - ForumPost
+            - Pool
+            - WikiPage
+        model_id:
+          type: number
+        link_type:
+          type: string
+          enum:
+            - wiki_link
+            - external_link
+        link_target:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     DTextResponse:
       type: object
       required:
@@ -5296,6 +5330,66 @@ paths:
           $ref: "#/components/responses/AccessDenied"
         404:
           $ref: "#/components/responses/NotFound"
+  # DText Links
+  /dtext_links.json:
+    get:
+      summary: Search DText Links
+      tags:
+        - DText
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/id"
+        - name: search[order]
+          in: query
+          schema:
+            type: string
+            enum:
+              - id_asc
+              - id_desc
+        - in: query
+          name: search[link_type]
+          schema:
+            type: string
+        - in: query
+          name: search[link_target]
+          schema:
+            type: string
+        - in: query
+          name: search[model_type]
+          schema:
+            type: string
+            enum:
+              - ForumPost
+              - Pool
+              - WikiPage
+        - in: query
+          name: search[model_id]
+          schema:
+            type: number
+        - in: query
+          name: search[has_linked_wiki]
+          schema:
+            type: boolean
+        - in: query
+          name: search[has_linked_tag]
+          schema:
+            type: boolean
+        - in: query
+          name: search[wiki_page_title]
+          schema:
+            type: string
+        - in: query
+          name: search[tag_name]
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DTextLink"
   # DText Preview
   /dtext_preview.json:
     post:
@@ -12690,8 +12784,6 @@ paths:
               properties:
                 body:
                   type: string
-                skip_post_count_rename_check:
-                  type: boolean
                 edit_reason:
                   type: string
                 parent:

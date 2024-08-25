@@ -4,6 +4,14 @@ class WikiPage < ApplicationRecord
   class RevertError < StandardError; end
 
   INTERNAL_PREFIXES = %w[internal: help:].freeze
+  META_PREFIXES = %w[internal: help: howto: tag_group:].freeze
+
+  belongs_to_creator
+  belongs_to_updater
+  has_one :help_page
+  has_one :tag, foreign_key: "name", primary_key: "title"
+  has_one :artist, foreign_key: "name", primary_key: "title"
+  has_many :versions, -> { order("wiki_page_versions.id ASC") }, class_name: "WikiPageVersion", dependent: :destroy
 
   after_initialize :set_parent_props
   before_validation :normalize_title, unless: :destroyed?
@@ -30,14 +38,9 @@ class WikiPage < ApplicationRecord
   after_save :log_save
   after_save :update_help_page, if: :saved_change_to_title?
 
-  attr_accessor :skip_post_count_rename_check, :edit_reason, :parent_name, :parent_anchor
+  attr_accessor :edit_reason, :parent_name, :parent_anchor
 
-  belongs_to_creator
-  belongs_to_updater
-  has_one :help_page
-  has_one :tag, foreign_key: "name", primary_key: "title"
-  has_one :artist, foreign_key: "name", primary_key: "title"
-  has_many :versions, -> { order("wiki_page_versions.id ASC") }, class_name: "WikiPageVersion", dependent: :destroy
+  has_dtext_links :body
 
   module LogMethods
     def log_save
@@ -82,6 +85,14 @@ class WikiPage < ApplicationRecord
       q = q.where_user(:creator_id, :creator, params)
       q = q.attribute_matches(:protection_level, params[:protection_level])
       q = q.attribute_matches(:parent, params[:parent].try(:tr, " ", "_"))
+
+      if params[:linked_to].present?
+        q = q.linked_to(params[:linked_to])
+      end
+
+      if params[:not_linked_to].present?
+        q = q.not_linked_to(params[:not_linked_to])
+      end
 
       case params[:order]
       when "title"
@@ -149,11 +160,16 @@ class WikiPage < ApplicationRecord
       errors.add(:title, "is used as a help page and cannot be changed")
       return
     end
-    return if skip_post_count_rename_check
 
     tag_was = Tag.find_by(name: Tag.normalize_name(title_was))
-    if tag_was.present? && tag_was.post_count > 0
-      errors.add(:title, "cannot be changed: '#{tag_was.name}' still has #{tag_was.post_count} posts. Move the posts and update any wikis linking to this page first.")
+    if tag_was.present? && !tag_was.empty?
+      warnings.add(:base, %(Warning: {{#{title_was}}} still has #{tag_was.post_count} #{'post'.pluralize(tag_was.post_count)}. Be sure to move the posts))
+    end
+
+    broken_wikis = WikiPage.linked_to(title_was)
+    if broken_wikis.count > 0
+      broken_wiki_search = Routes.wiki_pages_path(search: { linked_to: title_was })
+      warnings.add(:base, %(Warning: [[#{title_was}]] is still linked from "#{broken_wikis.count} #{'other wiki page'.pluralize(broken_wikis.count)}":[#{broken_wiki_search}]. Update #{broken_wikis.count > 1 ? 'these wikis' : 'this wiki'} to link to [[#{title}]] instead))
     end
   end
 
@@ -202,7 +218,12 @@ class WikiPage < ApplicationRecord
   end
 
   def normalize_title
-    self.title = title.downcase.tr(" ", "_")
+    self.title = WikiPage.normalize_title(title)
+  end
+
+  def self.normalize_title(title)
+    return "" if title.blank?
+    title.downcase.tr(" ", "_")
   end
 
   def self.normalize_other_name(name)
@@ -284,5 +305,13 @@ class WikiPage < ApplicationRecord
 
   def visible?
     true
+  end
+
+  def self.is_meta_wiki?(title)
+    title.present? && META_PREFIXES.any? { |prefix| title.starts_with?(prefix) }
+  end
+
+  def is_meta_wiki?
+    WikiPage.is_meta_wiki?(title)
   end
 end

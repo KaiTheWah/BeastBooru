@@ -175,7 +175,7 @@ class TagSetPresenter < Presenter
 
   def tag_link(tag, link_text = tag.name, link_type = :tag)
     link = link_type == :wiki_page ? show_or_new_wiki_pages_path(title: tag.name) : posts_path(tags: tag.name)
-    itemprop = 'itemprop="author"' if tag.category == TagCategory.artist
+    itemprop = 'itemprop="author"' if tag.artist?
     %(<a rel="nofollow" class="search-tag" #{itemprop} href="#{link}">#{h(link_text)}</a> )
   end
 end

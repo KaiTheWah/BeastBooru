@@ -198,7 +198,7 @@ class TagAlias < TagRelationship
   end
 
   def rename_artist_undo
-    if consequent_tag.category == TagCategory.artist && (consequent_tag.artist.present? && antecedent_tag.artist.blank?)
+    if consequent_tag.artist? && (consequent_tag.artist.present? && antecedent_tag.artist.blank?)
       consequent_tag.artist.update!(name: antecedent_name)
     end
   end
@@ -277,8 +277,8 @@ class TagAlias < TagRelationship
   def ensure_category_consistency
     return if consequent_tag.post_count > FemboyFans.config.alias_category_change_cutoff # Don't change category of large established tags.
     return if consequent_tag.is_locked? # Prevent accidentally changing tag type if category locked.
-    return if consequent_tag.category != TagCategory.general # Don't change the already existing category of the target tag
-    return if antecedent_tag.category == TagCategory.general # Don't set the target tag to general
+    return unless consequent_tag.general? # Don't change the already existing category of the target tag
+    return if antecedent_tag.general? # Don't set the target tag to general
 
     consequent_tag.update(category: antecedent_tag.category, reason: "alias ##{id} (#{antecedent_tag.name} -> #{consequent_tag.name})")
   end
@@ -314,7 +314,7 @@ class TagAlias < TagRelationship
   end
 
   def rename_artist
-    if antecedent_tag.category == TagCategory.artist && (antecedent_tag.artist.present? && consequent_tag.artist.blank?)
+    if antecedent_tag.artist? && (antecedent_tag.artist.present? && consequent_tag.artist.blank?)
       antecedent_tag.artist.update!(name: consequent_name)
     end
   end

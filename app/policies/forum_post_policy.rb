@@ -54,6 +54,6 @@ class ForumPostPolicy < ApplicationPolicy
   end
 
   def permitted_search_params
-    super + %i[creator_id creator_name topic_id topic_title_matches body_matches topic_category_id is_hidden]
+    super + %i[creator_id creator_name topic_id topic_title_matches body_matches topic_category_id is_hidden linked_to not_linked_to]
   end
 end

@@ -43,6 +43,8 @@ class ForumPost < ApplicationRecord
 
   attr_accessor :bypass_limits
 
+  has_dtext_links :body
+
   module ApiMethods
     def hidden_attributes
       super + %i[notified_mentions]
@@ -70,6 +72,10 @@ class ForumPost < ApplicationRecord
       active(user).permitted(user)
     end
 
+    def not_visible(user)
+      where.not(id: visible(user))
+    end
+
     def permitted(user)
       q = joins(topic: :category).where("forum_categories.can_view <= ?", user.level)
       q = q.joins(:topic).where("forum_topics.is_hidden = FALSE OR forum_topics.creator_id = ?", user.id) unless user.is_moderator?
@@ -86,7 +92,7 @@ class ForumPost < ApplicationRecord
       q = q.where_user(:creator_id, :creator, params)
 
       if params[:topic_id].present?
-        q = q.where("forum_posts.topic_id = ?", params[:topic_id].to_i)
+        q = q.where("forum_posts.topic_id": params[:topic_id])
       end
 
       if params[:topic_title_matches].present?
@@ -96,7 +102,15 @@ class ForumPost < ApplicationRecord
       q = q.attribute_matches(:body, params[:body_matches])
 
       if params[:topic_category_id].present?
-        q = q.joins(:topic).where("forum_topics.category_id = ?", params[:topic_category_id].to_i)
+        q = q.joins(:topic).where("forum_topics.category_id": params[:topic_category_id])
+      end
+
+      if params[:linked_to].present?
+        q = q.linked_to(params[:linked_to])
+      end
+
+      if params[:not_linked_to].present?
+        q = q.not_linked_to(params[:not_linked_to])
       end
 
       q = q.attribute_matches(:is_hidden, params[:is_hidden])

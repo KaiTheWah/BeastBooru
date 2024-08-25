@@ -26,6 +26,8 @@ class Pool < ApplicationRecord
 
   attr_accessor :skip_sync
 
+  has_dtext_links :description
+
   def limited_attribute_changed?
     name_changed? || description_changed? || is_active_changed?
   end
@@ -65,6 +67,14 @@ class Pool < ApplicationRecord
       q = q.attribute_matches(:description, params[:description_matches])
       q = q.where_user(:creator_id, :creator, params)
       q = q.attribute_matches(:is_active, params[:is_active])
+
+      if params[:linked_to].present?
+        q = q.linked_to(params[:linked_to])
+      end
+
+      if params[:not_linked_to].present?
+        q = q.not_linked_to(params[:not_linked_to])
+      end
 
       case params[:order]
       when "name"

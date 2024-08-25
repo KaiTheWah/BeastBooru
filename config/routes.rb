@@ -143,6 +143,7 @@ Rails.application.routes.draw do
       put :mark_all_as_read
     end
   end
+  resources :dtext_links, only:  %i[index]
   resource :dtext_preview, only: %i[create]
   resources :favorites, only: %i[index create destroy] do
     collection do

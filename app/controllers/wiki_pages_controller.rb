@@ -68,6 +68,7 @@ class WikiPagesController < ApplicationController
   def update
     @wiki_page = authorize(WikiPage.find(params[:id]))
     @wiki_page.update(permitted_attributes(@wiki_page))
+    flash[:notice] = @wiki_page.warnings.full_messages.join(".\n \n") if @wiki_page.warnings.any?
     respond_with(@wiki_page)
   end
 

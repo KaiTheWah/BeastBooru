@@ -1,0 +1,46 @@
+<h1>DText Links</h1>
+
+<%= render "search" %>
+
+<table class="striped">
+  <thead>
+  <tr>
+    <th>Page</th>
+    <th>Link</th>
+    <th>Type</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @dtext_links.each do |dtext_link| %>
+    <tr>
+      <td>
+        <% if dtext_link.model_type == "WikiPage" %>
+          <%= link_to(dtext_link.model.title, dtext_link.model) %>
+          <%= link_to("»", dtext_links_path(search: { model_type: "WikiPage", wiki_page_title: dtext_link.model.title })) %>
+        <% else %>
+        <%= link_to("#{dtext_link.model.model_name.singular.tr('_', ' ')} ##{dtext_link.model_id}", dtext_link.model) %>
+        <% end %>
+      </td>
+      <td>
+        <% if dtext_link.external_link? %>
+          <%= external_link_to(dtext_link.link_target) %>
+        <% elsif dtext_link.wiki_link? %>
+          <%= link_to_wiki dtext_link.link_target, class: tag_class(dtext_link.linked_wiki&.tag) %>
+        <% end %>
+
+        <%= link_to("»", dtext_links_path(search: { link_target: dtext_link.link_target })) %>
+      </td>
+      <td>
+        <%= dtext_link.link_type.delete_suffix("_link").capitalize %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<% content_for(:page_title) do %>
+  DText Links
+<% end %>
+
+<%= numbered_paginator(@dtext_links) %>

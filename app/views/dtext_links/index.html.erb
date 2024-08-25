@@ -26,7 +26,7 @@
         <% if dtext_link.external_link? %>
           <%= external_link_to(dtext_link.link_target) %>
         <% elsif dtext_link.wiki_link? %>
-          <%= link_to_wiki dtext_link.link_target, class: tag_class(dtext_link.linked_wiki&.tag) %>
+          <%= link_to_wiki_or_new(dtext_link.link_target, class: tag_class(dtext_link.linked_wiki&.tag)) %>
         <% end %>
 
         <%= link_to("»", dtext_links_path(search: { link_target: dtext_link.link_target })) %>

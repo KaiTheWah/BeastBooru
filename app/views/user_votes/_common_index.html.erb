@@ -16,50 +16,34 @@
   <%= f.input(:order, collection: [%w[Created id], ["IP Address", "ip_addr"]]) %>
 <% end %>
 
-<table class="striped" id="votes">
-  <thead>
-  <tr>
-    <th>ID</th>
-    <% if type == CommentVote %>
-      <th>Post</th>
-    <% end %>
-    <th><%= type.model_type.to_s.titlecase %></th>
-    <th><%= type.model_type.to_s.titlecase %> Creator</th>
-    <th>Voter</th>
-    <% if policy(type).can_see_email? %>
-      <th>Email</th>
-    <% end %>
-    <th>Signed Up</th>
-    <th>Vote</th>
-    <th>Created</th>
-    <% if policy(type).can_see_ip_addr? %>
-      <th>IP</th>
-    <% end %>
-  </tr>
-  </thead>
-  <tbody>
-  <% votes.each do |vote| %>
-    <tr id="r<%= vote.id %>">
-      <td><%= vote.id %></td>
-      <% if type == CommentVote %>
-        <td><%= link_to vote.post.id, post_path(vote.post) %></td>
-      <% end %>
-      <td><%= link_to vote.send("#{type.model_type}_id"), vote.send(type.model_type) %></td>
-      <td><%= link_to_user vote.send(type.model_type).send(type.model_creator_column) %></td>
-      <td><%= link_to_user vote.user %></td>
-      <% if policy(vote).can_see_email? %>
-        <td><%= vote.user.email %></td>
-      <% end %>
-      <td><%= time_ago_in_words_tagged(vote.user.created_at) %></td>
-      <td><%= vote.vote_display.html_safe %></td>
-      <td><%= time_ago_in_words_tagged(vote.created_at) %></td>
-      <% if policy(vote).can_see_ip_addr? %>
-        <td><%= link_to_ip vote.user_ip_addr%></td>
-      <% end %>
-    </tr>
+<%= table_for(votes, id: "votes-table") do |t| %>
+  <% t.column(:id, name: "ID") %>
+  <% t.column("Post", if: type == CommentVote) do |vote| %>
+    <%= link_to(vote.post.id, post_path(vote.post)) %>
   <% end %>
-  </tbody>
-</table>
+  <% t.column("#{type.model_type.to_s.titlecase} ID") do |vote| %>
+    <%= link_to(vote.send("#{type.model_type}_id"), vote.send(type.model_type)) %>
+  <% end %>
+  <% t.column("#{type.model_type.to_s.titlecase} Creator") do |vote| %>
+    <%= link_to_user(vote.send(type.model_type).send(type.model_creator_column)) %>
+  <% end %>
+  <% t.column("Voter") do |vote| %>
+    <%= link_to_user(vote.user) %>
+    <% if policy(vote).can_see_ip_addr? %>
+      (<%= link_to_ip(vote.user_ip_addr) %>)
+    <% end %>
+    <p><%= time_ago_in_words_tagged(vote.created_at) %></p>
+  <% end %>
+  <% t.column("Email", if: policy(type).can_see_email?) do |vote| %>
+    <%= vote.user.email %> <%= email_domain_search(vote.user.email) %>
+  <% end %>
+  <% t.column("Signed Up") do |vote| %>
+    <%= time_ago_in_words_tagged(vote.user.created_at) %>
+  <% end %>
+  <% t.column("Vote") do |vote| %>
+    <%= vote.vote_display.html_safe %>
+  <% end %>
+<% end %>
 
 <% if (deletable || lockable) && policy(type).manage? %>
   <br>

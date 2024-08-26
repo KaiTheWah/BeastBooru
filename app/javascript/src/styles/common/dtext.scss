@@ -151,3 +151,9 @@ div.post-thumbnail.dtext {
   position: relative;
   display: inline-block;
 }
+
+// TODO: change dtext_rb tn class to small-notice
+.tn, .small-notice {
+  font-size: 0.8em;
+  color: themed("color-text-muted");
+}

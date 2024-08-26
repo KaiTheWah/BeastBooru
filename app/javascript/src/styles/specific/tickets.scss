@@ -21,19 +21,21 @@
       }
     }
   }
-}
 
-.approved-ticket {
-  color: palette("text-green");
-  font-weight: bold;
-}
+  #tickets-table {
+    tr[data-status="approved"] .status-column {
+      color: palette("text-green");
+      font-weight: bold;
+    }
 
-.rejected-ticket {
-  color: palette("text-red");
-  font-weight: bold;
-}
+    tr[data-status="rejected"] .status-column {
+      color: palette("text-red");
+      font-weight: bold;
+    }
 
-.partial-ticket {
-  color: palette("text-yellow");
-  font-weight: bold;
+    tr[data-status="partial"] .status-column {
+      color: palette("text-yellow");
+      font-weight: bold;
+    }
+  }
 }

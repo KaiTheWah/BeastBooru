@@ -17,6 +17,7 @@ class AvoidPostingsController < ApplicationController
 
   def new
     @avoid_posting = authorize(AvoidPosting.new(permitted_attributes(AvoidPosting)))
+    @avoid_posting.artist = Artist.new(permitted_attributes(AvoidPosting)[:artist_attributes])
     respond_with(@artist)
   end
 

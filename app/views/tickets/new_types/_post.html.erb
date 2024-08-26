@@ -1,3 +1,1 @@
-<% @post = @ticket.model %>
-You are reporting <%= PostPresenter.preview(@post, show_deleted: true, no_blacklist: true) %>
-
+You are reporting <%= PostPresenter.preview(@ticket.model, show_deleted: true, no_blacklist: true) %>

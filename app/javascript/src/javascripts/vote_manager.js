@@ -10,7 +10,7 @@ class VoteManager {
   init () {
     const self = this;
     self.lastSelected = 0;
-    $("#votes").on("click", "tbody tr", function (evt) {
+    $("#votes-table").on("click", "tbody tr", function (evt) {
       if ($(evt.target).is("a")) return;
       evt.preventDefault();
       if (evt.shiftKey) {
@@ -27,21 +27,21 @@ class VoteManager {
   selectAll () {
     this.allSelected = !this.allSelected;
     if (this.allSelected)
-      $("#votes").find("tr").addClass("selected");
+      $("#votes-table").find("tr").addClass("selected");
     else
-      $("#votes").find("tr").removeClass("selected");
+      $("#votes-table").find("tr").removeClass("selected");
   }
 
   toggleRowsBetween (indices) {
     this.lastSelected = indices[1];
-    let rows = $("#votes").find("tr");
+    let rows = $("#votes-table").find("tr");
     indices = indices.sort();
     rows = rows.slice(indices[0], indices[1]);
     rows.toggleClass("selected");
   }
 
   selectedVotes () {
-    return $("#votes>tbody>tr.selected").map(function () {
+    return $("#votes-table>tbody>tr.selected").map(function () {
       return $(this).attr("id").substr(1);
     }).get();
   }

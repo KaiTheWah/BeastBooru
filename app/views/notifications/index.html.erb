@@ -2,33 +2,23 @@
 
 <%= render "search" %>
 
-<table class="striped" id="notification-list">
-  <thead>
-    <tr>
-      <th width="2%"></th>
-      <th width="10%">Created At</th>
-      <th>Notification</th>
-      <th width="10%"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @notifications.each do |notification| %>
-      <tr data-id="<%= notification.id %>">
-        <td>
-          <% unless notification.is_read? %>
-            <span class="new">NEW</span>
-          <% end %>
-        </td>
-        <td class="notification-date"><%= compact_time(notification.created_at) %></td>
-        <td class="notification-content"><%= format_text(notification.message, max_thumbs: 0) %></td>
-        <td>
-          <%= link_to("View", notification_path(notification)) %> |
-          <%= link_to("Delete", notification_path(notification), method: :delete) %>
-        </td>
-      </tr>
+<%= table_for(@notifications, class: "striped autofit") do |t| %>
+  <% t.column do |notification| %>
+    <% unless notification.is_read? %>
+      <span class="new">NEW</span>
     <% end %>
-  </tbody>
-</table>
+  <% end %>
+  <% t.column("Created At") do |notification| %>
+    <%= compact_time(notification.created_at) %>
+  <% end %>
+  <% t.column("Notification") do |notification| %>
+    <%= format_text(notification.message, max_thumbs: 0) %>
+  <% end %>
+  <% t.column do |notification| %>
+    <%= link_to("View", notification_path(notification)) %> |
+    <%= link_to("Delete", notification_path(notification), method: :delete) %>
+  <% end %>
+<% end %>
 
 <%= numbered_paginator(@notifications) %>
 

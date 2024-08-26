@@ -49,4 +49,8 @@ class TicketPolicy < ApplicationPolicy
     params += %i[accused_name accused_id claimant_id claimant_name reason] if user.is_moderator?
     params
   end
+
+  def html_data_attributes
+    super + %i[status]
+  end
 end

@@ -2,8 +2,8 @@
 
 <section>
   <%= form_tag(meta_search_tags_path, method: :get) do %>
-    <%= text_field_tag "name", params[:name], data: { autocomplete: "tag" } %>
-    <%= submit_tag "Go" %>
+    <%= text_field_tag("name", params[:name], data: { autocomplete: "tag" }) %>
+    <%= submit_tag("Go") %>
   <% end %>
 </section>
 
@@ -13,29 +13,15 @@
   <% if @meta_search.tags.blank? %>
     <p>No results</p>
   <% else %>
-    <table class="striped">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Count</th>
-          <th></th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <% @meta_search.tags.each do |tag| %>
-          <tr>
-            <td><%= tag.name %></td>
-            <td><%= tag.post_count %></td>
-            <td>
-              <% if tag.category_editable_by?(CurrentUser.user) %>
-                <%= link_to "edit", edit_tag_path(tag) %>
-              <% end %>
-            </td>
-          </tr>
+    <%= table_for(@meta_search.tags) do |t| %>
+      <% t.column(:name) %>
+      <% t.column(:post_count, name: "Count") %>
+      <% t.column do |tag| %>
+        <% if tag.category_editable_by?(CurrentUser.user) %>
+          <%= link_to("edit", edit_tag_path(tag)) %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+    <% end %>
   <% end %>
 </section>
 

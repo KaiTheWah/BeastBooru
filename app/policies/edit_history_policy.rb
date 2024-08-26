@@ -14,4 +14,8 @@ class EditHistoryPolicy < ApplicationPolicy
     params += %i[ip_addr] if can_search_ip_addr?
     params
   end
+
+  def html_data_attributes
+    super + %i[edit_type is_contentful?]
+  end
 end

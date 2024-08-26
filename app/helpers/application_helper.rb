@@ -151,18 +151,29 @@ module ApplicationHelper
       data:  {
         controller: controller_param,
         action:     action_param,
-        **data_attributes_for(user, "user", attributes),
+        **data_attributes_for(user, attributes, prefix: "user"),
       },
     }
   end
 
-  def data_attributes_for(record, prefix, attributes)
-    attributes.to_h do |attr|
-      name = attr.to_s.dasherize.delete("?")
-      value = record.send(attr)
-
-      [:"#{prefix}-#{name}", value]
-    end
+  def data_attributes_for(record, attributes = record.html_data_attributes, prefix: "data")
+    attributes.flat_map do |attr|
+      # If we have a hash, we assume this hash is a key-value of (relation, attributes)
+      # [:is_read?, { category: %i[id name] }]
+      if attr.is_a?(Hash)
+        attr.flat_map do |key, sub_attrs|
+          data_attributes_for(record.send(key), sub_attrs, prefix: "#{prefix}-#{key}").to_a
+        end
+      else
+        name = attr.to_s.dasherize.delete("?")
+        value = record.send(attr)
+        if value.is_a?(ApplicationRecord)
+          data_attributes_for(value, prefix: "#{prefix}-#{name}").to_a
+        else
+          [[:"#{prefix}-#{name}", value]]
+        end
+      end
+    end.to_h
   end
 
   def user_avatar(user)

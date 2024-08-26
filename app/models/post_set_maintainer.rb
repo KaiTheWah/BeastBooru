@@ -55,7 +55,7 @@ class PostSetMaintainer < ApplicationRecord
     save
     Dmail.create_automated(
       to_id:         post_set.creator_id,
-      title:         "#{user.name} approved your invite to maintain #{post_set.name}",
+      title:         "#{user.name} accepted your invite to maintain #{post_set.name}",
       body:          "\"#{user.name}\":/users/#{user_id} approved your invite to maintain \"#{post_set.name}\":/post_sets/#{post_set.id}.",
       respond_to_id: user.id,
     )
@@ -65,7 +65,7 @@ class PostSetMaintainer < ApplicationRecord
     if status == "pending"
       Dmail.create_automated(
         to_id:         post_set.creator_id,
-        title:         "#{user.name} denied your invite to maintain #{post_set.name}",
+        title:         "#{user.name} declined your invite to maintain #{post_set.name}",
         body:          "\"#{user.name}\":/users/#{user.id} denied your invite to maintain \"#{post_set.name}\":/post_sets/#{post_set.id}.",
         respond_to_id: user.id,
       )
@@ -110,7 +110,7 @@ class PostSetMaintainer < ApplicationRecord
 
     def ensure_maintainer_count
       if PostSetMaintainer.where(post_set_id: post_set_id).count >= 75
-        errors.add(:post_set, "current have too many maintainers")
+        errors.add(:post_set, "current has too many maintainers")
         false
       end
     end

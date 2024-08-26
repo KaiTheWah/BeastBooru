@@ -483,7 +483,7 @@ class User < ApplicationRecord
       max_updated_at > last_forum_read_at
     end
 
-    def has_viewed_thread?(id, last_updated)
+    def has_viewed_topic?(id, last_updated)
       @topic_views ||= forum_topic_visits.pluck(:forum_topic_id, :last_read_at).to_h
       @topic_views.key?(id) && @topic_views[id] >= last_updated
     end

@@ -2804,9 +2804,9 @@ components:
         - hidden_comments
         - deleted_comments
         - average_comments_per_day
-        - total_forum_threads
+        - total_forum_topics
         - total_forum_posts
-        - average_posts_per_thread
+        - average_posts_per_topic
         - average_forum_posts_per_day
         - total_tags
         - general_tags
@@ -2913,11 +2913,11 @@ components:
           type: number
         average_comments_per_day:
           type: number
-        total_forum_threads:
+        total_forum_topics:
           type: number
         total_forum_posts:
           type: number
-        average_posts_per_thread:
+        average_posts_per_topic:
           type: number
         average_forum_posts_per_day:
           type: number
@@ -9406,124 +9406,6 @@ paths:
                   $ref: "#/components/schemas/PostRecommendation"
         403:
           $ref: "#/components/responses/AccessDenied"
-  # Post Replacement Rejection Reasons
-  /posts/replacement_rejection_reasons.json:
-    get:
-      summary: List Post Replacement Rejection Reasons
-      tags:
-        - Post Replacement Rejection Reasons
-      security:
-        - basicAuth: []
-      description: You must have the "Approve Posts" permission.
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PostReplacementRejectionReason"
-    post:
-      summary: Create Post Replacement Rejection Reason
-      tags:
-        - Post Replacement Rejection Reasons
-      security:
-        - basicAuth: []
-      description: You must have the "Approve Posts" permission and be Admin+.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                reason:
-                  type: string
-                  description: The reason used when rejecting the replacement.
-                order:
-                  type: number
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PostReplacementRejectionReason"
-        403:
-          $ref: "#/components/responses/AccessDenied"
-        422:
-          $ref: "#/components/responses/ExpectedError"
-  /posts/replacement_rejection_reasons/{id}.json:
-    patch:
-      summary: Edit Post Replacement Rejection Reason
-      tags:
-        - Post Replacement Rejection Reasons
-      security:
-        - basicAuth: []
-      description: You must have the "Approve Posts" permission and be Admin+.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post replacement rejection reason.
-          schema:
-            type: number
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                reason:
-                  type: string
-                  description: The reason used when rejecting the replacement.
-      responses:
-        204:
-          description: Success
-        403:
-          $ref: "#/components/responses/AccessDenied"
-        404:
-          $ref: "#/components/responses/NotFound"
-        422:
-          $ref: "#/components/responses/ExpectedError"
-    delete:
-      summary: Delete Post Replacement Rejection Reason
-      tags:
-        - Post Replacement Rejection Reasons
-      security:
-        - basicAuth: []
-      description: You must have the "Approve Posts" permission and be Admin+.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post replacement rejection reason.
-          schema:
-            type: number
-      responses:
-        204:
-          description: Success
-        403:
-          $ref: "#/components/responses/AccessDenied"
-        404:
-          $ref: "#/components/responses/NotFound"
-  /posts/replacement_rejection_reasons/reorder.json:
-    post:
-      summary: Reorder Post Replacement Rejection Reasons
-      tags:
-        - Post Replacement Rejection Reasons
-      description: You must have the "Approve Posts" permission and be Admin+. No IDs can be omitted, no extra IDs can be present, and no duplicate IDs can be present.
-      security:
-        - basicAuth: []
-      requestBody:
-        $ref: "#/components/requestBodies/reorder"
-      responses:
-        204:
-          description: Success
-        400:
-          $ref: "#/components/responses/MessageError"
-        403:
-          $ref: "#/components/responses/AccessDenied"
   # Post Replacements
   /posts/replacements.json:
     get:
@@ -9754,6 +9636,124 @@ paths:
           $ref: "#/components/responses/NotFound"
         422:
           $ref: "#/components/responses/ExpectedError"
+  # Post Replacement Rejection Reasons
+  /posts/replacements/rejection_reasons.json:
+    get:
+      summary: List Post Replacement Rejection Reasons
+      tags:
+        - Post Replacement Rejection Reasons
+      security:
+        - basicAuth: []
+      description: You must have the "Approve Posts" permission.
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostReplacementRejectionReason"
+    post:
+      summary: Create Post Replacement Rejection Reason
+      tags:
+        - Post Replacement Rejection Reasons
+      security:
+        - basicAuth: []
+      description: You must have the "Approve Posts" permission and be Admin+.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: The reason used when rejecting the replacement.
+                order:
+                  type: number
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostReplacementRejectionReason"
+        403:
+          $ref: "#/components/responses/AccessDenied"
+        422:
+          $ref: "#/components/responses/ExpectedError"
+  /posts/replacements/rejection_reasons/{id}.json:
+    patch:
+      summary: Edit Post Replacement Rejection Reason
+      tags:
+        - Post Replacement Rejection Reasons
+      security:
+        - basicAuth: []
+      description: You must have the "Approve Posts" permission and be Admin+.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the post replacement rejection reason.
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: The reason used when rejecting the replacement.
+      responses:
+        204:
+          description: Success
+        403:
+          $ref: "#/components/responses/AccessDenied"
+        404:
+          $ref: "#/components/responses/NotFound"
+        422:
+          $ref: "#/components/responses/ExpectedError"
+    delete:
+      summary: Delete Post Replacement Rejection Reason
+      tags:
+        - Post Replacement Rejection Reasons
+      security:
+        - basicAuth: []
+      description: You must have the "Approve Posts" permission and be Admin+.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the post replacement rejection reason.
+          schema:
+            type: number
+      responses:
+        204:
+          description: Success
+        403:
+          $ref: "#/components/responses/AccessDenied"
+        404:
+          $ref: "#/components/responses/NotFound"
+  /posts/replacements/rejection_reasons/reorder.json:
+    post:
+      summary: Reorder Post Replacement Rejection Reasons
+      tags:
+        - Post Replacement Rejection Reasons
+      description: You must have the "Approve Posts" permission and be Admin+. No IDs can be omitted, no extra IDs can be present, and no duplicate IDs can be present.
+      security:
+        - basicAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/reorder"
+      responses:
+        204:
+          description: Success
+        400:
+          $ref: "#/components/responses/MessageError"
+        403:
+          $ref: "#/components/responses/AccessDenied"
   # Post Versions
   /posts/versions.json:
     get:

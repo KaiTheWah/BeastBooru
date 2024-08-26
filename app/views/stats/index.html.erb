@@ -1,15 +1,15 @@
 <p>Refreshed once a day.</p>
 <div class="stats-column">
-  <%= render "stats_table", header_title: "Site", data: [
+  <%= render(partial: "stats_table", locals: { header_title: "Site", data: [
       ["Started", compact_time(DateTime.parse(@stats["started"]))],
       ["Average registrations per day", "average_registrations_per_day"],
       ["Average posts per day", "average_posts_per_day"],
       ["Average comments per day", "average_comments_per_day"],
       ["Average forum posts per day", "average_forum_posts_per_day"],
     ]
-  %>
+  }) %>
 
-  <%= render "percentage_table", header_title: "Posts", data: [
+  <%= render(partial: "percentage_table", locals: { header_title: "Posts", data: [
       ["Total posts", "total_posts"],
       ["Active posts", "active_posts", "total_posts"],
       ["Deleted posts", "deleted_posts", "total_posts"],
@@ -26,11 +26,11 @@
       ["Private sets", "private_sets", "total_sets"],
       ["Average posts per set", "average_posts_per_set"],
     ]
-  %>
+  }) %>
 </div>
 
 <div class="stats-column">
-  <%= render "percentage_table", header_title: "Image files", data: [
+  <%= render(partial: "percentage_table", locals: { header_title: "Image files", data: [
       ["Total existing posts", "existing_posts"],
       ["JPG posts", "jpg_posts", "existing_posts"],
       ["PNG posts", "png_posts", "existing_posts"],
@@ -40,9 +40,9 @@
       ["Average file size", number_to_human_size(@stats["average_file_size"], precision: 3)],
       ["Total file size", number_to_human_size(@stats["total_file_size"], precision: 3)],
     ]
-  %>
+  }) %>
 
-  <%= render "percentage_table", header_title: "Users", data: [
+  <%= render(partial: "percentage_table", locals: { header_title: "Users", data: [
       ["User count", "total_users"],
       ["Unactivated users", "unactivated_users", "total_users"],
       ["Banned users", "banned_users", "total_users"],
@@ -55,26 +55,26 @@
       ["Owners", "owner_users", "total_users"],
       ["Dmails sent", "total_dmails"],
     ]
-  %>
+  }) %>
 </div>
 
 <div class="stats-column">
-  <%= render "percentage_table", header_title: "Comments", data: [
+  <%= render(partial: "percentage_table", locals: { header_title: "Comments", data: [
       ["Comment count", "total_comments"],
       ["Active comments", "active_comments", "total_comments"],
       ["Hidden comments", "hidden_comments", "total_comments"],
       ["Deleted comments", "deleted_comments", "total_comments"],
     ]
-  %>
+  }) %>
 
-  <%= render "stats_table", header_title: "Forum Posts", data: [
-      ["Thread count", "total_forum_threads"],
+  <%= render(partial: "stats_table", locals: { header_title: "Forum Posts", data: [
+      ["Topic count", "total_forum_topics"],
       ["Post count", "total_forum_posts"],
-      ["Average posts per thread", "average_posts_per_thread"],
+      ["Average posts per topic", "average_posts_per_topic"],
     ]
-  %>
+  }) %>
 
-  <%= render "percentage_table", header_title: "Tags", data: [
+  <%= render(partial: "percentage_table", locals: { header_title: "Tags", data: [
       ["Tag count", "total_tags"],
       ["General tag count", "general_tags", "total_tags"],
       ["Artist tag count", "artist_tags", "total_tags"],
@@ -87,7 +87,7 @@
       ["Lore tag count", "lore_tags", "total_tags"],
       ["Gender tag count", "gender_tags", "total_tags"],
     ]
-  %>
+  }) %>
 </div>
 
 <% content_for(:page_title) do %>

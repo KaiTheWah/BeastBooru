@@ -37,7 +37,7 @@ Notification.save_state = function () {
     return;
   }
   sessionStorage.setItem("notification_id", id);
-  $("body").attr("data-notification-id", id);
+  $("body").attr("data-id", id);
   params.delete("n");
   history.replaceState(null, "", Utility.set_query_params(window.location.href, params));
 };

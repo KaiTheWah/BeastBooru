@@ -1,5 +1,6 @@
 <h1>Post Deletion Reasons</h1>
 
+<%# TODO: convert to new table syntax %>
 <table class="striped" id="post-deletion-reasons-table">
   <thead>
   <tr>
@@ -29,10 +30,10 @@
       <td><%= reason.reason %></td>
       <% if policy(reason).all?(:update?, :destroy?, :reorder?) %>
         <td>
-          <%= link_to "Edit", edit_post_deletion_reason_path(reason) %> |
-          <%= link_to "Delete", post_deletion_reason_path(reason), method: :delete, data: { confirm: "Are you sure you want to delete this reason?" } %>
+          <%= link_to("Edit", edit_post_deletion_reason_path(reason)) %> |
+          <%= link_to("Delete", post_deletion_reason_path(reason), method: :delete, data: { confirm: "Are you sure you want to delete this reason?" }) %>
           <span class="add-spacing-link" style="display: none;">
-            | Add Spacing: <%= link_to "Above", "#", class: "link-add-spacing-above" %>/<%= link_to "Below", "#", class: "link-add-spacing-below"  %>
+            | Add Spacing: <%= link_to("Above", "#", class: "add-spacing-above-link") %>/<%= link_to("Below", "#", class: "add-spacing-below-link") %>
           </span>
         </td>
       <% end %>
@@ -49,64 +50,6 @@
 <% end %>
 
 <%= javascript_tag nonce: true do -%>
-  const spacing = $(`<%= render partial: "spacing" %>`);
-  function reinitRemoveListener() {
-    $(".link-remove-spacing").off("click.femboyfans.spacing");
-    $(".link-remove-spacing").on("click.femboyfans.spacing", function(event) {
-      event.preventDefault();
-      $(this).closest("tr").remove();
-    });
-  }
-  reinitRemoveListener();
-
-  function reorderData() {
-    return JSON.stringify(Array.from($("#post-deletion-reasons-table tr")).slice(1).map((element, index) => ({ id: element.dataset.id ? Number(element.dataset.id) : null, order: index + 1 })));
-  }
-
-  $(".link-add-spacing-below").on("click.femboyfans.spacing", function(event) {
-    event.preventDefault();
-    spacing.insertAfter($(this).closest("tr"));
-    reinitRemoveListener();
-  });
-
-  $(".link-add-spacing-above").on("click.femboyfans.spacing", function(event) {
-    event.preventDefault();
-    spacing.insertBefore($(this).closest("tr"));
-    reinitRemoveListener();
-  });
-
-  $(".edit-order-link").on("click.femboyfans.sorting", function(event) {
-    event.preventDefault();
-    $(".save-order-link").show();
-    $(".edit-order-link").hide();
-    $(".add-spacing-link").show();
-    $(".link-remove-spacing").show();
-    $("#post-deletion-reasons-table tbody").sortable();
-    Danbooru.notice("Drag and drop to reorder.");
-  });
-
-  $(".save-order-link").on("click.femboyfans.sorting", function(event) {
-    event.preventDefault();
-    $(".save-order-link").hide();
-    $(".add-spacing-link").hide();
-    $(".link-remove-spacing").hide();
-    $("#post-deletion-reasons-table tbody").sortable("disable");
-    $.ajax({
-      url: "/posts/deletion_reasons/reorder.json",
-      type: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      data: reorderData(),
-      success() {
-        Danbooru.notice("Order updated.");
-        $(".edit-order-link").show();
-      },
-      error() {
-        Danbooru.error("Failed to update order.");
-        $(".save-order-link").show();
-        $("#post-deletion-reasons-table tbody").sortable();
-      }
-    });
-  });
+  const spacing = $(`<%= render(partial: "spacing") %>`);
+  Danbooru.PostDeletionReasons.init(spacing);
 <% end %>

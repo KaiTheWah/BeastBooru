@@ -5,61 +5,44 @@
   <p>Nothing to see here.</p>
 <% else %>
   <%= form_tag(diff_moderator_user_text_versions_path, method: :get) do %>
-    <table class="striped">
-      <thead>
-      <tr>
-        <th width="3%"></th>
-        <th width="2%"></th>
-        <th width="2%"></th>
-        <th></th>
-        <th>User</th>
-        <th>Editor</th>
-        <% if policy(UserTextVersion).can_see_ip_addr? %>
-          <th>IP Address</th>
-        <% end %>
-        <th>Date</th>
-        <th>Changes</th>
-      </tr>
-      </thead>
-      <tbody>
-      <% skipped = 0 %>
-      <% @text_versions.each_with_index do |text_version, i| %>
-        <%# skip empty versions, unless we're viewing a user, then skip all empty versions except the first one %>
-        <% if params[:action] == "for_user" %>
-          <% next if text_version.empty_for?(CurrentUser.user) && !text_version.is_original? && skipped += 1 %>
+    <% if params[:action] == "for_user" %>
+      <% versions = @text_versions.reject { |ver| ver.empty_for?(CurrentUser.user) && !ver.is_original? } %>
+    <% else %>
+      <% versions = @text_versions.reject { |ver| ver.empty_for?(CurrentUser.user) } %>
+    <% end %>
+    <%= table_for(versions) do |t| %>
+      <% t.column(th: { width: "3%" }) do |text_version, i| %>
+        <% if i < versions.length - 1 %>
+          <%= link_to "diff", diff_moderator_user_text_versions_path(thisversion: text_version.id, otherversion: versions[i + 1].id) %>
         <% else %>
-          <% next if text_version.empty_for?(CurrentUser.user) && skipped += 1 %>
+          diff
         <% end %>
-        <%# correct for skipped versions %>
-        <% i -= skipped %>
-        <tr>
-          <td>
-            <% if i < @text_versions.length - 1 %>
-              <%= link_to "diff", diff_moderator_user_text_versions_path(thisversion: text_version.id, otherversion: @text_versions[i + 1].id) %>
-            <% else %>
-              diff
-            <% end %>
-          </td>
-          <td>
-            <%= radio_button_tag "otherversion", text_version.id, (i == 1), title: "Other Version" %>
-          </td>
-          <td>
-            <%= radio_button_tag "thisversion", text_version.id, (i == 0), title: "This Version" %>
-          </td>
-          <td><%= link_to "Show", action: :show, id: text_version.id %></td>
-          <td><%= link_to_user text_version.user %></td>
-          <td><%= link_to_user text_version.updater %></td>
-          <% if policy(UserTextVersion).can_see_ip_addr? %>
-            <td><%= link_to_ip text_version.updater_ip_addr %></td>
-          <% end %>
-          <td><%= compact_time text_version.created_at %></td>
-          <td><%= text_version.changes_for_pretty(CurrentUser.user) %></td>
-        </tr>
       <% end %>
-      </tbody>
-    </table>
+      <% t.column(th: { width: "2%" }) do |text_version, i| %>
+        <%= radio_button_tag "otherversion", text_version.id, (i == 1), title: "Other Version" %>
+      <% end %>
+      <% t.column(th: { width: "2%" }) do |text_version, i| %>
+        <%= radio_button_tag "thisversion", text_version.id, (i == 0), title: "This Version" %>
+      <% end %>
+      <% t.column do |text_version| %>
+        <%= link_to("Show", action: :show, id: text_version.id) %>
+      <% end %>
+      <% t.column("User") do |text_version| %>
+        <%= link_to_user(text_version.user) %>
+      <% end %>
+      <% t.column("Editor") do |text_version| %>
+        <%= link_to_user(text_version.updater) %>
+        <% if policy(text_version).can_see_ip_addr? %>
+          (<%= link_to_ip(text_version.updater_ip_addr) %>)
+        <% end %>
+        <p><%= compact_time(text_version.created_at) %></p>
+      <% end %>
+      <% t.column("Changes") do |text_version| %>
+        <%= text_version.changes_for_pretty(CurrentUser.user) %>
+      <% end %>
+    <% end %>
 
-    <%= submit_tag "Diff", name: nil, disabled: @text_versions.length == 1 %>
+    <%= submit_tag("Diff", name: nil, disabled: versions.length == 1) %>
   <% end %>
   <%= numbered_paginator(@text_versions) %>
 <% end %>

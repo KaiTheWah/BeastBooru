@@ -97,7 +97,6 @@ class AvoidPosting < ApplicationRecord
 
       q = q.attribute_matches(:details, params[:details])
       q = q.attribute_matches(:staff_notes, params[:staff_notes])
-      q = q.attribute_matches(:is_active, params[:is_active])
       q = q.where_user(:creator_id, :creator, params)
       q = q.where("creator_ip_addr <<= ?", params[:ip_addr]) if params[:ip_addr].present?
       case params[:order]

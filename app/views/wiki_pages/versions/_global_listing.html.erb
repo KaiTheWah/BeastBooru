@@ -1,38 +1,27 @@
 <div id="p-global-listing">
-  <table class="striped">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Wiki</th>
-        <% if policy(WikiPageVersion).can_see_ip_addr? %>
-          <th>IP Address</th>
-        <% end %>
-        <th>Last edited</th>
-        <th>Reason</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @wiki_page_versions.each do |wiki_page_version| %>
-        <tr>
-          <td class="category-<%= wiki_page_version.category_id %>">
-            <%= link_to wiki_page_version.title, wiki_page_version_path(wiki_page_version) %>
-          </td>
-          <td><%= link_to "wiki", wiki_page_path(wiki_page_version.wiki_page_id) %></td>
-          <% if policy(wiki_page_version).can_see_ip_addr? %>
-            <td>
-              <%= link_to_ip wiki_page_version.updater_ip_addr %>
-            </td>
-          <% end %>
-          <td>
-            <%= compact_time(wiki_page_version.updated_at) %>
-            <% if wiki_page_version.updater %>
-              by
-              <%= link_to_user wiki_page_version.updater %>
-            <% end %>
-          </td>
-          <td><%= wiki_page_version.reason %></td>
-        </tr>
+  <%= table_for(@wiki_page_versions) do |t| %>
+    <% t.column("Title") do |wiki_page_version| %>
+      <span class="category-<%= wiki_page_version.category_id %>">
+        <%= link_to(wiki_page_version.title, wiki_page_version_path(wiki_page_version)) %>
+      </span>
+    <% end %>
+    <% t.column("Wiki") do |wiki_page_version| %>
+      <%= link_to("wiki", wiki_page_path(wiki_page_version.wiki_page_id)) %>
+    <% end %>
+    <% if policy(WikiPageVersion).can_see_ip_addr? %>
+      <% t.column("IP Address") do |wiki_page_version| %>
+        <%= link_to_ip(wiki_page_version.updater_ip_addr) %>
       <% end %>
-    </tbody>
-  </table>
+    <% end %>
+    <% t.column("Last edited") do |wiki_page_version| %>
+      <%= compact_time(wiki_page_version.updated_at) %>
+      <% if wiki_page_version.updater %>
+        by
+        <%= link_to_user(wiki_page_version.updater) %>
+      <% end %>
+    <% end %>
+    <% t.column("Reason") do |wiki_page_version| %>
+      <%= wiki_page_version.reason %>
+    <% end %>
+  <% end %>
 </div>

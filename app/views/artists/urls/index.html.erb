@@ -1,37 +1,26 @@
-<%= form_search(path: artist_urls_path) do |f| %>
-  <%= f.input(:artist_name, label: "Artist Name", autocomplete: "artist") %>
-  <%= f.input(:url_matches, label: "URL") %>
-  <%= f.input(:normalized_url_matches, label: "Normalized URL") %>
-  <%= f.input(:is_active, label: "Active?", collection: [["Yes", true], ["No", false]], include_blank: true) %>
-  <%= f.input(:order, collection: [%w[ID id], %w[Created created_at], %w[Updated updated_at]]) %>
-<% end %>
+<%= render(partial: "search") %>
 
-<table class="striped">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Artist Name</th>
-      <th>URL</th>
-      <th>Normalized URL</th>
-      <th>Active?</th>
-      <th>Created</th>
-      <th>Updated</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @artist_urls.each do |artist_url| %>
-      <tr>
-        <%= tag.td(artist_url.id) %>
-        <%= tag.td(link_to(artist_url.artist.name, artist_url.artist)) %>
-        <%= tag.td(external_link_to(artist_url.url.to_s)) %>
-        <%= tag.td(external_link_to(artist_url.normalized_url)) %>
-        <%= tag.td(artist_url.is_active.to_s) %>
-        <%= tag.td(compact_time(artist_url.created_at)) %>
-        <%= tag.td(compact_time(artist_url.updated_at)) %>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<%= table_for(@artist_urls) do |t| %>
+  <% t.column(:id, name: "ID") %>
+  <% t.column("Artist name") do |url| %>
+    <%= link_to(url.artist.name, url.artist) %>
+  <% end %>
+  <% t.column("URL") do |url| %>
+    <%= external_link_to(url.url) %>
+  <% end %>
+  <% t.column("Normalized URL") do |url| %>
+    <%= external_link_to(url.normalized_url) %>
+  <% end %>
+  <% t.column("Active?") do |url| %>
+    <%= url.is_active.to_s %>
+  <% end %>
+  <% t.column("Created") do |url| %>
+    <%= compact_time(url.created_at) %>
+  <% end %>
+  <% t.column("Updated") do |url| %>
+    <%= compact_time(url.updated_at) %>
+  <% end %>
+<% end %>
 
 <%= numbered_paginator(@artist_urls) %>
 

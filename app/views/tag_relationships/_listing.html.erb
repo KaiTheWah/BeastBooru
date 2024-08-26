@@ -1,41 +1,38 @@
-<table class="striped">
-  <thead>
-    <tr>
-      <th>From</th>
-      <th>To</th>
-      <th>Forum</th>
-      <th>Creator</th>
-      <th>Approver</th>
-      <th>Status</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% tag_relations.each do |tag_relation| %>
-      <tr id="<%= tag_relation.model_name.singular_route_key.dasherize %>-<%= tag_relation.id %>">
-        <td class="category-<%= tag_relation.antecedent_tag.try(:category) %>">
-          <%= link_to_wiki_or_new tag_relation.antecedent_name %>
-          <span class="count"><%= tag_relation.antecedent_tag.post_count rescue 0 %></span>
-        </td>
-        <td class="category-<%= tag_relation.consequent_tag.try(:category) %>">
-          <%= link_to_wiki_or_new tag_relation.consequent_name %>
-          <span class="count"><%= tag_relation.consequent_tag.post_count rescue 0 %></span>
-          <% if tag_relation.is_a?(TagAlias) %>
-            <% if CurrentUser.user.is_member? && tag_relation.status == "pending" && tag_relation.has_transitives %>
-              <span class="text-error"> HAS TRANSITIVES</span>
-            <% end %>
-          <% end %>
-        </td>
-        <td>
-          <% if tag_relation.forum_topic_id %>
-            <%= link_to tag_relation.forum_topic_id, forum_topic_path(tag_relation.forum_topic_id) %>
-          <% end %>
-        </td>
-        <td><%= link_to_user(tag_relation.creator)%></td>
-        <td><%= link_to_user(tag_relation.approver) if tag_relation.approver %></td>
-        <td id="<%= tag_relation.model_name.singular_route_key.dasherize %>-status-for-<%= tag_relation.id %>"><%= tag_relation.status %></td>
-        <td><%= render "tag_relationships/command_buttons", tag_relation: tag_relation, with_show_link: true %></td>
-      </tr>
+<%# locals: (tag_relations:) -%>
+
+<%= table_for(tag_relations) do |t| %>
+  <% t.column("From") do |tag_relation| %>
+    <span class="category-<%= tag_relation.antecedent_tag.try(:category) %>">
+      <%= link_to_wiki_or_new(tag_relation.antecedent_name) %>
+      <span class="count"><%= tag_relation.antecedent_tag.post_count rescue 0 %></span>
+    </span>
+  <% end %>
+  <% t.column("To") do |tag_relation| %>
+    <span class="category-<%= tag_relation.consequent_tag.try(:category) %>">
+      <%= link_to_wiki_or_new(tag_relation.consequent_name) %>
+      <span class="count"><%= tag_relation.consequent_tag.post_count rescue 0 %></span>
+      <% if tag_relation.is_a?(TagAlias) %>
+      <% if CurrentUser.user.is_member? && tag_relation.status == "pending" && tag_relation.has_transitives %>
+        <span class="text-error"> HAS TRANSITIVES</span>
+      <% end %>
     <% end %>
-  </tbody>
-</table>
+    </span>
+  <% end %>
+  <% t.column("Forum") do |tag_relation| %>
+    <% if tag_relation.forum_topic_id %>
+      <%= link_to(tag_relation.forum_topic_id, forum_topic_path(tag_relation.forum_topic_id)) %>
+    <% end %>
+  <% end %>
+  <% t.column("Creator") do |tag_relation| %>
+    <%= link_to_user(tag_relation.creator) %>
+  <% end %>
+  <% t.column("Approver") do |tag_relation| %>
+    <%= link_to_user(tag_relation.approver) if tag_relation.approver %>
+  <% end %>
+  <% t.column("Status") do |tag_relation| %>
+    <%= tag_relation.status %>
+  <% end %>
+  <% t.column do |tag_relation| %>
+    <%= render("tag_relationships/command_buttons", tag_relation: tag_relation, with_show_link: true) %>
+  <% end %>
+<% end %>

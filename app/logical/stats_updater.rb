@@ -59,9 +59,9 @@ class StatsUpdater
 
     ### Forum posts ###
 
-    stats[:total_forum_threads] = ForumTopic.count
+    stats[:total_forum_topics] = ForumTopic.count
     stats[:total_forum_posts] = ForumPost.maximum("id") || 0
-    stats[:average_posts_per_thread] = stats[:total_forum_threads] == 0 ? 0 : (stats[:total_forum_posts] / stats[:total_forum_threads]).round
+    stats[:average_posts_per_topic] = stats[:total_forum_topics] == 0 ? 0 : (stats[:total_forum_posts] / stats[:total_forum_threads]).round
     stats[:average_forum_posts_per_day] = daily_average.call(stats[:total_forum_posts])
 
     ### Tags ###

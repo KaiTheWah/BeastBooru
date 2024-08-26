@@ -1,16 +1,10 @@
-<table class="striped">
-  <thead>
-    <tr>
-      <th style="width: 275px;"><h2><%= header_title %></h2></th>
-      <th style="width: 125px;"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% data.each do |(data_title, data_or_stats_key)| %>
-      <tr>
-        <td><%= data_title %></td>
-        <td><%= del(@stats[data_or_stats_key]) || data_or_stats_key %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<%# locals: (header_title:, data:) -%>
+
+<%= table_for(data) do |t| %>
+  <% t.column("<h2>#{header_title}</h2>".html_safe, th: { style: "width: 275px;" }) do |(data_title, _data_or_stats_key)| %>
+    <%= data_title %>
+  <% end %>
+  <% t.column(th: { style: "width: 125px;" }) do |(_data_title, data_or_stats_key)| %>
+    <%= del(@stats[data_or_stats_key]) || data_or_stats_key %>
+  <% end %>
+<% end %>

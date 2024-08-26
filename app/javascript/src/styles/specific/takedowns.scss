@@ -1,5 +1,3 @@
-
-
 div#c-takedowns {
   .takedown-vericode {
     border-radius: $border-radius-half;
@@ -64,6 +62,24 @@ div#c-takedowns {
 
   .takedown-post-delete {
     background-color: $state-error-color;
+  }
+
+  #takedowns-table {
+    tr[data-status="inactive"] .status-column {
+      background-color: palette("background-grey");
+    }
+
+    tr[data-status="denied"] .status-column {
+      background-color: palette("background-red");
+    }
+
+    tr[data-status="partial"] .status-column {
+      background-color: palette("background-yellow");
+    }
+
+    tr[data-status="approved"] .status-column {
+      background-color: palette("background-green");
+    }
   }
 }
 

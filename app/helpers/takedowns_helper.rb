@@ -6,7 +6,7 @@ module TakedownsHelper
     classes = {
       "inactive" => "background-grey",
       "denied"   => "background-red",
-      "partial"  => "background-green",
+      "partial"  => "background-yellow",
       "approved" => "background-green",
     }
     tag.td(status, class: classes[takedown.status])

@@ -1,4 +1,4 @@
-<%= form_search(path: path, policy: policy(Takedown)) do |f| %>
+<%= form_search(path: takedowns_path, policy: policy(Takedown)) do |f| %>
   <%= f.input(:status, label: "Status", collection: [
     %w[Pending pending],
     %w[Inactive inactive],

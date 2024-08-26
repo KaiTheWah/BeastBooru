@@ -1,41 +1,29 @@
 <%= render "search" %>
 <h1>Upload Whitelists</h1>
 
-<table class="striped">
-  <thead>
-    <tr>
-      <th>Pattern</th>
-      <th>Note</th>
-      <th>Hidden</th>
-      <th>Allowed</th>
-      <th>Ban Reason</th>
-      <th>Created</th>
-      <th>Updated</th>
-      <% if policy(UploadWhitelist).all?(:update?, :destroy?) %>
-        <th></th>
-      <% end %>
-    </tr>
-  </thead>
-  <tbody>
-    <% @whitelists.each do |whitelist| %>
-      <tr>
-        <td><%= whitelist.pattern %></td>
-        <td><%= whitelist.note %></td>
-        <td><%= whitelist.hidden? ? "Yes" : "No" %></td>
-        <td><%= whitelist.allowed? ? "Yes" : "No" %></td>
-        <td><%= whitelist.reason %></td>
-        <td><%= compact_time whitelist.created_at %></td>
-        <td><%= compact_time whitelist.updated_at %></td>
-        <% if policy(whitelist).all?(:update?, :destroy?) %>
-          <td>
-            <%= link_to "Edit", edit_upload_whitelist_path(whitelist) %> |
-            <%= link_to "Delete", upload_whitelist_path(whitelist), method: :delete, data: { confirm: "Do your really want to delete #{whitelist.pattern}?" } %>
-          </td>
-        <% end %>
-      </tr>
+<%= table_for(@whitelists) do |t| %>
+  <% t.column(:pattern) %>
+  <% t.column(:note) %>
+  <% t.column("Hidden") do |whitelist| %>
+    <%= whitelist.hidden? ? "Yes" : "No" %>
+  <% end %>
+  <% t.column("Allowed") do |whitelist| %>
+    <%= whitelist.allowed? ? "Yes" : "No" %>
+  <% end %>
+  <% t.column(:reason, name: "Ban Reason") %>
+  <% t.column("Created") do |whitelist| %>
+    <%= compact_time(whitelist.created_at) %>
+  <% end %>
+  <% t.column("Updated") do |whitelist| %>
+    <%= compact_time(whitelist.updated_at) %>
+  <% end %>
+  <% if policy(UploadWhitelist).all?(:update?, :destroy?) %>
+    <% t.column do |whitelist| %>
+      <%= link_to("Edit", edit_upload_whitelist_path(whitelist)) %> |
+      <%= link_to("Delete", upload_whitelist_path(whitelist), method: :delete, data: { confirm: "Do your really want to delete #{whitelist.pattern}?" }) %>
     <% end %>
-  </tbody>
-</table>
+  <% end %>
+<% end %>
 
 <%= numbered_paginator(@whitelists) %>
 

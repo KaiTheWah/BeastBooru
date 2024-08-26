@@ -11,20 +11,22 @@
 }
 
 div#c-users-feedbacks, div#c-moderator-dashboards .activity-container {
-  .feedback-category-positive {
-    background: palette("background-green");
-  }
+  #user-feedbacks-table {
+    tr[data-category="positive"] {
+      background: palette("background-green");
+    }
 
-  .feedback-category-neutral {
-    background: palette("background-grey");
-  }
+    tr[data-category="neutral"] {
+      background: palette("background-grey");
+    }
 
-  .feedback-category-negative {
-    background: palette("background-red");
-  }
+    tr[data-category="negative"] {
+      background: palette("background-red");
+    }
 
-  tr.user-feedback[data-is-deleted="true"] {
-    background: palette("background-yellow");
+    tr[data-is-deleted="true"] {
+      background: palette("background-yellow");
+    }
   }
 
   blockquote {

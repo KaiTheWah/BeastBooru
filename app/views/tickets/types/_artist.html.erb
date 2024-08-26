@@ -1,6 +1,10 @@
-<% if @ticket.model %>
-  <tr>
-    <td><span class="title">Reported Artist</span></td>
-    <td><%= link_to(@ticket.model.name, @ticket.model) %></td>
-  </tr>
-<% end %>
+<tr>
+  <td><span class="title">Reported Artist</span></td>
+  <td>
+    <% if @ticket.model.present? %>
+      <%= link_to(@ticket.model.name, artist_path(id: @ticket.model.id)) %>
+    <% else %>
+      <span class="text-error">Artist has been deleted</span>
+    <% end %>
+  </td>
+</tr>

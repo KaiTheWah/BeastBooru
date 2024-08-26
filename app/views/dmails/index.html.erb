@@ -8,48 +8,37 @@
 
 <%= render "search" %>
 
-<table class="striped">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <% if CurrentUser.user.is_owner? && params[:folder].blank? %>
-        <th>Owner</th>
+<%= table_for(@dmails, class: "striped autofit") do |t| %>
+  <% t.column("From") do |dmail| %>
+    <% if dmail.filtered? %>
+      <%= link_to("[filtered]", user_path(dmail.from)) %>
+    <% else %>
+      <%= link_to_user(dmail.from) %>
+      <% if policy(dmail).can_see_ip_addr? %>
+        (<%= link_to_ip(dmail.creator_ip_addr) %>)
       <% end %>
-      <th>From</th>
-      <th>To</th>
-      <th>Subject</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @dmails.each do |dmail| %>
-      <tr class="read-<%= dmail.is_read? %>">
-        <td><%= compact_time(dmail.created_at) %></td>
-        <% if CurrentUser.user.is_owner? && params[:folder].blank? %>
-          <td><%= link_to_user dmail.owner %></td>
-        <% end %>
-        <td>
-          <% if dmail.filtered? %>
-            <%= link_to "[filtered]", user_path(dmail.from) %>
-          <% else %>
-            <%= link_to_user dmail.from %>
-          <% end %>
-        </td>
-        <td><%= link_to_user dmail.to %></td>
-        <td>
-          <% if dmail.filtered? %>
-            <%= link_to "[filtered]", dmail_path(dmail) %>
-          <% else %>
-            <%= link_to dmail.title, dmail_path(dmail) %>
-          <% end %>
-        </td>
-        <td>
-          <%= link_to "delete", dmail_path(dmail), method: :delete, data: { confirm: "Are you sure you want to delete this Dmail?" } %>
-        </td>
-      </tr>
+      <p><%= compact_time(dmail.created_at) %></p>
     <% end %>
-  </tbody>
-</table>
+  <% end %>
+  <% t.column("To") do |dmail| %>
+    <%= link_to_user(dmail.to) %>
+  <% end %>
+  <% t.column("Owner", if: (CurrentUser.user.is_owner? && params[:folder].blank?)) do |dmail| %>
+    <%= link_to_user(dmail.owner) %>
+  <% end %>
+  <% t.column("Subject", th: { width: (CurrentUser.user.is_owner? && params[:folder].blank?) ? "55%" : "65%" }) do |dmail| %>
+    <% if dmail.filtered? %>
+      <%= link_to("[filtered]", dmail_path(dmail)) %>
+    <% else %>
+      <%= link_to(dmail.title, dmail_path(dmail)) %>
+    <% end %>
+  <% end %>
+  <% t.column do |dmail| %>
+    <%= link_to("view", dmail_path(dmail)) %>
+    | <%= link_to("delete", dmail_path(dmail), method: :delete, data: { confirm: "Are you sure you want to delete this Dmail?" }) %>
+  <% end %>
+<% end %>
+
 
 <%= numbered_paginator(@dmails) %>
 

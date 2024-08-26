@@ -24,4 +24,8 @@ class BanPolicy < ApplicationPolicy
   def permitted_search_params
     super + %i[banner_id banner_name user_id user_name reason_matches expired order]
   end
+
+  def html_data_attributes
+    super + %i[expired?]
+  end
 end

@@ -1,4 +1,4 @@
-#c-edit-history {
+#c-edit-histories {
   .edit-item {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -7,5 +7,21 @@
 
   .original {
     white-space: pre-wrap;
+  }
+
+  tr[data-edit-type="hide"] {
+    background-color: palette("background-red");
+  }
+
+  tr[data-edit-type="unhide"] {
+    background-color: palette("background-blue");
+  }
+
+  tr[data-edit-type="mark_warning"], tr[data-edit-type="mark_record"], tr[data-edit-type="mark_ban"] {
+    background-color: palette("background-yellow");
+  }
+
+  tr[data-edit-type="unmark"] {
+    background-color: palette("background-green");
   }
 }

@@ -1,12 +1,13 @@
 <p><%= link_to "Search for IP addresses with these users", moderator_ip_addrs_path(search: { user_id: @results[:users].map { |user_id, _| user_id }.join(","), with_history: params[:search][:with_history] }) %></p>
 
+<%# table builder does not support multiple rows per iteration %>
 <table class="striped">
   <thead>
   <tr>
     <th>User</th>
     <th>Type</th>
     <th>Number of Occurrences</th>
-    <th/>
+    <th></th>
   </tr>
   </thead>
   <tbody>

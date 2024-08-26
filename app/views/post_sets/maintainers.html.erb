@@ -19,33 +19,25 @@
   <% end %>
 <% end %>
 
-<table class="striped">
-  <thead>
-  <tr>
-    <th>Username</th>
-    <th>Status</th>
-    <th>Date</th>
-    <th></th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @maintainers.where(status: %w[pending approved]).order(updated_at: :desc).each do |m| %>
-    <tr>
-      <td><%= link_to_user m.user %></td>
-      <td><%= m.status.capitalize %></td>
-      <td><%= compact_time m.updated_at %></td>
-      <td>
-        <% if @post_set.can_edit_settings?(CurrentUser) && m.status == "approved" %>
-          <%= link_to "Remove", post_set_maintainer_path(m), method: :delete, data: { confirm: "Are you sure you want to remove this maintainer?" } %>
-        <% end %>
-        <% if @post_set.can_edit_settings?(CurrentUser) && m.status == "pending" %>
-          <%= link_to "Remove", post_set_maintainer_path(m), method: :delete, data: { confirm: "Are you sure you want to remove this pending invite?" } %>
-        <% end %>
-      </td>
-    </tr>
+<%= table_for(@maintainers.where(status: %w[pending approved]).order(updated_at: :desc)) do |t| %>
+  <% t.column("Username") do |maintainer| %>
+    <%= link_to_user(maintainer.user) %>
   <% end %>
-  </tbody>
-</table>
+  <% t.column("Status") do |maintainer| %>
+    <%= maintainer.status.capitalize %>
+  <% end %>
+  <% t.column("Date") do |maintainer| %>
+    <%= compact_time(maintainer.updated_at) %>
+  <% end %>
+  <% t.column do |maintainer| %>
+    <% if @post_set.can_edit_settings?(CurrentUser) && maintainer.status == "approved" %>
+      <%= link_to("Remove", post_set_maintainer_path(maintainer), method: :delete, data: { confirm: "Are you sure you want to remove this maintainer?" }) %>
+    <% end %>
+    <% if @post_set.can_edit_settings?(CurrentUser) && maintainer.status == "pending" %>
+      <%= link_to("Remove", post_set_maintainer_path(maintainer), method: :delete, data: { confirm: "Are you sure you want to remove this pending invite?" }) %>
+    <% end %>
+  <% end %>
+<% end %>
 
 <%= render partial: "secondary_links" %>
 

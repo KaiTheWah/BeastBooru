@@ -459,4 +459,9 @@ class ApplicationRecord < ActiveRecord::Base
       mn
     end
   end
+
+  def html_data_attributes(user = CurrentUser.user)
+    policy = Pundit.policy(user, self) || ApplicationPolicy.new(user, self)
+    policy.html_data_attributes
+  end
 end

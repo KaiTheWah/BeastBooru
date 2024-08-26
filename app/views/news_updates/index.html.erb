@@ -1,32 +1,19 @@
 <h1>News Updates</h1>
 
-<table class="striped">
-  <thead>
-    <tr>
-      <th>Creator</th>
-      <th>Date</th>
-      <th>Message</th>
-      <% if policy(NewsUpdate).all?(:update?, :destroy?) %>
-        <th></th>
-      <% end %>
-    </tr>
-  </thead>
-  <tbody>
-    <% @news_updates.each do |news_update| %>
-      <tr id="news-update-<%= news_update.id %>">
-        <td><%= link_to_user news_update.creator %></td>
-        <td><%= compact_time news_update.updated_at %></td>
-        <td><div class="dtext-container"><%= format_text news_update.message %></div></td>
-        <% if policy(news_update).all?(:update?, :destroy?) %>
-          <td>
-            <%= link_to "Edit", edit_news_update_path(news_update) %> |
-            <%= link_to "Delete", news_update_path(news_update), method: :delete %>
-          </td>
-        <% end %>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+
+<%= table_for(@news_updates, class: "striped autofit") do |t| %>
+  <% t.column("Creator") do |news_update| %>
+    <%= link_to_user news_update.creator %>
+    <p><%= compact_time(news_update.updated_at) %></p>
+  <% end %>
+  <% t.column("Message", th: { class: "col-expand" }) do |news_update| %>
+    <div class="dtext-container"><%= format_text news_update.message %></div>
+  <% end %>
+  <% t.column(if: policy(NewsUpdate).all?(:update?, :destroy?)) do |news_update| %>
+    <%= link_to("Edit", edit_news_update_path(news_update)) %> |
+    <%= link_to("Delete", news_update_path(news_update), method: :delete) %>
+  <% end %>
+<% end %>
 
 <%= numbered_paginator(@news_updates) %>
 

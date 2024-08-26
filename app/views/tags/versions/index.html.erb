@@ -1,43 +1,31 @@
 <%= render partial: "search" %>
 <div>
-  <table class="striped">
-    <thead>
-    <tr>
-      <th>Tag</th>
-      <th>Date</th>
-      <th>User</th>
-      <th>Category</th>
-      <th>Locked</th>
-      <th>Reason</th>
-    </tr>
-    </thead>
 
-    <tbody>
-    <% @tag_versions.each do |change| %>
-      <tr id="tag-version-<%= change.id %>">
-        <td><%= link_to change.tag.name, edit_tag_path(change.tag) %></td>
-        <td><%= compact_time change.created_at %></td>
-        <td><%= link_to_user change.updater %></td>
-
-        <td>
-
-          <% if change.category_changed? %>
-            <a class="<%= "tag-type-#{change.previous.category}" %>"><%= Tag.category_for_value(change.previous.category) %></a> ->
-          <% end %>
-          <a class="<%= "tag-type-#{change.category}" %>"><%= Tag.category_for_value(change.category) %></a>
-        </td>
-        <td>
-          <% if change.is_locked_changed? %>
-            <b><%= change.is_locked %></b>
-          <% else %>
-            <%= change.is_locked %>
-          <% end %>
-        </td>
-        <td><%= change.reason %></td>
-      </tr>
+  <%= table_for(@tag_versions) do |t| %>
+    <% t.column("Tag") do |change| %>
+      <%= link_to change.tag.name, edit_tag_path(change.tag) %>
     <% end %>
-    </tbody>
-  </table>
+    <% t.column("User") do |change| %>
+      <%= link_to_user(change.updater) %>
+      <p><%= time_ago_in_words_tagged(change.created_at, compact: true) %></p>
+    <% end %>
+    <% t.column("Category") do |change| %>
+      <% if change.category_changed? %>
+        <a class="<%= "tag-type-#{change.previous.category}" %>"><%= Tag.category_for_value(change.previous.category) %></a> ->
+      <% end %>
+      <a class="<%= "tag-type-#{change.category}" %>"><%= Tag.category_for_value(change.category) %></a>
+    <% end %>
+    <% t.column("Locked") do |change| %>
+      <% if change.is_locked_changed? %>
+        <b><%= change.is_locked %></b>
+      <% else %>
+        <%= change.is_locked %>
+      <% end %>
+    <% end %>
+    <% t.column("Reason") do |change| %>
+      <%= change.reason %>
+    <% end %>
+  <% end %>
 </div>
 
 <%= numbered_paginator(@tag_versions) %>

@@ -38,4 +38,8 @@ class UserFeedbackPolicy < ApplicationPolicy
     params += %i[deleted] if user.is_moderator?
     params
   end
+
+  def html_data_attributes
+    super + %i[category]
+  end
 end

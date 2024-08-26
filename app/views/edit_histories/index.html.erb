@@ -2,38 +2,32 @@
 
 <%= render "search" %>
 
-<table class="striped">
-  <thead>
-  <tr>
-    <th></th>
-    <th>Type</th>
-    <th>Edit Type</th>
-    <th>Date</th>
-    <th>Editor</th>
-    <th>Body</th>
-    <th>Subject</th>
-  </tr>
-  </thead>
-
-  <tbody>
-  <% @edit_histories.each do |edit| %>
-    <tr id="edit-<%= edit.id %>" class="edit-<%= edit.edit_type.tr("_", "-") %>">
-      <td><%= link_to "Show", action: "show", id: edit.versionable_id, type: edit.versionable_type, page: edit.page, anchor: "edit-#{edit.id}" %></td>
-      <td><%= edit.versionable_type %></td>
-      <td><%= edit.pretty_edit_type %></td>
-      <td><%= compact_time edit.updated_at %></td>
-      <td>
-        <h6><%= link_to_user edit.user %></h6>
-        <% if policy(edit).can_see_ip_addr? %>
-          <%= link_to_ip edit.ip_addr %>
-        <% end %>
-      </td>
-      <td><%= edit.body[0..30] %></td>
-      <td><%= (edit.subject || "")[0..30] %></td>
-    </tr>
+<%= table_for(@edit_histories) do |t| %>
+  <% t.column("Editor") do |edit| %>
+    <%= link_to_user edit.user %>
+    <% if policy(edit).can_see_ip_addr? %>
+      (<%= link_to_ip edit.ip_addr %>)
+    <% end %>
+    <p><%= compact_time(edit.updated_at) %></p>
   <% end %>
-  </tbody>
-</table>
+  <% t.column(:versionable_type, name: "Type") %>
+  <% t.column(:pretty_edit_type, name: "Edit Type") %>
+  <% t.column("Body", th: { width: "40%" }) do |edit| %>
+    <%= edit.body[0..50] %>
+    <% if edit.previous.present? && edit.previous.body == edit.body %>
+      <span class="small-notice">(no change)</span>
+    <% end %>
+  <% end %>
+  <% t.column("Subject", th: { width: "20%" }) do |edit| %>
+    <%= (edit.subject || "")[0..30] %>
+    <% if !edit.subject.nil? && edit.previous.present? && edit.previous.subject == edit.subject %>
+      <span class="small-notice">(no change)</span>
+    <% end %>
+  <% end %>
+  <% t.column do |edit| %>
+    <%= link_to("Show", action: "show", id: edit.versionable_id, type: edit.versionable_type, page: edit.page, anchor: "edit-#{edit.id}") %>
+  <% end %>
+<% end %>
 
 <%= numbered_paginator(@edit_histories) %>
 

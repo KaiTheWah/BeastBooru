@@ -1,30 +1,24 @@
 <h4>Deleted Posts</h4>
 
-<table class="striped">
-  <thead>
-  <tr>
-    <th>Post</th>
-    <th>Poster</th>
-    <th width="50%">Tags</th>
-    <th>Deleter</th>
-    <th>Deleted At</th>
-    <th>Reason</th>
-  </tr>
-  </thead>
-
-  <tbody>
-  <% @posts.each do |post| %>
-    <tr>
-      <td><%= link_to post.id, post_path(post) %></td>
-      <td><%= link_to_user post.uploader %></td>
-      <td><%= post.presenter.inline_tag_list_html %></td>
-      <td><%= link_to_user post.flags.where(is_deletion: true).last.creator %></td>
-      <td><%= compact_time post.deletion_flag&.created_at %></td>
-      <td class="dtext-container"><%= format_text(post.deletion_flag&.reason) %></td>
-    </tr>
+<%= table_for(@posts) do |t| %>
+  <% t.column("Post", width: "1%") do |post| %>
+    <%= PostPresenter.preview(post, show_deleted: true) %>
   <% end %>
-  </tbody>
-</table>
+  <% t.column("Tags", width: "45%") do |post| %>
+    <%= post.presenter.inline_tag_list_html %>
+  <% end %>
+  <% t.column("Poster", width: "10%") do |post| %>
+    <%= link_to_user(post.uploader )%>
+    <p><%= compact_time(post.created_at) %></p>
+  <% end %>
+  <% t.column("Deleter", width: "10%") do |post| %>
+    <%= link_to_user(post.flags.where(is_deletion: true).last.creator) %>
+    <p><%= compact_time(post.deletion_flag&.created_at) %></p>
+  <% end %>
+  <% t.column("Reason") do |post| %>
+    <div class="dtext-container"><%= format_text(post.deletion_flag&.reason) %></div>
+  <% end %>
+<% end %>
 
 <%= numbered_paginator(@posts) %>
 

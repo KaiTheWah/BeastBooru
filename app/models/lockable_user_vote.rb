@@ -22,6 +22,6 @@ class LockableUserVote < UserVote
 
   def vote_display
     return super unless is_locked?
-    %{<span class="yellowtext">Locked</span> (#{super})}
+    %{<span class="text-yellow">Locked</span> (#{super})}
   end
 end

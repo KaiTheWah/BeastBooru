@@ -1,56 +1,48 @@
 <%= render partial: "search" %>
 
-<h2>Ticket Center</h2>
-<table class="striped">
-  <thead>
-    <tr>
-      <th style="width:5%">ID</th>
-      <% if CurrentUser.user.is_moderator? %>
-        <th style="width:10%">Reporter</th>
-        <th style="width:10%">Accused</th>
-        <th style="width:10%">Claimed By</th>
-      <% end %>
-      <th style="width:15%">Type</th>
-      <th style="width:25%">Subject</th>
-      <th style="width:8%">Status</th>
-      <th style="width:10%">Updated</th>
-      <th style="width:18%">Created</th>
-    </tr>
-  </thead>
+<h2>Tickets</h2>
 
-  <tbody>
-    <% @tickets.each do |ticket| %>
-      <tr data-link="<%= ticket_path(ticket) %>">
-        <td><%= link_to ticket.id, ticket_path(ticket) %></td>
-        <% if CurrentUser.user.is_moderator? %>
-          <td><%= link_to_user ticket.creator %></td>
-          <td>
-            <% if ticket.accused %>
-              <%= link_to_user ticket.accused %>
-            <% end %>
-          </td>
-          <td>
-          <% if ticket.claimant.nil? %>
-            <span class="text-error">Unclaimed</span>
-          <% else %>
-            <%= link_to_user ticket.claimant %>
-          <% end %>
-          </td>
-        <% end %>
-        <td><%= link_to ticket.type_title, ticket_path(ticket) %></td>
-
-        <%= tag.td(class: "ticket-subject full-width-link", title: truncate(strip_tags(format_text(ticket.reason)), length: 200)) do %>
-            <%= link_to truncate(strip_tags(format_text(ticket.subject)), length: 200), ticket_path(ticket.id) %>
-          <% end %>
-
-
-        <td class="<%= ticket.status %>-ticket"><%= ticket.pretty_status %></td>
-        <td style="cursor:help;"><%= time_ago_in_words_tagged(ticket.updated_at) %></td>
-        <td style="cursor:help;"><%= time_ago_in_words_tagged(ticket.created_at) %></td>
-      </tr>
+<%= table_for(@tickets) do |t| %>
+  <% t.column("ID", width: "5%") do |ticket| %>
+    <%= link_to(ticket.id, ticket_path(ticket)) %>
+  <% end %>
+  <% if CurrentUser.user.is_moderator? %>
+    <% t.column("Reporter", width: "10%") do |ticket| %>
+      <%= link_to_user(ticket.creator) %>
     <% end %>
-  </tbody>
-</table>
+    <% t.column("Accused", width: "10%") do |ticket| %>
+      <% if ticket.accused.present? %>
+        <%= link_to_user(ticket.accused) %>
+      <% end %>
+    <% end %>
+    <% t.column("Claimed By", width: "10%") do |ticket| %>
+      <% if ticket.claimant.blank? %>
+        <span class="text-error">Unclaimed</span>
+      <% else %>
+        <%= link_to_user(ticket.claimant) %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% t.column("Type", width: "15%") do |ticket| %>
+    <% if ticket.model.present? %>
+      <%= link_to(ticket.type_title, polymorphic_path(ticket.model)) %>
+    <% else %>
+      <%= ticket.type_title %>
+    <% end %>
+  <% end %>
+  <% t.column("Subject", width: "25%") do |ticket| %>
+    <%= link_to(truncate(strip_tags(format_text(ticket.subject)), length: 200), ticket_path(ticket.id)) %>
+  <% end %>
+  <% t.column("Status", width: "8%") do |ticket| %>
+    <%= ticket.pretty_status %>
+  <% end %>
+  <% t.column("Updated", width: "10%") do |ticket| %>
+    <%= time_ago_in_words_tagged(ticket.updated_at) %>
+  <% end %>
+  <% t.column("Created", width: "18%") do |ticket| %>
+    <%= time_ago_in_words_tagged(ticket.created_at) %>
+  <% end %>
+<% end %>
 
 <%= numbered_paginator(@tickets) %>
 

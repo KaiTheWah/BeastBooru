@@ -130,4 +130,10 @@ class ApplicationPolicy
   def permitted_search_params
     %i[id created_at updated_at order]
   end
+
+  def html_data_attributes
+    record.class.columns.select do |column|
+      column.type.in?(%i[integer boolean datetime float uuid interval]) && !column.array?
+    end.map(&:name).map(&:to_sym)
+  end
 end

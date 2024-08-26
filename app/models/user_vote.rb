@@ -27,7 +27,7 @@ class UserVote < ApplicationRecord
   end
 
   def self.vote_types
-    [%w[Downvote -1 redtext], %w[Upvote 1 greentext]]
+    [%w[Downvote -1 text-red], %w[Upvote 1 text-green]]
   end
 
   def initialize_attributes

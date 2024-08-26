@@ -12,10 +12,9 @@ module PostSets
     def create
       @set = PostSet.find(params[:post_set_id])
       authorize(@set, :add_maintainer?)
-      @user = User.find_by(name: params[:username])
+      @user = User.find_by("lower(name) = ?", params[:username])
       if @user.nil?
         notice("User #{params[:username]} not found")
-        redirect_to(maintainers_post_set_path(@set))
         respond_to do |format|
           format.html { redirect_to(maintainers_post_set_path(@set)) }
           format.json { render_expected_error(404, "User #{params[:username]} not found") }

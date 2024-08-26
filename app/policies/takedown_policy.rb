@@ -46,4 +46,8 @@ class TakedownPolicy < ApplicationPolicy
     params += %i[email vericode order] if user.can_handle_takedowns?
     params
   end
+
+  def html_data_attributes
+    super + %i[status]
+  end
 end

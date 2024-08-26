@@ -15,7 +15,7 @@
 class TableBuilder
   # Represents a single column in the table.
   class Column
-    attr_reader :attribute, :name, :block, :header_attributes, :body_attributes
+    attr_reader :attribute, :name, :block, :header_attributes, :body_attributes, :caption
 
     # Define a table column.
     #
@@ -102,11 +102,21 @@ class TableBuilder
     yield(self) if block_given?
   end
 
+  # Set the table caption
+  def caption
+    if block_given?
+      @caption = yield
+    end
+    @caption
+  end
+
   # Add a column to the table.
   # @example
   #   table.column(:name)
-  def column(...)
-    @columns << Column.new(...)
+  def column(*, **options, &)
+    opt = options.extract!(:if, :unless)
+    return if (opt.key?(:if) && !opt[:if]) || (opt.key?(:unless) && opt[:unless])
+    @columns << Column.new(*, **options, &)
   end
 
   # Return the HTML attributes for each <tr> tag.
@@ -119,7 +129,7 @@ class TableBuilder
     {
       id: "#{item.model_name.singular.dasherize}-#{item.id}",
       **row_attributes,
-      **ApplicationController.helpers.data_attributes_for(item, item.model_name.singular.dasherize, []),
+      **ApplicationController.helpers.data_attributes_for(item),
     }
   end
 end

@@ -1,19 +1,11 @@
-<table class="striped">
-  <caption>Mod Actions</caption>
-  <thead>
-    <tr>
-      <th>Moderator</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @dashboard.mod_actions.each do |mod_action| %>
-      <tr>
-        <td><%= link_to_user mod_action.creator %></td>
-        <td class="dtext-container"><%= format_text(mod_action.format_text) %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<%= table_for(@dashboard.mod_actions) do |t| %>
+  <%= t.caption { "Mod Actions" } %>
+  <% t.column("Moderator") do |mod_action| %>
+    <%= link_to_user(mod_action.creator) %>
+  <% end %>
+  <% t.column("Description") do |mod_action| %>
+    <%= format_text(mod_action.format_text) %>
+  <% end %>
+<% end %>
 
-<p><%= link_to "View all actions", mod_actions_path %></p>
+<p><%= link_to("View all actions", mod_actions_path) %></p>

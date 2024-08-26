@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class DestroyedPostPolicy < ApplicationPolicy
+  def index?
+    user.is_admin?
+  end
+
   def create?
     user.is_admin?
   end

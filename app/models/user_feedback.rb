@@ -71,8 +71,11 @@ class UserFeedback < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.attribute_matches(:body, params[:body_matches])
+      deleted = (params[:deleted].presence || "excluded").downcase
+      q = q.active if deleted == "excluded"
+      q = q.deleted if deleted == "only"
 
+      q = q.attribute_matches(:body, params[:body_matches])
       q = q.where_user(:user_id, :user, params)
       q = q.where_user(:creator_id, :creator, params)
 

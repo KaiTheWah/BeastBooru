@@ -154,7 +154,7 @@ class ForumTopic < ApplicationRecord
         return true
       end
 
-      user.has_viewed_thread?(id, updated_at)
+      user.has_viewed_topic?(id, updated_at)
     end
 
     def mark_as_read!(user = CurrentUser.user)
@@ -252,5 +252,12 @@ class ForumTopic < ApplicationRecord
   def is_stale_for?(user)
     return false if user.is_moderator?
     is_stale?
+  end
+
+  def is_read?
+    return true if CurrentUser.is_anonymous?
+    return true if new_record?
+
+    read_by?(CurrentUser.user)
   end
 end

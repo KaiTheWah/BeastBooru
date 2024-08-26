@@ -25,10 +25,10 @@
 <% end %>
 
 <%= javascript_tag nonce: true do -%>
-  $(".closebutton").on('click', function(e) {
+  $(".closebutton").on("click", function(e) {
     $(e.target.parentNode).hide();
   });
-  $(".desc-show").on('click', function(e) {
+  $(".desc-show").on("click", function(e) {
     $(e.target).next().toggle();
   });
 <% end -%>

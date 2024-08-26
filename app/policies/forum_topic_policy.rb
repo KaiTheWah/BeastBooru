@@ -82,4 +82,8 @@ class ForumTopicPolicy < ApplicationPolicy
   def permitted_search_params
     super + %i[title title_matches category_id is_sticky is_locked is_hidden order]
   end
+
+  def html_data_attributes
+    super + [:is_read?, { category: %i[id name] }]
+  end
 end

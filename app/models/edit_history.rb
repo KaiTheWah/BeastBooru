@@ -43,8 +43,8 @@ class EditHistory < ApplicationRecord
   def previous_contentful_edit(versions)
     return nil if version == 1
     previous = previous_version(versions)
-    return previous if previous.present?
-    # we might be on a page that doesn'template contain the most recent contentful edit, query to try to find it
+    return previous if previous.present? && previous.is_contentful?
+    # we might be on a page that doesn't contain the most recent contentful edit, query to try to find it
     EditHistory.where(versionable_id: versionable_id, versionable_type: versionable_type, edit_type: %w[original edit]).and(EditHistory.where(EditHistory.arel_table[:version].lt(version))).last
   end
 
@@ -96,6 +96,10 @@ class EditHistory < ApplicationRecord
     limit = limit.to_i
     return 1 if limit <= 0
     (version / limit).ceil + 1
+  end
+
+  def previous
+    EditHistory.where(versionable_id: versionable_id, versionable_type: versionable_type).where("version < ?", version).order(version: :desc).first
   end
 
   module SearchMethods

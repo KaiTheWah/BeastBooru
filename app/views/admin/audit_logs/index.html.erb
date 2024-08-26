@@ -2,24 +2,17 @@
 
 <%= render "search" %>
 
-<table class="striped">
-  <thead>
-  <tr>
-    <th width="10%">Date</th>
-    <th width="15%">User</th>
-    <th width="75%">Message</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @audit_logs.each do |mod_action| %>
-    <tr>
-      <td><%= compact_time mod_action.created_at %></td>
-      <td><%= link_to_user mod_action.user %></td>
-      <td class="dtext-container"><%= format_text(mod_action.format_text) %></td>
-    </tr>
+<%= table_for(@audit_logs) do |t| %>
+  <% t.column("User", width: "20%") do |log| %>
+    <%= link_to_user(log.user) %>
+    <%= compact_time(log.created_at) %>
   <% end %>
-  </tbody>
-</table>
+  <% t.column("Message", width: "80%") do |log| %>
+    <div class="dtext-container">
+      <%= format_text(log.format_text) %>
+    </div>
+  <% end %>
+<% end %>
 
 <%= numbered_paginator(@audit_logs) %>
 

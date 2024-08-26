@@ -336,7 +336,7 @@ class Ticket < ApplicationRecord
   end
 
   def type_title
-    "#{model.class.name.titlecase} #{report_type.titlecase}"
+    "#{model_type.titlecase} #{report_type.titlecase}"
   end
 
   def subject

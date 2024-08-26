@@ -1,45 +1,46 @@
-<table class="striped">
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th class="updated-at updater">Last Post</th>
-      <th class="created-at creator">Created</th>
-      <th>Replies</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% forum_topics.each do |topic| %>
-      <tr class="forum-topic-row forum-topic-category-<%= topic.category_id %>" data-topic-is-hidden="<%= topic.is_hidden? %>" data-creator-id="<%= topic.creator_id %>">
-        <td>
-          <% if topic.is_sticky? %>
-            <span class="sticky">Sticky:</span>
-          <% end %>
+<%= table_for(forum_topics, tr: { class: "forum-topic-row" }) do |t| %>
+  <% t.column("Title") do |topic| %>
 
-          <% unless topic.read_by?(CurrentUser.user) %>
-            <span class="new">NEW</span>
-          <% end %>
-
-          <% if CurrentUser.user.go_to_recent_forum_post? && topic.response_count > 1 && (post = topic.posts.select(:id).last) %>
-            <%= link_to topic.title, forum_topic_path(topic, page: topic.last_page, anchor: "forum_post_#{post.id}"), class: "forum-post-link" %>
-          <% else %>
-            <%= link_to topic.title, forum_topic_path(topic), class: "forum-post-link" %>
-          <% end %>
-
-          <% if topic.last_page > 1 %>
-            <%= link_to "page #{topic.last_page}", forum_topic_path(topic, page: topic.last_page), class: "last-page" %>
-          <% end %>
-
-          <% if topic.is_locked? %>
-            <span class="locked-topic">(locked)</span>
-          <% end %>
-          <% if topic.is_hidden? %>
-            <span class="locked-topic">(hidden)</span>
-          <% end %>
-        </td>
-        <td class="updated-at updater"><%= link_to_user topic.posts.last.creator %> <%= time_ago_in_words_tagged topic.updated_at, compact: true %></td>
-        <td class="created-at creator"><%= link_to_user topic.creator %> <%= time_ago_in_words_tagged topic.created_at, compact: true %></td>
-        <td><%= topic.response_count - 1 %></td>
-      </tr>
+    <% if topic.is_sticky? %>
+      <span class="sticky">Sticky:</span>
     <% end %>
-  </tbody>
-</table>
+
+    <% unless topic.read_by?(CurrentUser.user) %>
+      <span class="new">NEW</span>
+    <% end %>
+
+    <% if CurrentUser.user.go_to_recent_forum_post? && topic.response_count > 1 && (post = topic.posts.select(:id).last) %>
+      <%= link_to topic.title, forum_topic_path(topic, page: topic.last_page, anchor: "forum_post_#{post.id}"), class: "forum-post-link" %>
+    <% else %>
+      <%= link_to topic.title, forum_topic_path(topic), class: "forum-post-link" %>
+    <% end %>
+
+    <% if topic.last_page > 1 %>
+      <%= link_to "page #{topic.last_page}", forum_topic_path(topic, page: topic.last_page), class: "last-page" %>
+    <% end %>
+
+    <% if topic.is_locked? %>
+      <span class="locked-topic">(locked)</span>
+    <% end %>
+    <% if topic.is_hidden? %>
+      <span class="locked-topic">(hidden)</span>
+    <% end %>
+  <% end %>
+  <% t.column("Last Post") do |topic| %>
+    <%= link_to_user(topic.posts.last.creator) %>
+    <% if policy(topic).can_see_ip_addr? %>
+      (<%= link_to_ip(topic.posts.last.creator_ip_addr) %>)
+    <% end %>
+    <p><%= time_ago_in_words_tagged(topic.updated_at, compact: true) %></p>
+  <% end %>
+  <% t.column("Creator", th: { class: "created-at creator" }) do |topic| %>
+    <%= link_to_user(topic.creator) %>
+    <% if policy(topic).can_see_ip_addr? %>
+      (<%= link_to_ip(topic.creator_ip_addr) %>)
+    <% end %>
+    <p><%= time_ago_in_words_tagged(topic.created_at, compact: true) %></p>
+  <% end %>
+  <% t.column("Replies") do |topic| %>
+    <%= topic.response_count - 1 %>
+  <% end %>
+<% end %>

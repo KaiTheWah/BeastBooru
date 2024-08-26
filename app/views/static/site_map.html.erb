@@ -92,7 +92,7 @@
     <% if CurrentUser.user.is_anonymous? %>
       <%= li_link_to("Signup", new_user_path) %>
     <% else %>
-      <%= li_link_to("Profile", user_path(CurrentUser.userdt)) %>
+      <%= li_link_to("Profile", user_path(CurrentUser.user)) %>
       <%= li_link_to("Settings", edit_users_path) %>
       <%= li_link_to("Refresh Counts", new_users_count_fixes_path) %>
       <%= li_link_to("Followed Tags", followed_tags_path) %>

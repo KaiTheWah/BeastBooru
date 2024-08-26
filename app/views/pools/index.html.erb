@@ -1,33 +1,20 @@
 <%= render partial: "search", locals: { path: pools_path } %>
 <h2>Pools</h2>
-<table class="striped">
-  <thead>
-    <tr>
-      <th width="50%">Name</th>
-      <th width="40%">Artists</th>
-      <th width="10%">Count</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @pools.each do |pool| %>
-      <tr id="pool-<%= pool.id %>">
-        <td>
-          <%= link_to pool.pretty_name, pool_path(pool) %>
 
-          <% if pool.last_page > 1 %>
-            <%= link_to "page #{pool.last_page}", pool_path(pool, page: pool.last_page), class: "last-page" %>
-          <% end %>
-        </td>
-        <td>
-          <%= link_to_pool_artists(pool.artists) %>
-        </td>
-        <td>
-          <%= pool.post_count %>
-        </td>
-      <% end %>
-    </tr>
-  </tbody>
-</table>
+<%= table_for(@pools) do |t| %>
+  <% t.column("Name") do |pool| %>
+    <%= link_to(pool.pretty_name, pool_path(pool)) %>
+    <% if pool.last_page > 1 %>
+      <%= link_to("page #{pool.last_page}", pool_path(pool, page: pool.last_page), class: "last-page") %>
+    <% end %>
+  <% end %>
+  <% t.column("Artists") do |pool| %>
+    <%= link_to_pool_artists(pool.artists) %>
+  <% end %>
+  <% t.column("Count") do |pool| %>
+    <%= pool.post_count %>
+  <% end %>
+<% end %>
 
 <%= numbered_paginator(@pools) %>
 

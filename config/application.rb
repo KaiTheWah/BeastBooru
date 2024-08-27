@@ -36,7 +36,7 @@ module FemboyFans
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     # config.autoload_lib(ignore: %w(assets tasks))
 
-    config.active_record.schema_format = :sql
+    config.active_record.schema_format = :ruby
     config.log_tags = [->(_req) { "PID:#{Process.pid}" }]
     config.action_controller.action_on_unpermitted_parameters = :raise
     config.force_ssl = true

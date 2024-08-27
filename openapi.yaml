@@ -1913,7 +1913,7 @@ components:
               items:
                 type: string
         locked_tags:
-          type: ["array", "null"]
+          type: "array"
           items:
             type: string
         change_seq:
@@ -2378,7 +2378,7 @@ components:
           items:
             type: string
         locked_tags:
-          type: ["string", "null"]
+          type: "string"
         added_locked_tags:
           type: array
           items:
@@ -3442,6 +3442,7 @@ components:
         - parent
         - creator_name
         - category_id
+        - protection_level
       properties:
         id:
           type: number
@@ -3468,6 +3469,8 @@ components:
         category_id:
           type: number
           enum: *tag-categories
+        protection_level:
+          type: ["number", "null"]
     WikiPageVersion:
       type: object
       required:
@@ -3481,6 +3484,7 @@ components:
         - updated_at
         - reason
         - parent
+        - protection_level
       properties:
         id:
           type: number
@@ -3504,6 +3508,8 @@ components:
           type: ["string", "null"]
         parent:
           type: ["string", "null"]
+        protection_level:
+          type: ["number", "null"]
   responses:
     NotFound:
       description: Not Found

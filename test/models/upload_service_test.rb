@@ -264,6 +264,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         service = @build_service.call(source: source1, rating: "s", file: fixture_file_upload("test.jpg"))
 
         assert_nothing_raised { @upload = service.start! }
+        puts @upload.status
         assert_equal(source2, @upload.post.source)
       end
     end

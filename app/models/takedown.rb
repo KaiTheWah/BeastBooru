@@ -6,11 +6,9 @@ class Takedown < ApplicationRecord
   before_validation :initialize_fields, on: :create
   before_validation :normalize_post_ids
   before_validation :strip_fields
-  validates :email, presence: true
-  validates :reason, presence: true
   validates :email, format: { with: /\A([\s*A-Z0-9._%+-]+@[\s*A-Z0-9.-]+\.\s*[A-Z\s*]{2,15}\s*)\z/i, on: :create }
-  validates :email, length: { maximum: 250 }
-  validates :reason, length: { maximum: 5_000 }
+  validates :email, length: { maximum: 250 }, presence: true
+  validates :reason, length: { maximum: 5_000 }, presence: true
   validates :instructions, length: { maximum: 5_000 }
   validates :notes, length: { maximum: 5_000 }
   validate :can_create_takedown, on: :create

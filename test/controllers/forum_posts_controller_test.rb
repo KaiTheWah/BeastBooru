@@ -194,6 +194,36 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "on a forum post with an AIBUR" do
+        should "work (alias)" do
+          as(@user) { @ta = create(:tag_alias, forum_topic: @forum_post.topic, forum_post: @forum_post) }
+          assert_equal(@forum_post.id, @ta.reload.forum_post_id)
+          assert_difference({ "ForumPost.count" => -1, "TagAlias.count" => 0 }) do
+            delete_auth forum_post_path(@forum_post), create(:admin_user)
+          end
+          assert_nil(@ta.reload.forum_post_id)
+        end
+
+        should "work (implication)" do
+          as(@user) { @ti = create(:tag_implication, forum_topic: @forum_post.topic, forum_post: @forum_post) }
+          assert_equal(@forum_post.id, @ti.reload.forum_post_id)
+          assert_difference({ "ForumPost.count" => -1, "TagImplication.count" => 0 }) do
+            delete_auth forum_post_path(@forum_post), create(:admin_user)
+          end
+          assert_nil(@ti.reload.forum_post_id)
+        end
+
+        should "work (bulk update request)" do
+          as(@user) { @bur = create(:bulk_update_request, forum_topic: @forum_post.topic, forum_post: @forum_post) }
+          @forum_post = @bur.forum_post
+          assert_equal(@forum_post.id, @bur.reload.forum_post_id)
+          assert_difference({ "ForumPost.count" => -1, "BulkUpdateRequest.count" => 0 }) do
+            delete_auth forum_post_path(@forum_post), create(:admin_user)
+          end
+          assert_nil(@bur.reload.forum_post_id)
+        end
+      end
+
       should "restrict access" do
         as(create(:admin_user)) { @posts = create_list(:forum_post, User::Levels.constants.length, topic: @forum_topic) }
         assert_access(User::Levels::ADMIN, success_response: :redirect) { |user| delete_auth forum_post_path(@posts.shift), user }

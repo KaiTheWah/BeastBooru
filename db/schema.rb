@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_27_201623) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -27,6 +27,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.datetime "last_used_at"
     t.inet "last_ip_address"
     t.index ["key"], name: "index_api_keys_on_key", unique: true
+    t.index ["name", "user_id"], name: "index_api_keys_on_name_and_user_id", unique: true
   end
 
   create_table "artist_urls", id: :serial, force: :cascade do |t|
@@ -36,6 +37,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.boolean "is_active", default: true, null: false
+    t.index ["artist_id", "url"], name: "index_artist_urls_on_artist_id_and_url", unique: true
     t.index ["artist_id"], name: "index_artist_urls_on_artist_id"
     t.index ["normalized_url"], name: "index_artist_urls_on_normalized_url_pattern", opclass: :text_pattern_ops
     t.index ["normalized_url"], name: "index_artist_urls_on_normalized_url_trgm", opclass: :gin_trgm_ops, using: :gin
@@ -95,7 +97,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "artist_id", null: false
-    t.index ["artist_id"], name: "index_avoid_postings_on_artist_id"
+    t.index ["artist_id"], name: "index_avoid_postings_on_artist_id", unique: true
     t.index ["creator_id"], name: "index_avoid_postings_on_creator_id"
     t.index ["updater_id"], name: "index_avoid_postings_on_updater_id"
   end
@@ -121,7 +123,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.datetime "updated_at", precision: nil, null: false
     t.integer "approver_id"
     t.integer "forum_post_id"
-    t.text "title"
+    t.text "title", default: "", null: false
     t.inet "creator_ip_addr", default: "127.0.0.1", null: false
     t.index ["forum_post_id"], name: "index_bulk_update_requests_on_forum_post_id"
   end
@@ -132,7 +134,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "score", null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.inet "user_ip_addr"
+    t.inet "user_ip_addr", null: false
     t.boolean "is_locked", default: false, null: false
     t.index ["comment_id", "user_id"], name: "index_comment_votes_on_comment_id_and_user_id", unique: true
     t.index ["comment_id"], name: "index_comment_votes_on_comment_id"
@@ -148,8 +150,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "score", default: 0, null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.integer "updater_id"
-    t.inet "updater_ip_addr"
+    t.integer "updater_id", null: false
+    t.inet "updater_ip_addr", null: false
     t.boolean "do_not_bump_post", default: false, null: false
     t.boolean "is_hidden", default: false, null: false
     t.boolean "is_sticky", default: false, null: false
@@ -170,8 +172,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.string "md5", null: false
     t.integer "destroyer_id", null: false
     t.inet "destroyer_ip_addr", null: false
-    t.integer "uploader_id"
-    t.inet "uploader_ip_addr"
+    t.integer "uploader_id", null: false
+    t.inet "uploader_ip_addr", null: false
     t.datetime "upload_date", precision: nil
     t.json "post_data", null: false
     t.datetime "created_at", null: false
@@ -218,6 +220,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.string "link_target", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["link_target", "model_type", "model_id"], name: "index_dtext_links_on_link_target_and_model_type_and_model_id", unique: true
     t.index ["link_target"], name: "index_dtext_links_on_link_target", opclass: :text_pattern_ops
     t.index ["link_type"], name: "index_dtext_links_on_link_type"
     t.index ["model_type", "model_id"], name: "index_dtext_links_on_model"
@@ -244,6 +247,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.string "domain", null: false
     t.integer "creator_id", null: false
     t.string "reason", null: false
+    t.index "lower((domain)::text)", name: "index_email_blacklists_on_lower_domain", unique: true
   end
 
   create_table "exception_logs", force: :cascade do |t|
@@ -252,7 +256,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.string "class_name", null: false
     t.inet "ip_addr", null: false
     t.string "version", null: false
-    t.text "extra_params"
+    t.text "extra_params", default: "{}", null: false
     t.text "message", null: false
     t.text "trace", null: false
     t.uuid "code", null: false
@@ -273,6 +277,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "order", null: false
     t.integer "can_view", default: 0, null: false
     t.integer "can_create", default: 10, null: false
+    t.index "lower((name)::text)", name: "index_forum_categories_on_lower_name", unique: true
   end
 
   create_table "forum_post_votes", force: :cascade do |t|
@@ -294,7 +299,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.boolean "is_hidden", default: false, null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.inet "creator_ip_addr"
+    t.inet "creator_ip_addr", null: false
     t.integer "warning_type"
     t.integer "warning_user_id"
     t.bigint "tag_change_request_id"
@@ -320,8 +325,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
   end
 
   create_table "forum_topic_visits", id: :serial, force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "forum_topic_id"
+    t.integer "user_id", null: false
+    t.integer "forum_topic_id", null: false
     t.datetime "last_read_at", precision: nil
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -460,11 +465,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "post_ids", default: [], null: false, array: true
     t.integer "added_post_ids", default: [], null: false, array: true
     t.integer "removed_post_ids", default: [], null: false, array: true
-    t.integer "updater_id"
-    t.inet "updater_ip_addr"
-    t.text "description"
+    t.integer "updater_id", null: false
+    t.inet "updater_ip_addr", null: false
+    t.text "description", null: false
     t.boolean "description_changed", default: false, null: false
-    t.text "name"
+    t.text "name", default: "", null: false
     t.boolean "name_changed", default: false, null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -508,16 +513,21 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "order", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index "lower((prompt)::text)", name: "index_post_deletion_reasons_on_lower_prompt", unique: true, where: "((title)::text <> ''::text)"
+    t.index "lower((reason)::text)", name: "index_post_deletion_reasons_on_lower_reason", unique: true
+    t.index "lower((title)::text)", name: "index_post_deletion_reasons_on_lower_title", unique: true, where: "((title)::text <> ''::text)"
     t.index ["creator_id"], name: "index_post_deletion_reasons_on_creator_id"
+    t.index ["order"], name: "index_post_deletion_reasons_on_order", unique: true
   end
 
   create_table "post_disapprovals", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "post_id", null: false
-    t.string "reason", default: "legacy"
-    t.text "message"
+    t.string "reason", null: false
+    t.text "message", default: "", null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.index ["post_id", "user_id"], name: "index_post_disapprovals_on_post_id_and_user_id", unique: true
     t.index ["post_id"], name: "index_post_disapprovals_on_post_id"
     t.index ["user_id"], name: "index_post_disapprovals_on_user_id"
   end
@@ -536,10 +546,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "post_id", null: false
     t.integer "creator_id", null: false
     t.inet "creator_ip_addr", null: false
-    t.text "reason"
+    t.text "reason", null: false
     t.boolean "is_resolved", default: false, null: false
     t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil
+    t.datetime "updated_at", precision: nil, null: false
     t.boolean "is_deletion", default: false, null: false
     t.index "to_tsvector('english'::regconfig, reason)", name: "index_post_flags_on_reason_tsvector", using: :gin
     t.index ["creator_id"], name: "index_post_flags_on_creator_id"
@@ -553,7 +563,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "order", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index "lower((reason)::text)", name: "index_post_replacement_rejection_reasons_on_lower_reason", unique: true
     t.index ["creator_id"], name: "index_post_replacement_rejection_reasons_on_creator_id"
+    t.index ["order"], name: "index_post_replacement_rejection_reasons_on_order", unique: true
   end
 
   create_table "post_replacements", force: :cascade do |t|
@@ -568,7 +580,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "image_height", null: false
     t.integer "image_width", null: false
     t.string "md5", null: false
-    t.string "source"
+    t.string "source", default: "", null: false
     t.string "file_name"
     t.string "storage_id", null: false
     t.string "status", default: "pending", null: false
@@ -599,7 +611,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.boolean "is_public", default: false, null: false
     t.boolean "transfer_on_delete", default: false, null: false
     t.integer "creator_id", null: false
-    t.inet "creator_ip_addr"
+    t.inet "creator_ip_addr", null: false
     t.integer "post_ids", default: [], null: false, array: true
     t.integer "post_count", default: 0, null: false
     t.datetime "created_at", precision: nil, null: false
@@ -612,19 +624,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.text "tags", null: false
     t.text "added_tags", default: [], null: false, array: true
     t.text "removed_tags", default: [], null: false, array: true
-    t.text "locked_tags"
+    t.text "locked_tags", default: "", null: false
     t.text "added_locked_tags", default: [], null: false, array: true
     t.text "removed_locked_tags", default: [], null: false, array: true
-    t.integer "updater_id"
+    t.integer "updater_id", null: false
     t.inet "updater_ip_addr", null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.string "rating", limit: 1
+    t.string "rating", limit: 1, null: false
     t.boolean "rating_changed", default: false, null: false
     t.integer "parent_id"
     t.boolean "parent_changed", default: false, null: false
-    t.text "source"
+    t.text "source", default: "", null: false
     t.boolean "source_changed", default: false, null: false
-    t.text "description"
+    t.text "description", default: "", null: false
     t.boolean "description_changed", default: false, null: false
     t.integer "version", default: 1, null: false
     t.string "reason"
@@ -641,7 +653,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "score", null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.inet "user_ip_addr"
+    t.inet "user_ip_addr", null: false
     t.boolean "is_locked", default: false, null: false
     t.index ["post_id"], name: "index_post_votes_on_post_id"
     t.index ["user_id", "post_id"], name: "index_post_votes_on_user_id_and_post_id", unique: true
@@ -687,7 +699,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.boolean "has_active_children", default: false, null: false
     t.bigint "bit_flags", default: 0, null: false
     t.integer "tag_count_meta", default: 0, null: false
-    t.text "locked_tags"
+    t.text "locked_tags", default: "", null: false
     t.integer "tag_count_species", default: 0, null: false
     t.integer "tag_count_invalid", default: 0, null: false
     t.text "description", default: "", null: false
@@ -725,6 +737,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "order", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["order"], name: "index_quick_rules_on_order", unique: true
     t.index ["rule_id"], name: "index_quick_rules_on_rule_id"
   end
 
@@ -736,7 +749,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.string "anchor", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index "lower((name)::text)", name: "index_rule_categories_on_lower_name", unique: true
     t.index ["creator_id"], name: "index_rule_categories_on_creator_id"
+    t.index ["order"], name: "index_rule_categories_on_order", unique: true
     t.index ["updater_id"], name: "index_rule_categories_on_updater_id"
   end
 
@@ -750,8 +765,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.string "anchor", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index "lower((name)::text)", name: "index_rules_on_lower_name", unique: true
     t.index ["category_id"], name: "index_rules_on_category_id"
     t.index ["creator_id"], name: "index_rules_on_creator_id"
+    t.index ["order", "category_id"], name: "index_rules_on_order_and_category_id", unique: true
     t.index ["updater_id"], name: "index_rules_on_updater_id"
   end
 
@@ -760,7 +777,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.string "action", default: "unknown_action", null: false
-    t.json "values"
+    t.json "values", default: "{}", null: false
     t.index ["user_id"], name: "index_staff_audit_logs_on_user_id"
   end
 
@@ -769,7 +786,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.integer "creator_id", null: false
-    t.string "body"
+    t.string "body", null: false
     t.boolean "is_deleted", default: false, null: false
     t.bigint "updater_id", null: false
     t.index ["creator_id"], name: "index_staff_notes_on_creator_id"
@@ -868,16 +885,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.integer "creator_id"
     t.inet "creator_ip_addr", null: false
     t.integer "approver_id"
-    t.string "status", default: "pending"
+    t.string "status", default: "pending", null: false
     t.string "vericode", null: false
-    t.string "source"
-    t.string "email"
-    t.text "reason"
+    t.string "source", default: "", null: false
+    t.string "email", null: false
+    t.text "reason", default: "", null: false
     t.boolean "reason_hidden", default: false, null: false
     t.text "notes", default: "none", null: false
-    t.text "instructions"
-    t.text "post_ids", default: ""
-    t.text "del_post_ids", default: ""
+    t.text "instructions", default: "", null: false
+    t.text "post_ids", default: "", null: false
+    t.text "del_post_ids", default: "", null: false
     t.integer "post_count", default: 0, null: false
   end
 
@@ -887,7 +904,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.string "status", default: "pending", null: false
     t.string "reason"
     t.string "response", default: "", null: false
-    t.integer "handler_id", default: 0, null: false
+    t.integer "handler_id"
     t.integer "claimant_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -905,6 +922,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.boolean "hidden", default: false, null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.index ["pattern"], name: "index_upload_whitelists_on_pattern", unique: true
   end
 
   create_table "uploads", id: :serial, force: :cascade do |t|
@@ -942,6 +960,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "suppress_mentions", default: false, null: false
+    t.index ["target_id", "user_id"], name: "index_user_blocks_on_target_id_and_user_id", unique: true
     t.index ["target_id"], name: "index_user_blocks_on_target_id"
     t.index ["user_id"], name: "index_user_blocks_on_user_id"
   end
@@ -953,8 +972,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.text "body", null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.inet "creator_ip_addr"
-    t.integer "updater_id"
+    t.inet "creator_ip_addr", null: false
+    t.integer "updater_id", null: false
     t.boolean "is_deleted", default: false, null: false
     t.index "lower(body) gin_trgm_ops", name: "index_user_feedback_on_lower_body_trgm", using: :gin
     t.index "to_tsvector('english'::regconfig, body)", name: "index_user_feedback_on_to_tsvector_english_body", using: :gin
@@ -968,9 +987,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.string "status", default: "pending", null: false
     t.integer "user_id", null: false
     t.integer "approver_id"
-    t.string "original_name"
-    t.string "desired_name"
-    t.text "change_reason"
+    t.string "original_name", null: false
+    t.string "desired_name", null: false
+    t.text "change_reason", default: "", null: false
     t.text "rejection_reason"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -1017,7 +1036,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.string "time_zone", default: "Eastern Time (US & Canada)", null: false
     t.text "bcrypt_password_hash"
     t.integer "per_page", default: 100, null: false
-    t.text "custom_style"
+    t.text "custom_style", default: "", null: false
     t.bigint "bit_prefs", default: 0, null: false
     t.inet "last_ip_addr"
     t.integer "unread_dmail_count", default: 0, null: false
@@ -1075,7 +1094,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.text "body", null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.integer "updater_id"
+    t.integer "updater_id", null: false
     t.string "parent"
     t.integer "protection_level"
     t.index "lower((title)::text) gin_trgm_ops", name: "index_wiki_pages_on_lower_title_trgm", using: :gin
@@ -1086,20 +1105,93 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
     t.index ["updated_at"], name: "index_wiki_pages_on_updated_at"
   end
 
+  add_foreign_key "api_keys", "users"
+  add_foreign_key "artist_urls", "artists"
+  add_foreign_key "artist_versions", "artists"
+  add_foreign_key "artist_versions", "users", column: "updater_id"
+  add_foreign_key "artists", "users", column: "creator_id"
+  add_foreign_key "artists", "users", column: "linked_user_id"
   add_foreign_key "avoid_posting_versions", "avoid_postings"
   add_foreign_key "avoid_posting_versions", "users", column: "updater_id"
   add_foreign_key "avoid_postings", "artists"
   add_foreign_key "avoid_postings", "users", column: "creator_id"
   add_foreign_key "avoid_postings", "users", column: "updater_id"
+  add_foreign_key "bans", "users"
+  add_foreign_key "bans", "users", column: "banner_id"
+  add_foreign_key "bulk_update_requests", "forum_posts", on_delete: :nullify
+  add_foreign_key "bulk_update_requests", "forum_topics", on_delete: :nullify
+  add_foreign_key "bulk_update_requests", "users", column: "approver_id"
+  add_foreign_key "bulk_update_requests", "users", column: "creator_id"
+  add_foreign_key "comment_votes", "comments"
+  add_foreign_key "comment_votes", "users"
+  add_foreign_key "comments", "posts"
+  add_foreign_key "comments", "users", column: "creator_id"
+  add_foreign_key "comments", "users", column: "updater_id"
+  add_foreign_key "comments", "users", column: "warning_user_id"
+  add_foreign_key "destroyed_posts", "users", column: "destroyer_id"
+  add_foreign_key "destroyed_posts", "users", column: "uploader_id"
+  add_foreign_key "dmail_filters", "users"
+  add_foreign_key "dmails", "users", column: "from_id"
+  add_foreign_key "dmails", "users", column: "owner_id"
   add_foreign_key "dmails", "users", column: "respond_to_id"
+  add_foreign_key "dmails", "users", column: "to_id"
+  add_foreign_key "edit_histories", "users"
+  add_foreign_key "email_blacklists", "users", column: "creator_id"
+  add_foreign_key "exception_logs", "users"
   add_foreign_key "favorites", "posts"
   add_foreign_key "favorites", "users"
+  add_foreign_key "forum_post_votes", "forum_posts"
+  add_foreign_key "forum_post_votes", "users"
+  add_foreign_key "forum_posts", "forum_topics", column: "topic_id"
+  add_foreign_key "forum_posts", "users", column: "creator_id"
+  add_foreign_key "forum_posts", "users", column: "updater_id"
+  add_foreign_key "forum_posts", "users", column: "warning_user_id"
+  add_foreign_key "forum_topic_statuses", "forum_topics"
+  add_foreign_key "forum_topic_statuses", "users"
+  add_foreign_key "forum_topic_visits", "forum_topics"
+  add_foreign_key "forum_topic_visits", "users"
+  add_foreign_key "forum_topics", "forum_categories", column: "category_id"
+  add_foreign_key "forum_topics", "users", column: "creator_id"
+  add_foreign_key "forum_topics", "users", column: "updater_id"
   add_foreign_key "help_pages", "wiki_pages"
+  add_foreign_key "ip_bans", "users", column: "creator_id"
   add_foreign_key "mascots", "users", column: "creator_id"
+  add_foreign_key "mod_actions", "users", column: "creator_id"
+  add_foreign_key "news_updates", "users", column: "creator_id"
+  add_foreign_key "news_updates", "users", column: "updater_id"
+  add_foreign_key "note_versions", "notes"
+  add_foreign_key "note_versions", "posts"
+  add_foreign_key "note_versions", "users", column: "updater_id"
+  add_foreign_key "notes", "posts"
+  add_foreign_key "notes", "users", column: "creator_id"
+  add_foreign_key "notifications", "users"
+  add_foreign_key "pool_versions", "pools"
+  add_foreign_key "pool_versions", "users", column: "updater_id"
+  add_foreign_key "pools", "users", column: "creator_id"
+  add_foreign_key "post_approvals", "posts"
+  add_foreign_key "post_approvals", "users"
   add_foreign_key "post_deletion_reasons", "users", column: "creator_id"
+  add_foreign_key "post_disapprovals", "posts"
+  add_foreign_key "post_disapprovals", "users"
   add_foreign_key "post_events", "users", column: "creator_id"
+  add_foreign_key "post_flags", "posts"
+  add_foreign_key "post_flags", "users", column: "creator_id"
   add_foreign_key "post_replacement_rejection_reasons", "users", column: "creator_id"
+  add_foreign_key "post_replacements", "posts"
+  add_foreign_key "post_replacements", "users", column: "approver_id"
+  add_foreign_key "post_replacements", "users", column: "creator_id"
   add_foreign_key "post_replacements", "users", column: "rejector_id"
+  add_foreign_key "post_replacements", "users", column: "uploader_id_on_approve"
+  add_foreign_key "post_set_maintainers", "post_sets"
+  add_foreign_key "post_set_maintainers", "users"
+  add_foreign_key "post_sets", "users", column: "creator_id"
+  add_foreign_key "post_versions", "posts"
+  add_foreign_key "post_versions", "users", column: "updater_id"
+  add_foreign_key "post_votes", "posts"
+  add_foreign_key "post_votes", "users"
+  add_foreign_key "posts", "users", column: "approver_id"
+  add_foreign_key "posts", "users", column: "uploader_id"
+  add_foreign_key "quick_rules", "rules"
   add_foreign_key "rule_categories", "users", column: "creator_id"
   add_foreign_key "rule_categories", "users", column: "updater_id"
   add_foreign_key "rules", "rule_categories", column: "category_id"
@@ -1107,10 +1199,39 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_144113) do
   add_foreign_key "rules", "users", column: "updater_id"
   add_foreign_key "staff_audit_logs", "users"
   add_foreign_key "staff_notes", "users"
+  add_foreign_key "staff_notes", "users", column: "creator_id"
   add_foreign_key "staff_notes", "users", column: "updater_id"
+  add_foreign_key "tag_aliases", "forum_posts", on_delete: :nullify
+  add_foreign_key "tag_aliases", "forum_topics", on_delete: :nullify
+  add_foreign_key "tag_aliases", "users", column: "approver_id"
+  add_foreign_key "tag_aliases", "users", column: "creator_id"
   add_foreign_key "tag_followers", "posts", column: "last_post_id"
+  add_foreign_key "tag_followers", "tags"
+  add_foreign_key "tag_followers", "users"
+  add_foreign_key "tag_implications", "forum_posts", on_delete: :nullify
+  add_foreign_key "tag_implications", "forum_topics", on_delete: :nullify
+  add_foreign_key "tag_implications", "users", column: "approver_id"
+  add_foreign_key "tag_implications", "users", column: "creator_id"
+  add_foreign_key "tag_versions", "tags"
+  add_foreign_key "tag_versions", "users", column: "updater_id"
+  add_foreign_key "takedowns", "users", column: "approver_id"
+  add_foreign_key "takedowns", "users", column: "creator_id"
   add_foreign_key "tickets", "users", column: "accused_id"
+  add_foreign_key "tickets", "users", column: "creator_id"
+  add_foreign_key "tickets", "users", column: "handler_id"
+  add_foreign_key "uploads", "posts"
+  add_foreign_key "uploads", "users", column: "uploader_id"
   add_foreign_key "user_blocks", "users"
   add_foreign_key "user_feedbacks", "users"
+  add_foreign_key "user_feedbacks", "users", column: "creator_id"
+  add_foreign_key "user_name_change_requests", "users"
+  add_foreign_key "user_name_change_requests", "users", column: "approver_id"
+  add_foreign_key "user_password_reset_nonces", "users"
+  add_foreign_key "user_text_versions", "users"
   add_foreign_key "user_text_versions", "users", column: "updater_id"
+  add_foreign_key "users", "posts", column: "avatar_id"
+  add_foreign_key "wiki_page_versions", "users", column: "updater_id"
+  add_foreign_key "wiki_page_versions", "wiki_pages"
+  add_foreign_key "wiki_pages", "users", column: "creator_id"
+  add_foreign_key "wiki_pages", "users", column: "updater_id"
 end

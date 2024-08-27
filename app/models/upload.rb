@@ -5,11 +5,12 @@ require "tmpdir"
 class Upload < ApplicationRecord
   class Error < StandardError; end
 
-  attr_accessor :as_pending, :replaced_post, :file, :original_post_id, :locked_tags, :locked_rating, :replacement_id
+  attr_accessor :as_pending, :replaced_post, :file, :original_post_id, :locked_rating, :replacement_id, :locked_tags
 
   belongs_to :uploader, class_name: "User"
   belongs_to :post, optional: true
 
+  after_initialize :set_locked_tags
   before_validation :assign_rating_from_tags
   before_validation :normalize_direct_url, on: :create
   validate :uploader_is_not_limited, on: :create
@@ -18,6 +19,10 @@ class Upload < ApplicationRecord
   validate :md5_is_unique, on: :file
   validate on: :file do |upload|
     FileValidator.new(upload, file.path).validate
+  end
+
+  def set_locked_tags
+    self.locked_tags ||= ""
   end
 
   module StatusMethods

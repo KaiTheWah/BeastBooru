@@ -186,7 +186,7 @@ module Posts
 
         should "restrict access" do
           assert_access([User::Levels::JANITOR, User::Levels::ADMIN, User::Levels::OWNER], success_response: :redirect) do |user|
-            Post.where.not(id: @post.id).delete_all
+            Post.where.not(id: @post.id).destroy_all
             @replacement.update_column(:status, "pending")
             post_auth promote_post_replacement_path(@replacement), user
           end

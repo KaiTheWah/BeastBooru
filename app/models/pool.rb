@@ -24,6 +24,8 @@ class Pool < ApplicationRecord
   after_save :create_version
   after_save :synchronize, if: :saved_change_to_post_ids?
 
+  has_many :versions, -> { order("id asc") }, class_name: "PoolVersion", dependent: :destroy
+
   attr_accessor :skip_sync
 
   has_dtext_links :description
@@ -138,10 +140,6 @@ class Pool < ApplicationRecord
     elsif name
       where("lower(pools.name) = ?", normalize_name(name).downcase).first
     end
-  end
-
-  def versions
-    PoolVersion.where("pool_id = ?", id).order("id asc")
   end
 
   def normalize_name

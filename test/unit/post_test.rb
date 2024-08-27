@@ -589,7 +589,7 @@ class PostTest < ActiveSupport::TestCase
             @post.save
 
             assert_equal("a b c", @post.tag_string)
-            assert_nil(@post.locked_tags)
+            assert_equal("", @post.locked_tags)
           end
 
           should "add dnp tags through an implication" do
@@ -645,7 +645,7 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not allow adding" do
-            @post.update_column(:locked_tags, nil)
+            @post.update_column(:locked_tags, "")
 
             @post.locked_tags = "invalid_tag -invalid_tag_2"
             @post.save

@@ -177,7 +177,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         file = fixture_file_upload("test.jpg")
         FemboyFans.config.stubs(:disable_age_checks?).returns(true)
         assert_access(User::Levels::MEMBER, anonymous_response: :forbidden) do |user|
-          Post.delete_all
+          Post.destroy_all
           post_auth uploads_path, user, params: { upload: { file: file, tag_string: "aaa", rating: "q", source: "aaa" }, format: :json }
         end
       end

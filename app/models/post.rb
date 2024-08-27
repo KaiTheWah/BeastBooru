@@ -621,9 +621,7 @@ class Post < ApplicationRecord
 
     def normalize_tags
       @tag_string_before_parse = remove_metatags(tag_array - tag_array_was).join(" ") if tag_string_diff.blank?
-      if !locked_tags.nil? && locked_tags.strip.blank?
-        self.locked_tags = nil
-      elsif locked_tags.present?
+      if locked_tags.present?
         remove_invalid_category_locked_tags
         locked = TagQuery.scan(locked_tags.downcase)
         to_remove, to_add = locked.partition { |x| x =~ /\A-/i }
@@ -668,7 +666,7 @@ class Post < ApplicationRecord
 
     # Prevent adding these without an implication
     def remove_dnp_tags(tags)
-      locked = locked_tags || ""
+      locked = locked_tags
       # Don't remove dnp tags here if they would be later added through locked tags
       # to prevent the warning message from appearing when they didn't actually get removed
       if locked.exclude?("avoid_posting")
@@ -681,7 +679,7 @@ class Post < ApplicationRecord
     end
 
     def add_dnp_tags_to_locked(tags)
-      locked = TagQuery.scan((locked_tags || "").downcase)
+      locked = TagQuery.scan(locked_tags.downcase)
       if tags.include?("avoid_posting")
         locked << "avoid_posting"
       end
@@ -712,7 +710,7 @@ class Post < ApplicationRecord
     end
 
     def remove_invalid_category_locked_tags
-      locked = (locked_tags || "").downcase.split
+      locked = locked_tags.downcase.split
       invalid = locked.select { |tag| Tag.category_for(tag.starts_with?("-") ? tag[1..] : tag) == TagCategory.invalid }
       unless invalid.empty?
         warnings.add(:base, "Forcefully removed #{invalid.length} invalid locked #{'tag'.pluralize(invalid.length)}: #{invalid.join(', ')}")
@@ -1707,7 +1705,7 @@ class Post < ApplicationRecord
           total: total_views,
         },
         tags:            TagCategory.category_names.index_with { |category| typed_tags(TagCategory.get(category).id) },
-        locked_tags:     locked_tags&.split || [],
+        locked_tags:     locked_tags.split,
         change_seq:      change_seq,
         flags:           {
           pending:       is_pending,

@@ -25,8 +25,8 @@ class Artist < ApplicationRecord
   after_save :clear_url_string_changed
   after_save :update_posts_index, if: :saved_change_to_linked_user_id?
 
-  has_many :urls, dependent: :destroy, class_name: "ArtistUrl", autosave: true
-  has_many :versions, -> { order("artist_versions.id ASC") }, class_name: "ArtistVersion"
+  has_many :urls, class_name: "ArtistUrl", autosave: true, dependent: :destroy
+  has_many :versions, -> { order("artist_versions.id ASC") }, class_name: "ArtistVersion", dependent: :destroy
   has_one :wiki_page, foreign_key: "title", primary_key: "name"
   has_one :tag_alias, foreign_key: "antecedent_name", primary_key: "name"
   has_one :tag, foreign_key: "name", primary_key: "name"

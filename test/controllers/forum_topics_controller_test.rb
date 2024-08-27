@@ -159,6 +159,35 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         delete_auth forum_topic_path(@forum_topic), @admin
         assert_redirected_to(forum_topics_path)
       end
+
+      context "on a forum topic with an AIBUR" do
+        should "work (alias)" do
+          as(@user) { @ta = create(:tag_alias, forum_topic: @forum_topic) }
+          assert_equal(@forum_topic.id, @ta.reload.forum_topic_id)
+          assert_difference({ "ForumTopic.count" => -1, "TagAlias.count" => 0 }) do
+            delete_auth forum_topic_path(@forum_topic), create(:admin_user)
+          end
+          assert_nil(@ta.reload.forum_topic_id)
+        end
+
+        should "work (implication)" do
+          as(@user) { @ti = create(:tag_implication, forum_topic: @forum_topic) }
+          assert_equal(@forum_topic.id, @ti.reload.forum_topic_id)
+          assert_difference({ "ForumTopic.count" => -1, "TagImplication.count" => 0 }) do
+            delete_auth forum_topic_path(@forum_topic), create(:admin_user)
+          end
+          assert_nil(@ti.reload.forum_topic_id)
+        end
+
+        should "work (bulk update request)" do
+          as(@user) { @bur = create(:bulk_update_request, forum_topic: @forum_topic) }
+          assert_equal(@forum_topic.id, @bur.reload.forum_topic_id)
+          assert_difference({ "ForumTopic.count" => -1, "BulkUpdateRequest.count" => 0 }) do
+            delete_auth forum_topic_path(@forum_topic), create(:admin_user)
+          end
+          assert_nil(@bur.reload.forum_topic_id)
+        end
+      end
     end
 
     context "hide action" do

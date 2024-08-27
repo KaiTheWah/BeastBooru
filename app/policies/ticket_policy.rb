@@ -50,6 +50,13 @@ class TicketPolicy < ApplicationPolicy
     params
   end
 
+  def api_attributes
+    attr = super
+    attr -= %i[claimant_id] unless user.is_moderator?
+    attr -= %i[creator_id] unless record.can_see_reporter?(user)
+    attr
+  end
+
   def html_data_attributes
     super + %i[status]
   end

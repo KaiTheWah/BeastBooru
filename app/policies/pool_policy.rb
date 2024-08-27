@@ -20,4 +20,8 @@ class PoolPolicy < ApplicationPolicy
   def permitted_search_params
     super + %i[name_matches description_matches any_artist_name_like any_artist_name_matches creator_id creator_name category is_active linked_to not_linked_to]
   end
+
+  def api_attributes
+    super + %i[artists creator_name post_count]
+  end
 end

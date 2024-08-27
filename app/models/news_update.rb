@@ -18,4 +18,8 @@ class NewsUpdate < ApplicationRecord
   def invalidate_cache
     Cache.delete("recent_news")
   end
+
+  def self.available_includes
+    %i[creator updater]
+  end
 end

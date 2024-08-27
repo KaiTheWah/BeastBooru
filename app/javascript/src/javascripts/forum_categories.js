@@ -1,11 +1,11 @@
 import Utility from "./utility";
 
 class ForumCategories {
-  static initialize_listeners() {
+  static initialize_listeners () {
     const $saveOrderLink = $(".save-order-link");
     const $editOrderLink = $(".edit-order-link");
     const $sortableCategories = $("#forum-categories-table tbody");
-    $editOrderLink.on("click.femboyfans.sorting", function(event) {
+    $editOrderLink.on("click.femboyfans.sorting", function (event) {
       event.preventDefault();
       $saveOrderLink.show();
       $editOrderLink.hide();
@@ -13,7 +13,7 @@ class ForumCategories {
       Utility.notice("Drag and drop to reorder.");
     });
 
-    $saveOrderLink.on("click.femboyfans.sorting", function(event) {
+    $saveOrderLink.on("click.femboyfans.sorting", function (event) {
       event.preventDefault();
       $saveOrderLink.hide();
       $editOrderLink.show();
@@ -22,30 +22,30 @@ class ForumCategories {
         url: "/forum_categories/reorder.json",
         type: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         data: ForumCategories.reorderData(),
-        success() {
+        success () {
           Utility.notice("Order updated.");
           $editOrderLink.show();
         },
-        error() {
+        error () {
           Utility.error("Failed to update order.");
           $saveOrderLink.show();
           $sortableCategories.sortable();
-        }
+        },
       });
     });
   }
 
-  static reorderData() {
+  static reorderData () {
     return JSON.stringify(Array.from($("#forum-categories-table tr")).slice(1).map((element, index) => ({ id: Number(element.dataset.id), order: index + 1 })));
   }
 }
 
 
-$(function() {
-  if($("#c-forum-categories #a-show").length) {
+$(function () {
+  if ($("#c-forum-categories #a-show").length) {
     ForumCategories.initialize_listeners();
   }
 });

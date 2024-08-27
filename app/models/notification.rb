@@ -101,4 +101,12 @@ class Notification < ApplicationRecord
   end
 
   extend SearchMethods
+
+  def self.available_includes
+    %i[user]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.id == user_id
+  end
 end

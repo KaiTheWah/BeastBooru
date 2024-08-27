@@ -57,4 +57,12 @@ class TagFollower < ApplicationRecord
       end
     end
   end
+
+  def self.available_includes
+    %i[tag user]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_moderator? || !user.enable_privacy_mode?
+  end
 end

@@ -54,4 +54,8 @@ class HelpPage < ApplicationRecord
   end
 
   include LogMethods
+
+  def self.available_includes
+    %i[wiki_page]
+  end
 end

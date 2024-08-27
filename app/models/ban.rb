@@ -163,4 +163,8 @@ class Ban < ApplicationRecord
   end
 
   include LogMethods
+
+  def self.available_includes
+    %i[banner user]
+  end
 end

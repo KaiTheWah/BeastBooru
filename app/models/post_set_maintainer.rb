@@ -151,4 +151,12 @@ class PostSetMaintainer < ApplicationRecord
   end
 
   include ValidaitonMethods
+
+  def self.available_includes
+    %i[post_set user]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.id == user_id
+  end
 end

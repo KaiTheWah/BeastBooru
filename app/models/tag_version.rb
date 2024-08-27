@@ -32,4 +32,8 @@ class TagVersion < ApplicationRecord
   def is_locked_changed?
     previous && previous.is_locked? != is_locked?
   end
+
+  def self.available_includes
+    %i[tag updater]
+  end
 end

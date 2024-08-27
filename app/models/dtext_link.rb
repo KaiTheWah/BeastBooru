@@ -74,4 +74,12 @@ class DtextLink < ApplicationRecord
   end
 
   extend SearchMethods
+
+  def self.available_includes
+    %i[model linked_wiki linked_tag]
+  end
+
+  def visible?(user = CurrentUser.user)
+    model.visible?(user)
+  end
 end

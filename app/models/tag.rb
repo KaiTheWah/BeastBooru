@@ -417,4 +417,8 @@ class Tag < ApplicationRecord
   def empty?
     post_count <= 0
   end
+
+  def self.available_includes
+    %i[artist antecedent_alias wiki_page]
+  end
 end

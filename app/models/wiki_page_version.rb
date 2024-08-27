@@ -46,4 +46,8 @@ class WikiPageVersion < ApplicationRecord
   def category_id
     Tag.category_for(title)
   end
+
+  def self.available_includes
+    %i[artist updater wiki_page]
+  end
 end

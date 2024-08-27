@@ -538,10 +538,6 @@ class Artist < ApplicationRecord
     true
   end
 
-  def visible?
-    true
-  end
-
   def is_note_locked?
     wiki_page.try(:is_restricted?) || false
   end
@@ -552,5 +548,9 @@ class Artist < ApplicationRecord
 
   def log_destroy
     ModAction.log!(:artist_delete, self, artist_id: id, artist_name: name)
+  end
+
+  def self.available_includes
+    %i[creator urls wiki_page tag_alias tag avoid_posting linked_user]
   end
 end

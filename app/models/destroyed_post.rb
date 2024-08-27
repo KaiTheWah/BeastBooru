@@ -55,4 +55,12 @@ class DestroyedPost < ApplicationRecord
       reason:          reason,
     ).push_pubsub("create")
   end
+
+  def self.available_includes
+    %i[destroyer uploader]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_admin?
+  end
 end

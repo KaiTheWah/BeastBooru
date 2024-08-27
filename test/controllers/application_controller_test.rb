@@ -199,5 +199,71 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         end
       end
     end
+
+    context "the only parameter" do
+      setup do
+        @user = create(:user)
+        @mod = create(:moderator_user)
+        CurrentUser.user = @user
+      end
+
+      should "work" do
+        get user_path(@user), params: { only: "id", format: :json }
+        assert_response :success
+        assert_equal({ "id" => @user.id }, @response.parsed_body)
+      end
+
+      should "work with multiple attributes" do
+        get user_path(@user), params: { only: "id,name", format: :json }
+        assert_response :success
+        assert_equal({ "id" => @user.id, "name" => @user.name }, @response.parsed_body)
+      end
+
+      should "work with nested attributes" do
+        @artist = create(:artist, linked_user: @user)
+        get user_path(@user), params: { only: "artists[id]", format: :json }
+        assert_response :success
+        assert_equal({ "artists" => [{ "id" => @artist.id }] }, @response.parsed_body)
+      end
+
+      should "work with multiple nested attributes" do
+        @artist = create(:artist, linked_user: @user)
+        @ban = as(@mod) { create(:ban, user: @user, banner: @mod) }
+        get user_path(@user), params: { only: "artists[id,name],bans[id]", format: :json }
+        assert_response :success
+        assert_equal({ "artists" => [{ "id" => @artist.id, "name" => @artist.name }], "bans" => [{ "id" => @ban.id }] }, @response.parsed_body)
+      end
+
+      should "not reveal hidden relations" do
+        as(@mod) do
+          @forum = create(:forum_topic, is_hidden: true)
+          @bur = create(:bulk_update_request, forum_topic: @forum)
+        end
+        get_auth bulk_update_request_path(@bur), @user, params: { only: "forum_topic[id],creator[id]", format: :json }
+        assert_response :success
+        assert_equal({ "creator" => { "id" => @mod.id } }, @response.parsed_body)
+      end
+
+      should "not allow unspecified includes" do
+        create(:dmail, owner: @user)
+        get_auth user_path(@user), @user, params: { only: "dmails[id]", format: :json }
+        assert_response :success
+        assert_equal({}, @response.parsed_body)
+      end
+
+      should "allow underscore" do
+        get_auth user_path(@user), @user, params: { only: "_", format: :json }
+        assert_response :success
+        assert_equal(as(@user) { @user.as_json }, @response.parsed_body)
+      end
+
+      should "allow underscore and other includes" do
+        @artist = create(:artist, linked_user: @user)
+        get_auth user_path(@user), @user, params: { only: "_,artists", format: :json }
+        assert_response :success
+        @user.reload
+        assert_equal(as(@user) { @user.as_json.merge({ "artists" => [@artist.as_json] }) }, @response.parsed_body)
+      end
+    end
   end
 end

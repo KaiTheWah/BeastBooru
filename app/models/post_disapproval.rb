@@ -53,4 +53,12 @@ class PostDisapproval < ApplicationRecord
   def update_post_index
     post.update_index
   end
+
+  def self.available_includes
+    %i[post user]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_approver?
+  end
 end

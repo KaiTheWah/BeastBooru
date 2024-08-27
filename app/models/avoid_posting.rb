@@ -70,14 +70,6 @@ class AvoidPosting < ApplicationRecord
     delegate :name, to: :artist, prefix: true, allow_nil: true
   end
 
-  module ApiMethods
-    def hidden_attributes
-      attr = super
-      attr += %i[staff_notes] unless CurrentUser.is_staff?
-      attr
-    end
-  end
-
   module SearchMethods
     def artist_search(params)
       Artist.search(params.slice(:any_name_matches, :any_other_name_matches).merge({ id: params[:artist_id], name: params[:artist_name] }))
@@ -142,7 +134,10 @@ class AvoidPosting < ApplicationRecord
   end
 
   include LogMethods
-  include ApiMethods
   include ArtistMethods
   extend SearchMethods
+
+  def self.available_includes
+    %i[artist creator updater]
+  end
 end

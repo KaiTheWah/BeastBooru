@@ -12,7 +12,9 @@ class UserBlock < ApplicationRecord
   end
 
   def target_name
-    return nil unless target_id
+    if association(:target).loaded?
+      return target&.name || "Anonymous"
+    end
     User.id_to_name(target_id)
   end
 
@@ -34,5 +36,13 @@ class UserBlock < ApplicationRecord
       errors.add(:base, "You cannot block messages")
       throw(:abort)
     end
+  end
+
+  def self.available_includes
+    %i[target user]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_admin? || user_id == user.id
   end
 end

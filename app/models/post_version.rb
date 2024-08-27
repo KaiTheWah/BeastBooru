@@ -234,8 +234,8 @@ class PostVersion < ApplicationRecord
     end
   end
 
-  def visible?
-    post&.visible? || false
+  def visible?(user = CurrentUser.user)
+    post.try(:visible?, user) || false
   end
 
   def diff_sources(version = nil)
@@ -390,19 +390,17 @@ class PostVersion < ApplicationRecord
     version > 1
   end
 
-  concerning :ApiMethods do
-    def method_attributes
-      super + %i[updater_name]
-    end
+  def original_tags_array
+    @original_tags_array ||= original_tags.split
+  end
 
-    def original_tags_array
-      @original_tags_array ||= original_tags.split
-    end
+  def serializable_hash(*)
+    hash = super
+    changes.each { |key, value| key.to_s.include?("tags") && value.is_a?(Array) ? hash[key] = value.join(" ") : hash[key] = value }
+    hash
+  end
 
-    def serializable_hash(*)
-      hash = super
-      changes.each { |key, value| key.to_s.include?("tags") && value.is_a?(Array) ? hash[key] = value.join(" ") : hash[key] = value }
-      hash
-    end
+  def self.available_includes
+    %i[post updater]
   end
 end

@@ -270,12 +270,6 @@ class Takedown < ApplicationRecord
     end
   end
 
-  module APIMethods
-    def hidden_attributes
-      super + %i[source vericode email reason instructions post_ids del_post_ids creator_id notes]
-    end
-  end
-
   module LogMethods
     def log_delete
       ModAction.log!(:takedown_delete, self)
@@ -283,7 +277,6 @@ class Takedown < ApplicationRecord
   end
 
   include PostMethods
-  include APIMethods
   include ValidationMethods
   include StatusMethods
   include ModifyPostMethods
@@ -291,4 +284,8 @@ class Takedown < ApplicationRecord
   include AccessMethods
   include LogMethods
   extend SearchMethods
+
+  def self.available_includes
+    %i[approver]
+  end
 end

@@ -14,6 +14,8 @@ class ApplicationController < ActionController::Base
   after_action :reset_current_user
   layout "default"
 
+  self.responder = ApplicationResponder
+
   include TitleHelper
   include DeferredPosts
   include Pundit::Authorization
@@ -285,5 +287,24 @@ class ApplicationController < ActionController::Base
 
   def notice(message)
     flash[:notice] = message if request.format.html?
+  end
+
+  def model_includes(params, model: nil) # rubocop:disable Lint/UnusedMethodArgument
+    if params[:only] && params[:format] == "json"
+      includes_array = ParameterBuilder.includes_parameters(params[:only], model_name)
+    elsif params[:action] == "index"
+      includes_array = default_includes(params)
+    else
+      includes_array = []
+    end
+    includes_array
+  end
+
+  def default_includes(*)
+    []
+  end
+
+  def model_name
+    controller_name.classify
   end
 end

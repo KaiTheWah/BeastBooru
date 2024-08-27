@@ -29,4 +29,12 @@ class UserBlockPolicy < ApplicationPolicy
   def permitted_attributes_for_create
     super + %i[target_id target_name]
   end
+
+  def api_attributes
+    super + %i[target_name]
+  end
+
+  def html_data_attributes
+    super + %i[target_name]
+  end
 end

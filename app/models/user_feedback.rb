@@ -117,4 +117,12 @@ class UserFeedback < ApplicationRecord
   def destroyable_by?(destroyer)
     deletable_by?(destroyer) && (destroyer.is_admin? || destroyer == creator)
   end
+
+  def self.available_includes
+    %i[creator updater user]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_moderator? || !is_deleted?
+  end
 end

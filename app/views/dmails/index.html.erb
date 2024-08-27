@@ -23,10 +23,10 @@
   <% t.column("To") do |dmail| %>
     <%= link_to_user(dmail.to) %>
   <% end %>
-  <% t.column("Owner", if: (CurrentUser.user.is_owner? && params[:folder].blank?)) do |dmail| %>
+  <% t.column("Owner", if: CurrentUser.user.is_owner? && params[:folder].blank?) do |dmail| %>
     <%= link_to_user(dmail.owner) %>
   <% end %>
-  <% t.column("Subject", th: { width: (CurrentUser.user.is_owner? && params[:folder].blank?) ? "55%" : "65%" }) do |dmail| %>
+  <% t.column("Subject", th: { width: CurrentUser.user.is_owner? && params[:folder].blank? ? "55%" : "65%" }) do |dmail| %>
     <% if dmail.filtered? %>
       <%= link_to("[filtered]", dmail_path(dmail)) %>
     <% else %>

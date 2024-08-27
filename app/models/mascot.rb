@@ -92,10 +92,6 @@ class Mascot < ApplicationRecord
     q.order("lower(artist_name)")
   end
 
-  def method_attributes
-    super + [:url_path]
-  end
-
   module LogMethods
     def log_create
       ModAction.log!(:mascot_create, self)
@@ -112,4 +108,8 @@ class Mascot < ApplicationRecord
 
   include FileMethods
   include LogMethods
+
+  def self.available_includes
+    %i[creator]
+  end
 end

@@ -19,4 +19,10 @@ class PostFlagPolicy < ApplicationPolicy
     params += %i[ip_addr] if can_search_ip_addr?
     params
   end
+
+  def api_attributes
+    attr = super + %i[type]
+    attr -= %i[creator_id] unless user.can_view_flagger_on_post?(record)
+    attr
+  end
 end

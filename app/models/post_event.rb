@@ -2,6 +2,7 @@
 
 class PostEvent < ApplicationRecord
   belongs_to :creator, class_name: "User"
+  belongs_to :post
   enum :action, {
     deleted:                 0,
     undeleted:               1,
@@ -82,10 +83,6 @@ class PostEvent < ApplicationRecord
   end
 
   module ApiMethods
-    def hidden_attributes
-      super + %i[extra_data]
-    end
-
     # whitelisted data attributes
     def allowed_data
       %w[reason parent_id child_id bg_color replacement_id old_md5 new_md5 source_post_id md5]
@@ -100,4 +97,8 @@ class PostEvent < ApplicationRecord
 
   include ApiMethods
   extend SearchMethods
+
+  def self.available_includes
+    %i[post]
+  end
 end

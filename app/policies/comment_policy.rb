@@ -53,4 +53,8 @@ class CommentPolicy < ApplicationPolicy
     params += %i[ip_addr] if can_search_ip_addr?
     params
   end
+
+  def api_attributes
+    super - %i[notified_mentions] + %i[mentions creator_name updater_name]
+  end
 end

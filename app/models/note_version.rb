@@ -2,6 +2,7 @@
 
 class NoteVersion < ApplicationRecord
   belongs_to_updater counter_cache: "note_update_count"
+  belongs_to :note
   scope :for_user, ->(user_id) { where("updater_id = ?", user_id) }
 
   def self.search(params)
@@ -29,5 +30,9 @@ class NoteVersion < ApplicationRecord
 
   def previous
     NoteVersion.where("note_id = ? and updated_at < ?", note_id, updated_at).order("updated_at desc").first
+  end
+
+  def self.available_includes
+    %i[note updater]
   end
 end

@@ -16,9 +16,6 @@ class ForumTopicsController < ApplicationController
       format.html do
         @forum_topics = @forum_topics.includes(:creator, :updater).load
       end
-      format.json do
-        render(json: @forum_topics.to_json)
-      end
     end
   end
 

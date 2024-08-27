@@ -57,6 +57,10 @@ class ForumPostPolicy < ApplicationPolicy
     super + %i[creator_id creator_name topic_id topic_title_matches body_matches topic_category_id is_hidden linked_to not_linked_to]
   end
 
+  def api_attributes
+    super - %i[notified_mentions] + %i[mentions creator_name updater_name]
+  end
+
   def html_data_attributes
     super + %i[topic]
   end

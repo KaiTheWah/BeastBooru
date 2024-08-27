@@ -60,4 +60,8 @@ class StaffNote < ApplicationRecord
 
   include LogMethods
   extend SearchMethods
+
+  def self.available_includes
+    %i[creator updater user]
+  end
 end

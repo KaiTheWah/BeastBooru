@@ -25,4 +25,8 @@ class DmailFilter < ApplicationRecord
       /\b#{union}\b/i
     end
   end
+
+  def self.available_includes
+    %i[user]
+  end
 end

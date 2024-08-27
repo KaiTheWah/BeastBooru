@@ -1582,22 +1582,6 @@ class Post < ApplicationRecord
   end
 
   module ApiMethods
-    def hidden_attributes
-      list = super + %i[pool_string fav_string]
-      unless visible?
-        list += %i[md5 file_ext]
-      end
-      super + list
-    end
-
-    def method_attributes
-      list = super + %i[has_large has_visible_children children_ids pool_ids is_favorited? is_voted_up? is_voted_down?]
-      if visible?
-        list += %i[file_url large_file_url preview_file_url]
-      end
-      list
-    end
-
     def thumbnail_attributes
       attributes = {
         id:           id,
@@ -2013,23 +1997,23 @@ class Post < ApplicationRecord
   extend CountMethods
   extend SearchMethods
 
-  def safeblocked?
+  def safeblocked?(_user = CurrentUser.user)
     return true if FemboyFans.config.safe_mode? && rating != "s"
     CurrentUser.safe_mode? && (rating != "s" || has_tag?(*FemboyFans.config.safeblocked_tags))
   end
 
-  def deleteblocked?
-    !FemboyFans.config.can_user_see_post?(CurrentUser.user, self)
+  def deleteblocked?(user = CurrentUser.user)
+    !FemboyFans.config.can_user_see_post?(user, self)
   end
 
-  def loginblocked?
-    CurrentUser.is_anonymous? && (hide_from_anonymous? || FemboyFans.config.user_needs_login_for_post?(self))
+  def loginblocked?(user = CurrentUser.user)
+    user.is_anonymous? && (hide_from_anonymous? || FemboyFans.config.user_needs_login_for_post?(self))
   end
 
-  def visible?
-    return false if loginblocked?
-    return false if safeblocked?
-    return false if deleteblocked?
+  def visible?(user = CurrentUser.user)
+    return false if loginblocked?(user)
+    return false if safeblocked?(user)
+    return false if deleteblocked?(user)
     true
   end
 
@@ -2136,5 +2120,9 @@ class Post < ApplicationRecord
   def self.search_uploaders(params)
     q = all
     q.where_user(:uploader_id, :user, params)
+  end
+
+  def self.available_includes
+    %i[approver uploader children]
   end
 end

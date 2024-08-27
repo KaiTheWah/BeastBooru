@@ -19,4 +19,8 @@ class PostVote < LockableUserVote
     end
     true
   end
+
+  def self.available_includes
+    %i[post user]
+  end
 end

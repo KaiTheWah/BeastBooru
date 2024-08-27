@@ -148,17 +148,10 @@ class Upload < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def method_attributes
-      super + [:uploader_name]
-    end
-  end
-
   include FileMethods
   include StatusMethods
   include UploaderMethods
   extend SearchMethods
-  include ApiMethods
   include DirectURLMethods
 
   def uploader_is_not_limited
@@ -229,5 +222,13 @@ class Upload < ApplicationRecord
 
   def upload_as_pending?
     as_pending.to_s.truthy?
+  end
+
+  def self.available_includes
+    %i[post uploader]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_janitor?
   end
 end

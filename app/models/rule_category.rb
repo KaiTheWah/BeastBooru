@@ -45,4 +45,8 @@ class RuleCategory < ApplicationRecord
   def self.log_reorder(changes)
     ModAction.log!(:rule_categories_reorder, nil, total: changes)
   end
+
+  def self.available_includes
+    %i[creator updater]
+  end
 end

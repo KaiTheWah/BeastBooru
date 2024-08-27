@@ -1,7 +1,7 @@
 import Utility from "./utility";
 
 class PostDeletionReasons {
-  static init(spacing) {
+  static init (spacing) {
     const $addSpacingBelowLink = $(".add-spacing-below-link");
     const $addSpacingAboveLink = $(".add-spacing-above-link");
     const $editOrderLink = $(".edit-order-link");
@@ -9,19 +9,19 @@ class PostDeletionReasons {
     const $addSpacingLink = $(".add-spacing-link");
     const $removeSpacingLink = $(".remove-spacing-link");
     const $sortablePostDeletionReasons = $("#post-deletion-reasons-table tbody");
-    $addSpacingBelowLink.on("click.femboyfans.spacing", function(event) {
+    $addSpacingBelowLink.on("click.femboyfans.spacing", function (event) {
       event.preventDefault();
       spacing.insertAfter($(this).closest("tr"));
       PostDeletionReasons.reinitRemoveListener();
     });
 
-    $addSpacingAboveLink.on("click.femboyfans.spacing", function(event) {
+    $addSpacingAboveLink.on("click.femboyfans.spacing", function (event) {
       event.preventDefault();
       spacing.insertBefore($(this).closest("tr"));
       PostDeletionReasons.reinitRemoveListener();
     });
 
-    $editOrderLink.on("click.femboyfans.sorting", function(event) {
+    $editOrderLink.on("click.femboyfans.sorting", function (event) {
       event.preventDefault();
       $saveOrderLink.show();
       $editOrderLink.hide();
@@ -31,7 +31,7 @@ class PostDeletionReasons {
       Utility.notice("Drag and drop to reorder.");
     });
 
-    $saveOrderLink.on("click.femboyfans.sorting", function(event) {
+    $saveOrderLink.on("click.femboyfans.sorting", function (event) {
       event.preventDefault();
       $saveOrderLink.hide();
       $addSpacingLink.hide();
@@ -41,33 +41,33 @@ class PostDeletionReasons {
         url: "/posts/deletion_reasons/reorder.json",
         type: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         data: PostDeletionReasons.reorderData(),
-        success() {
+        success () {
           Utility.notice("Order updated.");
           $editOrderLink.show();
         },
-        error() {
+        error () {
           Utility.error("Failed to update order.");
           $saveOrderLink.show();
           $sortablePostDeletionReasons.sortable();
-        }
+        },
       });
     });
     this.reinitRemoveListener();
   }
 
-  static reinitRemoveListener() {
+  static reinitRemoveListener () {
     const $removeSpacingLink = $(".remove-spacing-link");
     $removeSpacingLink.off("click.femboyfans.spacing");
-    $removeSpacingLink.on("click.femboyfans.spacing", function(event) {
+    $removeSpacingLink.on("click.femboyfans.spacing", function (event) {
       event.preventDefault();
       $(this).closest("tr").remove();
     });
   }
 
-  static reorderData() {
+  static reorderData () {
     return JSON.stringify(Array.from($("#post-deletion-reasons-table tr")).slice(1).map((element, index) => ({ id: element.dataset.id ? Number(element.dataset.id) : null, order: index + 1 })));
   }
 }

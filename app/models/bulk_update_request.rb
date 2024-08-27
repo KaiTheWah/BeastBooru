@@ -196,4 +196,8 @@ class BulkUpdateRequest < ApplicationRecord
   def estimate_update_count
     BulkUpdateRequestImporter.new(script, nil).estimate_update_count
   end
+
+  def self.available_includes
+    %i[approver creator forum_post forum_topic]
+  end
 end

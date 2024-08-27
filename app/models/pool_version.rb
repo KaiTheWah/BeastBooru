@@ -2,6 +2,7 @@
 
 class PoolVersion < ApplicationRecord
   belongs_to_updater counter_cache: "pool_update_count"
+  belongs_to :pool
   before_validation :fill_version, on: :create
   before_validation :fill_changes, on: :create
 
@@ -84,5 +85,9 @@ class PoolVersion < ApplicationRecord
 
   def pretty_name
     name&.tr("_", " ") || "(Unknown Name)"
+  end
+
+  def self.available_includes
+    %i[pool updater]
   end
 end

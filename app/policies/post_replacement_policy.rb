@@ -38,4 +38,8 @@ class PostReplacementPolicy < ApplicationPolicy
   def permitted_search_params
     super + %i[file_ext md5 status creator_id creator_name approver_id approver_name rejector_id rejector_name uploader_name_on_approve uploader_id_on_approve]
   end
+
+  def api_attributes
+    super - %i[storage_id protected uploader_id_on_approve penalize_uploader_on_approve previous_details] + %i[file_url]
+  end
 end

@@ -74,22 +74,7 @@ class PostFlag < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def hidden_attributes
-      list = super
-      unless CurrentUser.can_view_flagger_on_post?(self)
-        list += [:creator_id]
-      end
-      super + list
-    end
-
-    def method_attributes
-      super + [:type]
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
 
   def type
     return :deletion if is_deletion
@@ -186,5 +171,9 @@ class PostFlag < ApplicationRecord
   def create_post_event
     # Deletions also create flags, but they create a deletion event instead
     PostEvent.add(post.id, CurrentUser.user, :flag_created, { reason: reason }) unless is_deletion
+  end
+
+  def self.available_includes
+    %i[post]
   end
 end

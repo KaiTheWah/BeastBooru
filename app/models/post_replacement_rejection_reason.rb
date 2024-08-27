@@ -43,4 +43,12 @@ class PostReplacementRejectionReason < ApplicationRecord
   def self.log_reorder(changes)
     ModAction.log!(:post_replacement_rejection_reasons_reorder, nil, total: changes)
   end
+
+  def self.available_includes
+    %i[creator]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_approver?
+  end
 end

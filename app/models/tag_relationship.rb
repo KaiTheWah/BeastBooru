@@ -233,4 +233,8 @@ class TagRelationship < ApplicationRecord
 
   extend SearchMethods
   include MessageMethods
+
+  def self.available_includes
+    %i[antecedent_tag approver consequent_tag creator forum_post forum_topic]
+  end
 end

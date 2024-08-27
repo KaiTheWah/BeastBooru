@@ -16,4 +16,8 @@ class NotePolicy < ApplicationPolicy
   def permitted_search_params
     super + %i[body_matches is_active post_id post_tags_match post_note_updater_id post_note_updater_name creator_id creator_name]
   end
+
+  def api_attributes
+    super + %i[creator_name]
+  end
 end

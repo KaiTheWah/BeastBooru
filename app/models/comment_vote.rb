@@ -32,4 +32,8 @@ class CommentVote < LockableUserVote
       errors.add(:base, "You cannot vote on sticky comments")
     end
   end
+
+  def self.available_includes
+    %i[comment post user]
+  end
 end

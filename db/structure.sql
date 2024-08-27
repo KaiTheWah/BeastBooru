@@ -1054,11 +1054,11 @@ ALTER SEQUENCE public.mascots_id_seq OWNED BY public.mascots.id;
 
 CREATE TABLE public.mod_actions (
     id integer NOT NULL,
-    creator_id integer,
+    creator_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    action text,
-    "values" json,
+    action text NOT NULL,
+    "values" json DEFAULT '{}'::json NOT NULL,
     subject_id integer,
     subject_type character varying
 );
@@ -5274,6 +5274,7 @@ ALTER TABLE ONLY public.staff_notes
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240827144113'),
 ('20240825012820'),
 ('20240824192520'),
 ('20240824173724'),

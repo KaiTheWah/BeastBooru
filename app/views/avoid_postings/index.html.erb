@@ -20,7 +20,7 @@
     <% end %>
   <% end %>
   <% t.column(:status, th: { class: "dnp-status" }, td: { class: "dnp-status" }, if: search_params.key?(:is_active)) %>
-  <% t.column("Creator", th: { class: "dnp-creator" }, td: { class: "dnp-creator" }, if: (search_params.key?(:creator_id) || search_params.key?(:creator_name))) do |avoid_posting| %>
+  <% t.column("Creator", th: { class: "dnp-creator" }, td: { class: "dnp-creator" }, if: search_params.key?(:creator_id) || search_params.key?(:creator_name)) do |avoid_posting| %>
     <%= link_to_user(avoid_posting.creator) %>
     <% if policy(avoid_posting).can_see_ip_addr? %>
       (<%= link_to_ip(avoid_posting.creator_ip_addr) %>)

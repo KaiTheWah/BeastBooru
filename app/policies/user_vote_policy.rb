@@ -39,6 +39,10 @@ class UserVotePolicy < ApplicationPolicy
     params
   end
 
+  def api_attributes
+    super + %i[user_name]
+  end
+
   protected
 
   def model

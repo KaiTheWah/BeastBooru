@@ -47,6 +47,14 @@ class TakedownPolicy < ApplicationPolicy
     params
   end
 
+  def api_attributes
+    attr = super
+    attr -= %i[source reason notes] unless !record.reason_hidden || user.is_janitor?
+    attr -= %i[creator_id instructions] unless user.is_janitor?
+    attr -= %i[email vericode post_ids del_post_ids] unless user.can_handle_takedowns?
+    attr
+  end
+
   def html_data_attributes
     super + %i[status]
   end

@@ -12,9 +12,6 @@ class ForumPost < ApplicationRecord
   has_many :votes, class_name: "ForumPostVote"
   has_many :tickets, as: :model
   has_many :versions, class_name: "EditHistory", as: :versionable, dependent: :destroy
-  has_one :tag_alias
-  has_one :tag_implication
-  has_one :bulk_update_request
   belongs_to :tag_change_request, polymorphic: true, optional: true
   before_validation :initialize_is_hidden, on: :create
   before_create :auto_report_spam
@@ -44,20 +41,6 @@ class ForumPost < ApplicationRecord
   attr_accessor :bypass_limits
 
   has_dtext_links :body
-
-  module ApiMethods
-    def hidden_attributes
-      super + %i[notified_mentions]
-    end
-
-    def mentions
-      notified_mentions.map { |id| { id: id, name: User.id_to_name(id) } }
-    end
-
-    def method_attributes
-      super + %i[mentions creator_name updater_name]
-    end
-  end
 
   module SearchMethods
     def topic_title_matches(title)
@@ -119,7 +102,6 @@ class ForumPost < ApplicationRecord
     end
   end
 
-  include ApiMethods
   extend SearchMethods
 
   def votable?
@@ -189,10 +171,6 @@ class ForumPost < ApplicationRecord
     return true if user.is_admin?
     return false if was_warned? || (is_aibur? && !tag_change_request.is_pending?)
     creator_id == user.id && visible?(user)
-  end
-
-  def visible?(user)
-    user.is_moderator? || (topic.visible?(user) && (!is_hidden? || user.id == creator_id))
   end
 
   def can_hide?(user)
@@ -303,5 +281,13 @@ class ForumPost < ApplicationRecord
 
   def spam_ticket
     tickets.where(creator: User.system, reason: "Spam.").first
+  end
+
+  def self.available_includes
+    %i[creator updater topic dtext_links tag_change_request]
+  end
+
+  def visible?(user = CurrentUser.user)
+    topic.visible?(user) && (user.is_moderator? || !is_hidden? || user.id == creator_id)
   end
 end

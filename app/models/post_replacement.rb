@@ -177,28 +177,6 @@ class PostReplacement < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def hidden_attributes
-      super + %i[storage_id protected uploader_id_on_approve penalize_uploader_on_approve previous_details]
-    end
-
-    def method_attributes
-      super + %i[file_url]
-    end
-
-    def file_url
-      if post.deleteblocked?
-        nil
-      elsif post.visible?
-        if original_file_visible_to?(CurrentUser)
-          replacement_file_url
-        else
-          replacement_thumb_url
-        end
-      end
-    end
-  end
-
   module ProcessingMethods
     def approve!(penalize_current_uploader:)
       unless %w[pending original].include?(status)
@@ -352,12 +330,23 @@ class PostReplacement < ApplicationRecord
     as_pending.to_s.truthy?
   end
 
-  include ApiMethods
   include StorageMethods
   include FileMethods
   include ProcessingMethods
   include PromotionMethods
   include PostMethods
+
+  def file_url
+    if post.deleteblocked?
+      nil
+    elsif post.visible?
+      if original_file_visible_to?(CurrentUser)
+        replacement_file_url
+      else
+        replacement_thumb_url
+      end
+    end
+  end
 
   def post_details
     {
@@ -392,5 +381,9 @@ class PostReplacement < ApplicationRecord
     else
       previous_details.transform_keys(&:to_sym)
     end
+  end
+
+  def self.available_includes
+    %i[creator approver rejector post uploader_on_approve]
   end
 end

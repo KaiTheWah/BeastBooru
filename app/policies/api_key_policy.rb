@@ -12,4 +12,8 @@ class ApiKeyPolicy < ApplicationPolicy
   def permitted_search_params
     super + %i[user_id user_name]
   end
+
+  def api_attributes
+    super - %i[key]
+  end
 end

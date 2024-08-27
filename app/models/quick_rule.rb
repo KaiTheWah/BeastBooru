@@ -38,4 +38,8 @@ class QuickRule < ApplicationRecord
   def self.log_reorder(total)
     ModAction.log!(:quick_rules_reorder, nil, total: total)
   end
+
+  def self.available_includes
+    %i[rule]
+  end
 end

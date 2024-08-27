@@ -70,4 +70,8 @@ class ForumCategory < ApplicationRecord
 
   include LogMethods
   extend SearchMethods
+
+  def visible?(user = CurrentUser.user)
+    user.level >= can_view
+  end
 end

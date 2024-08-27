@@ -23,7 +23,7 @@ class UsersController < ApplicationController
   def show
     @user = User.find(User.name_or_id_to_id_forced(params[:id]))
     @presenter = UserPresenter.new(@user)
-    respond_with(@user, methods: @user.full_attributes)
+    respond_with(@user)
   end
 
   def new
@@ -57,7 +57,7 @@ class UsersController < ApplicationController
 
   def me
     @user = authorize(CurrentUser.user)
-    respond_with(@user, methods: @user.full_attributes)
+    respond_with(@user)
   end
 
   def create

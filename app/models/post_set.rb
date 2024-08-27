@@ -367,4 +367,12 @@ class PostSet < ApplicationRecord
   include PostMethods
   include LogMethods
   extend SearchMethods
+
+  def self.available_includes
+    %i[creator]
+  end
+
+  def visible?(user = CurrentUser.user)
+    can_view?(user)
+  end
 end

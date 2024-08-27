@@ -69,4 +69,8 @@ class EmailBlacklist < ApplicationRecord
 
     matching_users.each(&:mark_unverified!)
   end
+
+  def self.available_includes
+    %i[creator]
+  end
 end

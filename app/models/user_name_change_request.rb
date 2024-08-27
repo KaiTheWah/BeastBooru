@@ -5,10 +5,10 @@ class UserNameChangeRequest < ApplicationRecord
   validates :original_name, :desired_name, presence: true
   validates :status, inclusion: { in: %w[pending approved rejected] }
   validates :change_reason, length: { maximum: 250 }
-  belongs_to :user
-  belongs_to :approver, class_name: "User", optional: true
   validate :not_limited, on: :create
   validates :desired_name, user_name: true
+  belongs_to :user
+  belongs_to :approver, class_name: "User", optional: true
   attr_accessor :skip_limited_validation
 
   def initialize_attributes
@@ -69,11 +69,11 @@ class UserNameChangeRequest < ApplicationRecord
     end
   end
 
-  def hidden_attributes
-    if CurrentUser.is_admin? || user == CurrentUser.user
-      []
-    else
-      super + %i[change_reason rejection_reason]
-    end
+  def self.available_includes
+    %i[approver user]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_moderator? || user_id == user.id
   end
 end

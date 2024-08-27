@@ -33,12 +33,6 @@ class Dmail < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def hidden_attributes
-      super + %i[key]
-    end
-  end
-
   module FactoryMethods
     extend ActiveSupport::Concern
 
@@ -170,7 +164,6 @@ class Dmail < ApplicationRecord
 
   include AddressMethods
   include FactoryMethods
-  include ApiMethods
   extend SearchMethods
 
   def user_not_limited
@@ -298,5 +291,13 @@ class Dmail < ApplicationRecord
     return true if user.is_moderator? && (from_id == User.system.id || Ticket.exists?(model: self) || key == self.key)
     return true if user.is_admin? && (to.is_admin? || from.is_admin?)
     owner_id == user.id
+  end
+
+  def self.available_includes
+    %i[from to owner]
+  end
+
+  def visible?(user = CurrentUser.user)
+    visible_to?(user)
   end
 end

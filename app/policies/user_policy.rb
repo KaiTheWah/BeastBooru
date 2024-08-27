@@ -38,4 +38,30 @@ class UserPolicy < ApplicationPolicy
     params += %i[email_matches] if CurrentUser.is_admin?
     params
   end
+
+  def api_attributes
+    attr = %i[
+      id created_at name level base_upload_limit
+      post_upload_count post_update_count note_update_count
+      level_string avatar_id wiki_page_version_count
+      artist_version_count pool_version_count
+      forum_post_count comment_count
+      favorite_count positive_feedback_count
+      positive_feedback_count neutral_feedback_count negative_feedback_count
+      upload_limit profile_about profile_artinfo
+    ] + User::Preferences.public_list
+
+    if record.id == user.id
+      attr += User::Preferences.private_list + %i[
+        updated_at email last_logged_in_at last_forum_read_at
+        recent_tags comment_threshold default_image_size
+        favorite_tags blacklisted_tags time_zone per_page
+        custom_style favorite_count followed_tags_list
+        api_regen_multiplier api_burst_limit remaining_api_limit
+        statement_timeout favorite_limit
+        tag_query_limit has_mail?
+      ]
+    end
+    attr
+  end
 end

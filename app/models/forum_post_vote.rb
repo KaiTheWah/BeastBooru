@@ -16,17 +16,6 @@ class ForumPostVote < UserVote
     :creator
   end
 
-  def user_name
-    if association(:user).loaded?
-      return user&.name || "Anonymous"
-    end
-    User.id_to_name(user_id)
-  end
-
-  def method_attributes
-    super + %i[user_name]
-  end
-
   def validate_user_is_not_limited
     allowed = user.can_forum_vote_with_reason
     if allowed != true
@@ -60,5 +49,9 @@ class ForumPostVote < UserVote
 
   def self.model_type
     model_name.singular.delete_suffix("_vote").to_sym
+  end
+
+  def self.available_includes
+    %i[forum_post user]
   end
 end

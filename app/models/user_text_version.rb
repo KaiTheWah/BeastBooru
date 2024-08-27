@@ -144,4 +144,12 @@ class UserTextVersion < ApplicationRecord
   end
 
   extend SearchMethods
+
+  def self.available_includes
+    %i[updater user]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_moderator?
+  end
 end

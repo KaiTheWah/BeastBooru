@@ -16,4 +16,8 @@ class MascotPolicy < ApplicationPolicy
   def permitted_attributes
     %i[mascot_file display_name background_color artist_url artist_name available_on_string active hide_anonymous]
   end
+
+  def api_attributes
+    super + %i[url_path]
+  end
 end

@@ -4,7 +4,7 @@ class ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(user, record)
-    @user = user
+    @user = user || User.anonymous
     @record = record
   end
 
@@ -123,17 +123,21 @@ class ApplicationPolicy
     relation
   end
 
-  def api_attributes
-    record.class.column_names.map(&:to_sym)
-  end
-
   def permitted_search_params
     %i[id created_at updated_at order]
   end
 
+  def api_attributes
+    attr = record.class.column_names.map(&:to_sym)
+    attr -= %i[uploader_ip_addr updater_ip_addr creator_ip_addr user_ip_addr ip_addr] unless can_see_ip_addr?
+    attr
+  end
+
   def html_data_attributes
-    record.class.columns.select do |column|
+    data_attributes = record.class.columns.select do |column|
       column.type.in?(%i[integer boolean datetime float uuid interval]) && !column.array?
     end.map(&:name).map(&:to_sym)
+
+    api_attributes & data_attributes
   end
 end

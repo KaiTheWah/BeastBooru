@@ -54,14 +54,7 @@ class Note < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def method_attributes
-      super + %i[creator_name]
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
 
   def user_not_limited
     allowed = CurrentUser.can_note_edit_with_reason
@@ -187,5 +180,9 @@ class Note < ApplicationRecord
         end
       end
     end
+  end
+
+  def self.available_includes
+    %i[creator post]
   end
 end

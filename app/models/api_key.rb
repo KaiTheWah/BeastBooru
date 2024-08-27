@@ -11,12 +11,6 @@ class ApiKey < ApplicationRecord
   validate :validate_permissions, if: :permissions_changed?
   has_secure_token :key
 
-  module ApiMethods
-    def hidden_attributes
-      super + %i[key]
-    end
-  end
-
   module PermissionMethods
     def has_permission?(ip, controller, action)
       ip_permitted?(ip) && action_permitted?(controller, action)
@@ -60,7 +54,6 @@ class ApiKey < ApplicationRecord
     end
   end
 
-  include ApiMethods
   include PermissionMethods
   extend SearchMethods
 
@@ -70,5 +63,9 @@ class ApiKey < ApplicationRecord
 
   def pretty_permissions
     permissions.map { |perm| Permissions.route(perm) }
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_owner? || user_id == user.id
   end
 end

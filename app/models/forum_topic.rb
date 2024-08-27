@@ -203,13 +203,6 @@ class ForumTopic < ApplicationRecord
     creator_id == user.id
   end
 
-  def visible?(user)
-    return false unless category && user.level >= category.can_view
-    return true if CurrentUser.is_moderator?
-    return false if is_hidden && user.id != creator_id
-    true
-  end
-
   def can_reply?(user = CurrentUser.user)
     user.level >= category.can_create
   end
@@ -259,5 +252,13 @@ class ForumTopic < ApplicationRecord
     return true if new_record?
 
     read_by?(CurrentUser.user)
+  end
+
+  def self.available_includes
+    %i[category creator updater original_post]
+  end
+
+  def visible?(user = CurrentUser.user)
+    (category && user.level >= category.can_view) && (user.is_moderator? || !is_hidden || creator_id == user.id)
   end
 end

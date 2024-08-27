@@ -38,6 +38,10 @@ class WikiPagePolicy < ApplicationPolicy
     super + %i[title title_matches body_matches creator_id creator_name protection_level linked_to not_linked_to]
   end
 
+  def api_attributes
+    super + %i[creator_name category_id]
+  end
+
   private
 
   def unrestricted?

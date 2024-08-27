@@ -179,30 +179,95 @@ class ApplicationRecord < ActiveRecord::Base
   module ApiMethods
     extend ActiveSupport::Concern
 
-    def as_json(options = {})
-      options ||= {}
-      options[:except] ||= []
-      options[:except] += hidden_attributes
+    module ClassMethods
+      def available_includes
+        []
+      end
 
+      def multiple_includes
+        reflections.select { |_, v| v.macro == :has_many }.keys.map(&:to_sym)
+      end
+
+      def associated_models(name)
+        if reflections[name].options[:polymorphic]
+          reflections[name].active_record.try(:model_types) || []
+        else
+          [reflections[name].class_name]
+        end
+      end
+    end
+
+    def available_includes
+      self.class.available_includes
+    end
+
+    # XXX deprecated, shouldn't expose this as an instance method.
+    def api_attributes(user: CurrentUser.user)
+      policy = Pundit.policy(user, self) || ApplicationPolicy.new(user, self)
+      policy.api_attributes
+    end
+
+    # XXX deprecated, shouldn't expose this as an instance method.
+    def html_data_attributes(user: CurrentUser.user)
+      policy = Pundit.policy(user, self) || ApplicationPolicy.new(user, self)
+      policy.html_data_attributes
+    end
+
+    def process_api_attributes(options, underscore: false)
       options[:methods] ||= []
-      options[:methods] += method_attributes
+      attributes, methods = api_attributes.partition { |attr| has_attribute?(attr) }
+      methods += options[:methods]
+      if underscore && options[:only].blank?
+        options[:only] = attributes + methods
+      else
+        options[:only] ||= attributes + methods
+      end
 
-      super(options)
+      attributes &= options[:only]
+      methods &= options[:only]
+
+      options[:only] = attributes
+      options[:methods] = methods
+
+      options.delete(:methods) if options[:methods].empty?
+      options
     end
 
-    def serializable_hash(*args)
-      hash = super(*args)
-      hash.transform_keys { |key| key.delete("?") }
+    def serializable_hash(options = {})
+      options ||= {}
+      return :not_visible unless visible?
+      if options[:only].is_a?(String)
+        options.delete(:methods)
+        options.delete(:include)
+        options.merge!(ParameterBuilder.serial_parameters(options[:only], self))
+        if options[:only].include?("_")
+          options[:only].delete("_")
+          options = process_api_attributes(options, underscore: true)
+        end
+      else
+        options = process_api_attributes(options)
+      end
+      options[:only] += [SecureRandom.hex(6)]
+
+      hash = super(options)
+      hash.transform_keys! { |key| key.delete("?") }
+      deep_reject_hash(hash) { |_, v| v == :not_visible }
     end
 
-    protected
-
-    def hidden_attributes
-      %i[uploader_ip_addr updater_ip_addr creator_ip_addr user_ip_addr ip_addr]
+    def visible?(_user = CurrentUser.user)
+      true
     end
 
-    def method_attributes
-      []
+    def deep_reject_hash(hash, &block)
+      hash.each_with_object({}) do |(key, value), result|
+        if value.is_a?(Hash)
+          result[key] = deep_reject_hash(value, &block)
+        elsif value.is_a?(Array)
+          result[key] = value.map { |v| v.is_a?(Hash) ? deep_reject_hash(v, &block) : v }.reject { |i| block.call(nil, i) }
+        elsif !block.call(key, value)
+          result[key] = value
+        end
+      end
     end
   end
 
@@ -356,6 +421,10 @@ class ApplicationRecord < ActiveRecord::Base
               user.notifications.create!(category: "mention", data: { mention_id: id, mention_type: type, user_id: creator, **extra })
             end
             save
+          end
+
+          define_method(:mentions) do
+            notified_mentions.map { |id| { id: id, name: User.id_to_name(id) } }
           end
         end
       end

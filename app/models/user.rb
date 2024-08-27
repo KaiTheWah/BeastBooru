@@ -717,46 +717,6 @@ class User < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    # blacklist all attributes by default. whitelist only safe attributes.
-    def hidden_attributes
-      super + attributes.keys.map(&:to_sym)
-    end
-
-    def method_attributes
-      list = super + %i[
-        id created_at name level base_upload_limit
-        post_upload_count post_update_count note_update_count
-        level_string avatar_id
-      ] + Preferences.public_list
-
-      if id == CurrentUser.user.id
-        list += Preferences.private_list + %i[
-          updated_at email last_logged_in_at last_forum_read_at
-          recent_tags comment_threshold default_image_size
-          favorite_tags blacklisted_tags time_zone per_page
-          custom_style favorite_count followed_tags_list
-          api_regen_multiplier api_burst_limit remaining_api_limit
-          statement_timeout favorite_limit
-          tag_query_limit has_mail?
-        ]
-      end
-
-      list
-    end
-
-    # extra attributes returned for /users/:id.json but not for /users.json.
-    def full_attributes
-      %i[
-        wiki_page_version_count artist_version_count pool_version_count
-        forum_post_count comment_count
-        favorite_count positive_feedback_count
-        positive_feedback_count neutral_feedback_count negative_feedback_count
-        upload_limit profile_about profile_artinfo
-      ]
-    end
-  end
-
   module CountMethods
     def wiki_page_version_count
       wiki_update_count
@@ -1019,7 +979,6 @@ class User < ApplicationRecord
   include BlacklistMethods
   include ForumMethods
   include LimitMethods
-  include ApiMethods
   include CountMethods
   include BlockMethods
   include LogChanges
@@ -1121,5 +1080,9 @@ class User < ApplicationRecord
 
   def self.email_not_verified
     where("bit_prefs & :value != :value", { value: Preferences::EMAIL_VERIFIED })
+  end
+
+  def self.available_includes
+    %i[artists bans feedback]
   end
 end

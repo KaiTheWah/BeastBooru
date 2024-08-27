@@ -152,16 +152,9 @@ class StaffAuditLog < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def method_attributes
-      json_keys
-    end
-
-    def hidden_attributes
-      super + %i[values]
-    end
-  end
-
-  include ApiMethods
   extend SearchMethods
+
+  def self.available_includes
+    %i[user]
+  end
 end

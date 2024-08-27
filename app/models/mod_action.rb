@@ -625,22 +625,6 @@ class ModAction < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def method_attributes
-      super + json_keys
-    end
-
-    def hidden_attributes
-      super + %i[values]
-    end
-
-    def serializable_hash(*)
-      return super.merge("#{subject_type.underscore}_id": subject_id) if subject
-      super
-    end
-  end
-
-  include ApiMethods
   extend SearchMethods
 
   def self.without_logging(&)
@@ -648,5 +632,14 @@ class ModAction < ApplicationRecord
     yield
   ensure
     self.disable_logging = false
+  end
+
+  def serializable_hash(*)
+    return super.merge("#{subject_type.underscore}_id": subject_id) if subject
+    super
+  end
+
+  def self.available_includes
+    %i[creator]
   end
 end

@@ -34,20 +34,6 @@ class Comment < ApplicationRecord
   has_many :tickets, as: :model
   has_many :versions, class_name: "EditHistory", as: :versionable, dependent: :destroy
 
-  module ApiMethods
-    def hidden_attributes
-      super + %i[notified_mentions]
-    end
-
-    def mentions
-      notified_mentions.map { |id| { id: id, name: User.id_to_name(id) } }
-    end
-
-    def method_attributes
-      super + %i[mentions creator_name updater_name]
-    end
-  end
-
   module SearchMethods
     def recent
       reorder("comments.id desc").limit(RECENT_COUNT)
@@ -135,7 +121,6 @@ class Comment < ApplicationRecord
     end
   end
 
-  include ApiMethods
   extend SearchMethods
 
   def validate_post_exists
@@ -270,5 +255,13 @@ class Comment < ApplicationRecord
 
   def spam_ticket
     tickets.where(creator: User.system, reason: "Spam.").first
+  end
+
+  def self.available_includes
+    %i[creator post updater]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_moderator? || !is_hidden? || creator_id == user.id
   end
 end

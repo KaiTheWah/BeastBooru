@@ -114,4 +114,11 @@ class PostPolicy < ApplicationPolicy
   def permitted_search_params_for_uploaders
     permitted_search_params + %i[user_id user_name]
   end
+
+  def api_attributes
+    attr = super + %i[has_large has_visible_children children_ids pool_ids is_favorited? is_voted_up? is_voted_down?] - %i[pool_string fav_string vote_string]
+    attr += %i[file_url large_file_url preview_file_url] if record.visible?
+    attr -= %i[md5 file_ext] unless record.visible?
+    attr
+  end
 end

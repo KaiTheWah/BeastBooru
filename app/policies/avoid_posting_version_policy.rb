@@ -6,4 +6,10 @@ class AvoidPostingVersionPolicy < ApplicationPolicy
     params += %i[ip_addr] if can_search_ip_addr?
     params
   end
+
+  def api_attributes
+    attr = super
+    attr -= %i[staff_notes] unless user.is_janitor?
+    attr
+  end
 end

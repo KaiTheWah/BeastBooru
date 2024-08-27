@@ -107,12 +107,6 @@ class WikiPage < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def method_attributes
-      super + %i[creator_name category_id]
-    end
-  end
-
   module HelpPageMethods
     def validate_not_used_as_help_page
       if help_page.present?
@@ -132,7 +126,6 @@ class WikiPage < ApplicationRecord
     end
   end
 
-  include ApiMethods
   include HelpPageMethods
   include LogMethods
   include RestrictionMethods
@@ -303,15 +296,15 @@ class WikiPage < ApplicationRecord
     end.map { |x| x.downcase.tr(" ", "_").to_s }.uniq
   end
 
-  def visible?
-    true
-  end
-
   def self.is_meta_wiki?(title)
     title.present? && META_PREFIXES.any? { |prefix| title.starts_with?(prefix) }
   end
 
   def is_meta_wiki?
     WikiPage.is_meta_wiki?(title)
+  end
+
+  def self.available_includes
+    %i[artist dtext_links help_page tag]
   end
 end

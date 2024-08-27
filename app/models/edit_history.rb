@@ -147,4 +147,12 @@ class EditHistory < ApplicationRecord
   end
 
   extend SearchMethods
+
+  def self.available_includes
+    %i[user versionable]
+  end
+
+  def visible?(user = CurrentUser.user)
+    user.is_moderator?
+  end
 end

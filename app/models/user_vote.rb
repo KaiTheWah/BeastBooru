@@ -35,6 +35,13 @@ class UserVote < ApplicationRecord
     self.user_ip_addr ||= CurrentUser.ip_addr
   end
 
+  def user_name
+    if association(:user).loaded?
+      return user&.name || "Anonymous"
+    end
+    User.id_to_name(user_id)
+  end
+
   def is_positive?
     score == 1
   end
@@ -111,4 +118,8 @@ class UserVote < ApplicationRecord
   end
 
   extend SearchMethods
+
+  def visible?(user = CurrentUser.user)
+    user.is_moderator? || user_id == user.id
+  end
 end

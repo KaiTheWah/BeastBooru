@@ -47,10 +47,6 @@ class Ticket < ApplicationRecord
   # * Janitor+ can see details if the creator is Janitor+ or the ticket is a commendation, else Moderator+
   module TicketTypes
     module Artist
-      def can_create_for?(_user)
-        true
-      end
-
       def can_view?(user)
         user.is_janitor? || user.id == creator_id
       end
@@ -61,10 +57,6 @@ class Ticket < ApplicationRecord
     end
 
     module Comment
-      def can_create_for?(user)
-        model&.visible_to?(user)
-      end
-
       def can_view?(user)
         user.is_moderator? || (user.id == creator_id)
       end
@@ -72,7 +64,7 @@ class Ticket < ApplicationRecord
 
     module Dmail
       def can_create_for?(user)
-        model&.visible_to?(user) && model.to_id == user.id
+        model&.visible?(user) && model.to_id == user.id
       end
 
       def can_view?(user)
@@ -85,20 +77,12 @@ class Ticket < ApplicationRecord
     end
 
     module ForumPost
-      def can_create_for?(user)
-        model.visible?(user)
-      end
-
       def can_view?(user)
         user.is_moderator? || (user.id == creator_id)
       end
     end
 
     module Pool
-      def can_create_for?(_user)
-        true
-      end
-
       def can_view?(user)
         user.is_janitor? || user.id == creator_id
       end
@@ -113,10 +97,6 @@ class Ticket < ApplicationRecord
         reason.split("\n")[0] || "Unknown Report Type"
       end
 
-      def can_create_for?(_user)
-        true
-      end
-
       def can_view?(user)
         user.is_janitor? || user.id == creator_id
       end
@@ -127,10 +107,6 @@ class Ticket < ApplicationRecord
     end
 
     module PostSet
-      def can_create_for?(user)
-        model&.can_view?(user)
-      end
-
       def can_view?(user)
         user.is_moderator? || user.id == creator_id
       end
@@ -141,10 +117,6 @@ class Ticket < ApplicationRecord
     end
 
     module Tag
-      def can_create_for?(_user)
-        true
-      end
-
       def can_view?(user)
         user.is_janitor? || (user.id == creator_id)
       end
@@ -155,10 +127,6 @@ class Ticket < ApplicationRecord
     end
 
     module User
-      def can_create_for?(_user)
-        true
-      end
-
       def can_view?(user)
         user.is_moderator? || user.id == creator_id || (user.is_janitor? && (report_type == "commendation" || creator.is_janitor?))
       end
@@ -169,10 +137,6 @@ class Ticket < ApplicationRecord
     end
 
     module WikiPage
-      def can_create_for?(_user)
-        true
-      end
-
       def can_view?(user)
         user.is_janitor? || (user.id == creator_id)
       end
@@ -180,15 +144,6 @@ class Ticket < ApplicationRecord
       def bot_target_name
         model&.title
       end
-    end
-  end
-
-  module APIMethods
-    def hidden_attributes
-      hidden = []
-      hidden += %i[claimant_id] unless CurrentUser.is_moderator?
-      hidden += %i[creator_id] unless can_see_reporter?(CurrentUser)
-      super + hidden
     end
   end
 
@@ -244,7 +199,7 @@ class Ticket < ApplicationRecord
       if user.is_moderator?
         all
       elsif user.is_janitor?
-        for_creator(user.id).or(where.not(qtype: %w[Dmail User]))
+        for_creator(user.id).or(where(model_type: %w[Post]))
       else
         for_creator(user.id)
       end
@@ -323,7 +278,7 @@ class Ticket < ApplicationRecord
     end
   end
 
-  def can_view?(_user)
+  def can_view?(user)
     user.is_moderator?
   end
 
@@ -331,8 +286,8 @@ class Ticket < ApplicationRecord
     user.is_moderator? || (user.id == creator_id)
   end
 
-  def can_create_for?(_user)
-    false
+  def can_create_for?(user)
+    model.try(:visible?, user)
   end
 
   def type_title
@@ -452,20 +407,16 @@ class Ticket < ApplicationRecord
 
   include ClassifyMethods
   include ValidationMethods
-  include APIMethods
   include ClaimMethods
   include NotificationMethods
   include PubSubMethods
   extend SearchMethods
 
-  def self.visible(_user)
-    # if user.is_moderator?
-    #  all
-    # elsif user.is_janitor?
-    #  where(creator: user).or(where(model_type: %w[Artist Pool Post WikiPage User]))
-    # else
-    #  where(creator: user)
-    # end
-    all
+  def self.available_includes
+    %i[handler]
+  end
+
+  def visible?(user = CurrentUser.user)
+    can_view?(user)
   end
 end

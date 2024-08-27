@@ -8,4 +8,8 @@ class StaffAuditLogPolicy < ApplicationPolicy
   def permitted_search_params
     super + %i[user_id user_name action]
   end
+
+  def api_attributes
+    super - %i[values] + record.json_keys
+  end
 end

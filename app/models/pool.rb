@@ -332,10 +332,6 @@ class Pool < ApplicationRecord
     (post_count / CurrentUser.user.per_page.to_f).ceil
   end
 
-  def method_attributes
-    super + %i[artists creator_name post_count]
-  end
-
   def validate_name
     case name
     when /\A(any|none)\z/i
@@ -367,4 +363,8 @@ class Pool < ApplicationRecord
   end
 
   include LogMethods
+
+  def self.available_includes
+    %i[creator]
+  end
 end

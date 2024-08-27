@@ -2,7 +2,7 @@
 
 <%= render "search" %>
 
-<% revert = (params.dig(:search, :post_id).present? || params.dig(:search, :note_id).present?) %>
+<% revert = params.dig(:search, :post_id).present? || params.dig(:search, :note_id).present? %>
 <%= table_for(@note_versions, class: "striped autofit") do |t| %>
   <% t.column("Post") do |note_version| %>
     <%= link_to(note_version.post_id, post_path(note_version.post_id)) %>

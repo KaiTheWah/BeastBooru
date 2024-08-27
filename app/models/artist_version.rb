@@ -44,4 +44,8 @@ class ArtistVersion < ApplicationRecord
   def previous
     ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").first
   end
+
+  def self.available_includes
+    %i[artist updater]
+  end
 end

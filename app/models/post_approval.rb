@@ -38,4 +38,8 @@ class PostApproval < ApplicationRecord
       end
     end
   end
+
+  def self.available_includes
+    %i[post user]
+  end
 end

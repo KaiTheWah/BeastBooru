@@ -24,4 +24,8 @@ class ForumTopicStatus < ApplicationRecord
       end
     end
   end
+
+  def self.available_includes
+    %i[forum_topic user]
+  end
 end

@@ -3325,7 +3325,6 @@ components:
         - id
         - user_id
         - target_id
-        - hide_uploads
         - hide_comments
         - hide_forum_topics
         - hide_forum_posts
@@ -3340,8 +3339,6 @@ components:
           type: number
         target_id:
           type: number
-        hide_uploads:
-          type: boolean
         hide_comments:
           type: boolean
         hide_forum_topics:
@@ -12227,8 +12224,6 @@ paths:
                   type: number
                 target_name:
                   type: string
-                hide_uploads:
-                  type: boolean
                 hide_comments:
                   type: boolean
                 hide_forum_topics:
@@ -12279,8 +12274,6 @@ paths:
             schema:
               type: object
               properties:
-                hide_uploads:
-                  type: boolean
                 hide_comments:
                   type: boolean
                 hide_forum_topics:

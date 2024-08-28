@@ -2,9 +2,6 @@
   <% t.column("User") do |block| %>
     <%= link_to_user(block.target) %>
   <% end %>
-  <% t.column("Hide Uploads") do |block| %>
-    <%= block.hide_uploads ? "Yes" : "No" %>
-  <% end %>
   <% t.column("Hide Comments") do |block| %>
     <%= block.hide_comments ? "Yes" : "No" %>
   <% end %>

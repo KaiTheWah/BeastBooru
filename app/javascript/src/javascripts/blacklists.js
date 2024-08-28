@@ -50,8 +50,8 @@ Blacklist.init_blacklist_editor = function () {
     if (Blacklist.isAnonymous) {
       LStorage.Blacklist.AnonymousBlacklist = blacklist_json;
     } else {
-      $.ajax("/users/" + Utility.meta("current-user-id") + ".json", {
-        method: "PUT",
+      $.ajax("/users/update.json", {
+        method: "POST",
         data: {
           "user[blacklisted_tags]": blacklist_content,
         },
@@ -127,20 +127,17 @@ Blacklist.init_comment_blacklist = function () {
     const token = filter.tokens[0];
 
     switch (token.type) {
-      case "user": {
+      case "uploader": {
         if (token.value.startsWith("!")) {
-          $(`article[data-creator-id="${token.value.slice(1)}"]`).hide();
-          continue;
+          $(`article[data-uploader-id="${token.value.slice(1)}"]`).hide();
+          break;
         }
-        // falls through
+        $(`article[data-uploader="${token.value}"]`).hide();
+        break;
       }
-      case "username": {
-        $(`article[data-creator="${token.value}"]`).hide();
-        continue;
-      }
-      case "userid": {
-        $(`article[data-creator-id="${token.value}"]`).hide();
-        continue;
+      case "uploaderid": {
+        $(`article[data-uploader-id="${token.value}"]`).hide();
+        break;
       }
     }
   }

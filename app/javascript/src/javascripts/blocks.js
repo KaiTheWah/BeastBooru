@@ -4,7 +4,6 @@ class Block {
   static entries = JSON.parse(Utility.meta("user-blocks") || "[]");
 
   static hiddenCount = {
-    uploads: 0,
     comments: 0,
     forum_posts: 0,
     forum_topics: 0,
@@ -25,13 +24,11 @@ class Block {
   static text (name) {
     const p = (t, n) => (n === 1 ? `${n} ${t}` : `${n} ${t}s`);
     const beginnings = {
-      uploads: p("post", this.hiddenCount[name]),
       comments: p("comment", this.hiddenCount[name]),
       forum_posts: p("forum post", this.hiddenCount[name]),
       forum_topics: p("forum topic", this.hiddenCount[name]),
     };
     return `${beginnings[name]} on this page ${this.hiddenCount[name] === 1 ? "was" : "were"} hidden due to a user being blocked.`;
-    // $(".blocked-notice").html(`2 topics on this page were hidden due to a user being blocked. Click <a href="#" class="deactivate-all-blocks">here</a> to temporarily disable blocking.`)
   }
 
   static updateText () {
@@ -39,7 +36,7 @@ class Block {
     for (const [name, counts] of Object.entries(this.hiddenCount)) {
       if (counts === 0) {
         if (this.disabled.includes(name)) {
-          html += `<p>Hiding of ${name.replace("_", " ").replace("uploads", "posts")} has been disabled. Click <a href="#" class="reactivate-blocks" data-block-type="${name}">here</a> to reenable blocking.</p>`;
+          html += `<p>Hiding of ${name.replace("_", " ")} has been disabled. Click <a href="#" class="reactivate-blocks" data-block-type="${name}">here</a> to reenable blocking.</p>`;
         }
         continue;
       }
@@ -58,15 +55,7 @@ class Block {
       return;
     }
 
-    const { hide_uploads, hide_comments, hide_forum_topics, hide_forum_posts } = entry;
-
-    if (hide_uploads) {
-      if (hide) {
-        this.hide($(`article.post-preview[data-uploader-id=${entry.target_id}]:visible`), "uploads");
-      } else {
-        this.show($(`article.post-preview[data-uploader-id=${entry.target_id}]:hidden`), "uploads");
-      }
-    }
+    const { hide_comments, hide_forum_topics, hide_forum_posts } = entry;
 
     if (hide_comments) {
       if (hide) {

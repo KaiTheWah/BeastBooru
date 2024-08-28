@@ -894,10 +894,6 @@ class User < ApplicationRecord
       blocks.find_by(target: target)
     end
 
-    def is_blocking_uploads_from?(target)
-      is_blocking?(target) && block_for(target).hide_uploads?
-    end
-
     def is_blocking_comments_from?(target)
       is_blocking?(target) && block_for(target).hide_comments?
     end

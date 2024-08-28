@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_27_201623) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_28_144918) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -952,7 +952,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_201623) do
   create_table "user_blocks", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "target_id", null: false
-    t.boolean "hide_uploads", default: false, null: false
     t.boolean "hide_comments", default: false, null: false
     t.boolean "hide_forum_topics", default: false, null: false
     t.boolean "hide_forum_posts", default: false, null: false

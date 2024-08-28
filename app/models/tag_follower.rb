@@ -11,7 +11,7 @@ class TagFollower < ApplicationRecord
   after_create :set_latest_post, unless: -> { last_post_id.present? }
   after_commit :update_tag_follower_count, on: %i[create destroy]
   delegate :name, to: :tag, prefix: true
-  
+
   scope :for_user, ->(user_id) { where(user_id: user_id) }
 
   def set_latest_post(exclude: nil)

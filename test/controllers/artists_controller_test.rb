@@ -89,7 +89,6 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "work" do
         attributes = attributes_for(:artist)
-        puts attributes
         assert_difference("Artist.count", 1) do
           attributes.delete(:is_active)
           post_auth artists_path, @user, params: { artist: attributes }

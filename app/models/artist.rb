@@ -228,7 +228,6 @@ class Artist < ApplicationRecord
         urls.find_or_initialize_by(url: url, is_active: is_active)
       end.uniq(&:url).first(MAX_URLS_PER_ARTIST)
 
-
       self.url_string_changed = (url_string_was != url_string)
     end
 

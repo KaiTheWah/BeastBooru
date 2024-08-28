@@ -11,6 +11,8 @@ class TagFollower < ApplicationRecord
   after_create :set_latest_post, unless: -> { last_post_id.present? }
   after_commit :update_tag_follower_count, on: %i[create destroy]
   delegate :name, to: :tag, prefix: true
+  
+  scope :for_user, ->(user_id) { where(user_id: user_id) }
 
   def set_latest_post(exclude: nil)
     post = Post.sql_raw_tag_match(tag_name).order(id: :asc)
@@ -63,6 +65,6 @@ class TagFollower < ApplicationRecord
   end
 
   def visible?(user = CurrentUser.user)
-    user.is_moderator? || !user.enable_privacy_mode?
+    user.is_moderator? || !user.enable_privacy_mode? || user_id == user.id
   end
 end

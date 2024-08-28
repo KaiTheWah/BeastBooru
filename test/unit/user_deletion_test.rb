@@ -41,7 +41,10 @@ class UserDeletionTest < ActiveSupport::TestCase
       @post = create(:post)
       FavoriteManager.add!(user: @user, post: @post)
 
-      @user.update(email: "gay@pawov.in")
+      @tag = @post.tags.first
+      @tag.follow!(@user)
+
+      @user.update(email: "gay@femboy.fan")
 
       @deletion = UserDeletion.new(@user, "password")
       with_inline_jobs { @deletion.delete! }
@@ -71,6 +74,12 @@ class UserDeletionTest < ActiveSupport::TestCase
       assert_equal(0, Favorite.count)
       assert_equal("", @post.fav_string)
       assert_equal(0, @post.fav_count)
+    end
+
+    should "remove any followed tags" do
+      @tag.reload
+      assert_equal(0, TagFollower.count)
+      assert_equal(0, @tag.follower_count)
     end
   end
 end

@@ -75,6 +75,7 @@ class UsersController < ApplicationController
           if FemboyFans.config.enable_email_verification?
             Users::EmailConfirmationMailer.confirmation(@user).deliver_now
           end
+          UserEvent.create_from_request!(@user, :user_creation, request)
         else
           flash[:notice] = "Sign up failed: #{@user.errors.full_messages.join('; ')}"
         end
@@ -100,6 +101,9 @@ class UsersController < ApplicationController
     if @user.errors.any?
       flash[:notice] = @user.errors.full_messages.join("; ")
     else
+      if @user.saved_change_to_bcrypt_password_hash?
+        UserEvent.create_from_request!(@user, :password_change, request)
+      end
       flash[:notice] = "Settings updated"
     end
     respond_with(@user) do |format|

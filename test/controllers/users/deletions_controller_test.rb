@@ -24,6 +24,7 @@ module Users
         should "work" do
           delete_auth users_deletion_path, @user, params: { password: "password" }
           assert_redirected_to(posts_path)
+          assert_equal(true, @user.user_events.user_deletion.exists?)
         end
 
         should "restrict access" do

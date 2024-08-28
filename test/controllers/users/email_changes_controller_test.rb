@@ -24,6 +24,7 @@ module Users
             assert_redirected_to(home_users_path)
             @user.reload
             assert_equal("abc@ogres.net", @user.email)
+            assert_equal(true, @user.user_events.email_change.exists?)
           end
         end
 
@@ -47,6 +48,7 @@ module Users
           post_auth users_email_change_path, @user, params: { email_change: { password: "password", email: "abc@ogres.net" } }
           @user.reload
           assert_equal("abc@ogres.net", @user.email)
+          assert_equal(true, @user.user_events.email_change.exists?)
         end
 
         should "restrict access" do

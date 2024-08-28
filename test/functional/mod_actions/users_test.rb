@@ -26,7 +26,7 @@ module ModActions
       end
 
       should "format user_delete correctly" do
-        UserDeletion.new(@target, nil).send(:create_mod_action)
+        UserDeletion.new(@target, nil, mock_request).send(:create_mod_action)
 
         assert_matches(
           actions: %w[user_delete],

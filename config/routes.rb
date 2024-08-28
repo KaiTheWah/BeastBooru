@@ -376,6 +376,8 @@ Rails.application.routes.draw do
       end
       resources :name_change_requests, controller: "users/name_change_requests", as: "user_name_change_requests", only: %i[index show new create]
       resource :revert, controller: "users/reverts", as: "user_revert", only: %i[new create]
+      resources :events, controller: "users/events", as: "user_events", only: %i[index]
+      resources :sessions, controller: "users/sessions", as: "user_sessions", only: %i[index]
     end
     member do
       put :delete

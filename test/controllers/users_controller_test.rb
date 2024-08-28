@@ -95,6 +95,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("xxx", created_user.name)
         assert_equal(FemboyFans.config.records_per_page, created_user.per_page)
         assert_not_nil(created_user.last_ip_addr)
+        assert_equal(true, created_user.user_events.user_creation.exists?)
       end
 
       context "with sockpuppet validation enabled" do
@@ -186,7 +187,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "for an user with blank email" do
+      context "for a user with blank email" do
         setup do
           @user = create(:user, email: "")
           FemboyFans.config.stubs(:enable_email_verification?).returns(true)
@@ -196,6 +197,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           post_auth update_users_path, @user, params: { user: { comment_threshold: "-100" } }
           assert_match(/Email can't be blank/, flash[:notice])
         end
+      end
+
+      should "change password" do
+        post_auth update_users_path, @user, params: { user: { old_password: "password", password: "password2", password_confirmation: "password2" } }
+        @user.reload
+        assert_equal(true, @user.bcrypt_password.is_password?("password2"))
+        assert_equal(true, @user.user_events.password_change.exists?)
       end
 
       should "restrict access" do

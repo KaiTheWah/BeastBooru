@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_28_144918) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_28_151201) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -964,6 +964,24 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_28_144918) do
     t.index ["user_id"], name: "index_user_blocks_on_user_id"
   end
 
+  create_table "user_events", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "user_session_id", null: false
+    t.integer "category", null: false
+    t.inet "ip_addr", null: false
+    t.string "session_id", null: false
+    t.string "user_agent"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_user_events_on_category"
+    t.index ["ip_addr"], name: "index_user_events_on_ip_addr"
+    t.index ["session_id"], name: "index_user_events_on_session_id"
+    t.index ["user_agent"], name: "index_user_events_on_user_agent"
+    t.index ["user_id"], name: "index_user_events_on_user_id"
+    t.index ["user_session_id"], name: "index_user_events_on_user_session_id"
+  end
+
   create_table "user_feedbacks", id: :serial, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "creator_id", null: false
@@ -1001,6 +1019,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_28_144918) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.integer "user_id", null: false
+  end
+
+  create_table "user_sessions", force: :cascade do |t|
+    t.inet "ip_addr", null: false
+    t.string "session_id", null: false
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ip_addr"], name: "index_user_sessions_on_ip_addr"
+    t.index ["session_id"], name: "index_user_sessions_on_session_id"
   end
 
   create_table "user_text_versions", force: :cascade do |t|
@@ -1221,6 +1249,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_28_144918) do
   add_foreign_key "uploads", "posts"
   add_foreign_key "uploads", "users", column: "uploader_id"
   add_foreign_key "user_blocks", "users"
+  add_foreign_key "user_events", "user_sessions"
+  add_foreign_key "user_events", "users"
   add_foreign_key "user_feedbacks", "users"
   add_foreign_key "user_feedbacks", "users", column: "creator_id"
   add_foreign_key "user_name_change_requests", "users"

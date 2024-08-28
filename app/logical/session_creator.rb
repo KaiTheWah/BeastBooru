@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class SessionCreator
-  attr_reader :session, :cookies, :name, :password, :ip_addr, :remember, :secure
+  attr_reader :session, :cookies, :name, :password, :ip_addr, :remember, :secure, :request
 
-  def initialize(session, cookies, name, password, ip_addr, remember: false, secure: false) # rubocop:disable Metrics/ParameterLists
+  def initialize(session, cookies, name, password, ip_addr, request, remember: false, secure: false) # rubocop:disable Metrics/ParameterLists
     @session = session
     @cookies = cookies
     @name = name
@@ -11,16 +11,19 @@ class SessionCreator
     @ip_addr = ip_addr
     @remember = remember
     @secure = secure
+    @request = request
   end
 
   def authenticate
+    user = User.find_by_normalized_name(name)
     if User.authenticate(name, password)
-      user = User.find_by_normalized_name(name)
-
       session[:user_id] = user.id
       session[:last_authenticated_at] = Time.now.utc.to_s
       session[:ph] = user.password_token
-      user.update_column(:last_ip_addr, ip_addr) unless user.is_banned?
+      unless user.is_banned?
+        UserEvent.create_from_request!(user, :login, request)
+        user.update_column(:last_ip_addr, ip_addr)
+      end
 
       if remember
         verifier = ActiveSupport::MessageVerifier.new(FemboyFans.config.remember_key, serializer: JSON, digest: "SHA256")
@@ -28,6 +31,7 @@ class SessionCreator
       end
       return true
     end
+    UserEvent.create_from_request!(user, :failed_login, request) if user.present?
     false
   end
 end

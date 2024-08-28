@@ -4,11 +4,12 @@ class UserDeletion
   class ValidationError < StandardError
   end
 
-  attr_reader :user, :password
+  attr_reader :user, :password, :request
 
-  def initialize(user, password)
+  def initialize(user, password, request)
     @user = user
     @password = password
+    @request = request
   end
 
   def delete!
@@ -18,6 +19,7 @@ class UserDeletion
     clear_user_settings
     reset_password
     create_mod_action
+    create_user_event
     UserDeletionJob.perform_later(user.id)
   end
 
@@ -29,6 +31,10 @@ class UserDeletion
 
   def create_mod_action
     ModAction.log!(:user_delete, user, user_id: user.id)
+  end
+
+  def create_user_event
+    UserEvent.create_from_request!(user, :user_deletion, request)
   end
 
   def clear_user_settings

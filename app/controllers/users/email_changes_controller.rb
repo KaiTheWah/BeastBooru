@@ -12,6 +12,7 @@ module Users
         flash[:notice] = CurrentUser.user.errors.full_messages.join("; ")
         redirect_to(new_users_email_change_path)
       else
+        UserEvent.create_from_request!(CurrentUser.user, :email_change, request)
         redirect_to(home_users_path, notice: "Email was updated")
       end
     end

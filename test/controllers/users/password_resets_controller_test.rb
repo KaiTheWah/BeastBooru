@@ -51,6 +51,10 @@ module Users
           should "deliver an email to the supplied email address" do
             assert_equal(1, ActionMailer::Base.deliveries.size)
           end
+
+          should "create a user event" do
+            assert_equal(true, @user.user_events.password_reset.exists?)
+          end
         end
       end
 

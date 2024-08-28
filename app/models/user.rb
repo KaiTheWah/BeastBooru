@@ -203,6 +203,7 @@ class User < ApplicationRecord
   has_many :blocks, class_name: "UserBlock"
   has_many :followed_tags, class_name: "TagFollower"
   has_many :notifications
+  has_many :user_events
 
   belongs_to :avatar, class_name: "Post", optional: true
   accepts_nested_attributes_for :dmail_filter
@@ -327,10 +328,7 @@ class User < ApplicationRecord
     module ClassMethods
       def authenticate(name, pass)
         user = find_by(name: name)
-        if user && user.password_hash.present? && Pbkdf2.validate_password(pass, user.password_hash)
-          user.upgrade_password(pass)
-          user
-        elsif user&.bcrypt_password_hash && user.bcrypt_password == pass
+        if user&.bcrypt_password == pass
           user
         end
       end

@@ -3,11 +3,11 @@
 module Users
   class DeletionsController < ApplicationController
     def show
-      authorize(UserDeletion.new(CurrentUser.user, nil))
+      authorize(UserDeletion.new(CurrentUser.user, nil, request))
     end
 
     def destroy
-      deletion = authorize(UserDeletion.new(CurrentUser.user, params[:password]))
+      deletion = authorize(UserDeletion.new(CurrentUser.user, params[:password], request))
       deletion.delete!
       cookies.delete(:remember)
       session.delete(:user_id)

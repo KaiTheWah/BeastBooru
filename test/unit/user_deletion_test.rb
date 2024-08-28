@@ -3,12 +3,16 @@
 require "test_helper"
 
 class UserDeletionTest < ActiveSupport::TestCase
+  setup do
+    @request = mock_request
+  end
+
   context "an invalid user deletion" do
     context "for an invalid password" do
       setup do
         @user = create(:user)
         CurrentUser.user = @user
-        @deletion = UserDeletion.new(@user, "wrongpassword")
+        @deletion = UserDeletion.new(@user, "wrongpassword", @request)
       end
 
       should "fail" do
@@ -22,7 +26,7 @@ class UserDeletionTest < ActiveSupport::TestCase
       setup do
         @user = create(:admin_user)
         CurrentUser.user = @user
-        @deletion = UserDeletion.new(@user, "password")
+        @deletion = UserDeletion.new(@user, "password", @request)
       end
 
       should "fail" do
@@ -46,9 +50,13 @@ class UserDeletionTest < ActiveSupport::TestCase
 
       @user.update(email: "gay@femboy.fan")
 
-      @deletion = UserDeletion.new(@user, "password")
+      @deletion = UserDeletion.new(@user, "password", @request)
       with_inline_jobs { @deletion.delete! }
       @user.reload
+    end
+
+    should "create user event" do
+      assert_equal(true, @user.user_events.user_deletion.exists?)
     end
 
     should "blank out the email" do

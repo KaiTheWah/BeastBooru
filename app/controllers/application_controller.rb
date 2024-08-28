@@ -181,6 +181,7 @@ class ApplicationController < ActionController::Base
 
   def set_current_user
     SessionLoader.new(request).load
+    session.send(:load!) unless session.send(:loaded?)
   end
 
   def reset_current_user

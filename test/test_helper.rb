@@ -86,6 +86,17 @@ class ActiveSupport::TestCase # rubocop:disable Style/ClassAndModuleChildren
     Post.document_store.delete_by_query(query: "*", body: {})
     Post.document_store.refresh_index!
   end
+
+  def mock_request(remote_ip: "127.0.0.1", user_agent: "Firefox", session_id: "1234")
+    request = mock
+    request.stubs(:remote_ip).returns(remote_ip)
+    request.stubs(:user_agent).returns(user_agent)
+    request.stubs(:session).returns(session_id: session_id)
+    request.stubs(:parameters).returns({})
+    request.stubs(:delete).with(:user_id).returns(nil)
+    request.stubs(:delete).with(:last_authenticated_at).returns(nil)
+    request
+  end
 end
 
 class ActionDispatch::IntegrationTest # rubocop:disable Style/ClassAndModuleChildren

@@ -13,6 +13,7 @@ module Users
     def create
       ::User.with_email(params[:email]).each do |user|
         next if user.is_moderator?
+        UserEvent.create_from_request!(user, :password_reset, request)
         UserPasswordResetNonce.create(user_id: user.id)
       end
       redirect_to(new_users_password_reset_path, notice: "If your email was on file, an email has been sent your way. It should arrive within the next few minutes. Make sure to check your spam folder.")

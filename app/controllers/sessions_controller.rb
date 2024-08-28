@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
       FemboyFans::Logger.add_attributes("user.login" => "rate_limited")
       return redirect_to(new_session_path, notice: "Username/Password was incorrect")
     end
-    session_creator = SessionCreator.new(session, cookies, sparams[:name], sparams[:password], request.remote_ip, remember: sparams[:remember], secure: request.ssl?)
+    session_creator = SessionCreator.new(session, cookies, sparams[:name], sparams[:password], request.remote_ip, request, remember: sparams[:remember], secure: request.ssl?)
 
     if session_creator.authenticate
       url = sparams[:url] if sparams[:url]&.start_with?("/") && !sparams[:url].start_with?("//")
@@ -28,6 +28,7 @@ class SessionsController < ApplicationController
     session.delete(:user_id)
     session.delete(:last_authenticated_at)
     cookies.delete(:remember)
+    UserEvent.create_from_request!(CurrentUser.user, :logout, request)
     redirect_to(posts_path, notice: "You are now logged out")
   end
 

@@ -124,7 +124,12 @@
         <% end %>
         <% if presenter.policy.can_see_ip_addr? %>
           <span>Last IP</span>
-          <span><%= link_to_ip(user.last_ip_addr) %></span>
+          <span>
+            <%= link_to_ip(user.last_ip_addr) %>
+            <% if policy(UserEvent).index? %>
+            (<%= link_to("events", user_events_path(search: { ip_addr: user.last_ip_addr })) %>)
+            <% end %>
+          </span>
         <% end %>
 
         <% unless presenter.show_uploads? %>

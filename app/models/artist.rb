@@ -35,6 +35,13 @@ class Artist < ApplicationRecord
   belongs_to :linked_user, class_name: "User", optional: true
   attribute :notes, :string
 
+  # FIXME: This is a hack on top of the hack below for setting url_string to ensure name is set first for validations
+  def assign_attributes(new_attributes)
+    assign_first = new_attributes.extract!(:name)
+    super(assign_first) unless assign_first.empty?
+    super(new_attributes)
+  end
+
   def log_changes
     if saved_change_to_name? && !previously_new_record?
       ModAction.log!(:artist_rename, self, new_name: name, old_name: name_before_last_save)
@@ -220,6 +227,7 @@ class Artist < ApplicationRecord
         is_active, url = ArtistUrl.parse_prefix(url)
         urls.find_or_initialize_by(url: url, is_active: is_active)
       end.uniq(&:url).first(MAX_URLS_PER_ARTIST)
+
 
       self.url_string_changed = (url_string_was != url_string)
     end

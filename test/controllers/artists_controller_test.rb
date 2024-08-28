@@ -89,7 +89,21 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "work" do
         attributes = attributes_for(:artist)
+        puts attributes
         assert_difference("Artist.count", 1) do
+          attributes.delete(:is_active)
+          post_auth artists_path, @user, params: { artist: attributes }
+        end
+
+        artist = Artist.find_by(name: attributes[:name])
+        assert_not_nil(artist)
+        assert_redirected_to(artist_path(artist.id))
+      end
+
+      should "work (with url string)" do
+        attributes = attributes_for(:artist)
+        attributes[:url_string] ||= "https://femboy.fan"
+        assert_difference(%w[Artist.count ArtistUrl.count], 1) do
           attributes.delete(:is_active)
           post_auth artists_path, @user, params: { artist: attributes }
         end

@@ -6,4 +6,4 @@ SELECT id,
        other_names,
        linked_user_id,
        is_locked
-FROM public.artists
+FROM public.artists ORDER BY id;

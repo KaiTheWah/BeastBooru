@@ -882,6 +882,26 @@ components:
           type: string
         reason:
           type: string
+    Favorite:
+      type: object
+      required:
+        - id
+        - user_id
+        - post_id
+        - created_at
+        - post
+      properties:
+        id:
+          type: number
+        user_id:
+          type: number
+        post_id:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        post:
+          $ref: "#/components/schemas/Post"
     ForumCategory:
       type: object
       required:
@@ -5526,7 +5546,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Post"
+                  $ref: "#/components/schemas/Favorite"
         403:
           $ref: "#/components/responses/AccessDenied"
         404:
@@ -5555,7 +5575,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                $ref: "#/components/schemas/Favorite"
         404:
           $ref: "#/components/responses/NotFound"
         422:

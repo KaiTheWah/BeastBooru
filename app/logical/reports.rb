@@ -6,7 +6,7 @@ module Reports
   LIMIT = 100
 
   def enabled?
-    FemboyFans.config.reports_enabled?
+    !Rails.env.test? && FemboyFans.config.reports_enabled?
   end
 
   def get(path)

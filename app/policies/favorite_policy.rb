@@ -8,4 +8,8 @@ class FavoritePolicy < ApplicationPolicy
   def clear?
     unbanned?
   end
+
+  def api_attributes
+    super + %i[post]
+  end
 end

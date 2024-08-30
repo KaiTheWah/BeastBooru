@@ -44,11 +44,11 @@ Favorite.create = function (post_id) {
       Post.notice_update("dec");
       Favorite.after_action(post_id, 1);
       Post.after_vote(post_id, {
-        score: data.score.total,
-        up: data.score.up,
-        down: data.score.down,
-        our_score: data.own_vote,
-        is_locked: data.own_vote === 0,
+        score: data.post.score.total,
+        up: data.post.score.up,
+        down: data.post.score.down,
+        our_score: data.post.own_vote,
+        is_locked: data.post.own_vote === 0,
       });
       Utility.notice("Favorite added");
     }).fail(function (data) {

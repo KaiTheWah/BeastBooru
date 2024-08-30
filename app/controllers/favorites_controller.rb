@@ -26,13 +26,13 @@ class FavoritesController < ApplicationController
 
   def create
     @post = authorize(Post.find(params[:post_id]), policy_class: FavoritePolicy)
-    FavoriteManager.add!(user: CurrentUser.user, post: @post)
+    fav = FavoriteManager.add!(user: CurrentUser.user, post: @post)
     if params[:upvote].to_s.truthy?
       VoteManager::Posts.vote!(user: CurrentUser.user, post: @post, score: 1)
     end
     notice("You have favorited this post")
 
-    respond_with(@post)
+    respond_with(fav)
   rescue Favorite::Error, ActiveRecord::RecordInvalid => e
     render_expected_error(422, e.message)
   end

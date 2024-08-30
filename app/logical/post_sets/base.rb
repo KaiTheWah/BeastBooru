@@ -39,7 +39,7 @@ module PostSets
     end
 
     def load_view_counts!
-      daily = Reports.get_bulk_post_views(posts.map(&:id), Time.zone.today)
+      daily = Reports.get_bulk_post_views(posts.map(&:id), Time.today)
       total = Reports.get_bulk_post_views(posts.map(&:id))
       ViewCountCache.add_all!(daily, :daily)
       ViewCountCache.add_all!(total, :total)

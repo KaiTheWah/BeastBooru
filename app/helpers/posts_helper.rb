@@ -197,4 +197,53 @@ module PostsHelper
     sig = generate_report_signature(purpose: "search", tags: tags, page: page)
     render(partial: "posts/partials/common/report_js", locals: { sig: sig, url: "/searches" })
   end
+
+  def post_ribbons(post)
+    tag.div(class: "ribbons") do # rubocop:disable Metrics/BlockLength
+      [if post.parent_id.present?
+         if post.has_visible_children?
+           tag.div(class: "ribbon left has-parent has-children", title: "Has Parent\nHas Children") do
+             tag.span
+           end
+         else
+           tag.div(class: "ribbon left has-parent", title: "Has Parent") do
+             tag.span
+           end
+         end
+       elsif post.has_visible_children?
+         tag.div(class: "ribbon left has-children", title: "Has Children") do
+           tag.span
+         end
+       end,
+       if post.is_flagged?
+         if post.is_pending?
+           tag.div(class: "ribbon right is-flagged is-pending", title: "Flagged\nPending") do
+             tag.span
+           end
+         else
+           tag.div(class: "ribbon right is-flagged", title: "Flagged") do
+             tag.span
+           end
+         end
+       elsif post.is_pending?
+         tag.div(class: "ribbon right is-pending", title: "Pending") do
+           tag.span
+         end
+       end,].join.html_safe
+    end
+  end
+
+  def post_vote_buttons(post)
+    tag.div(id: "vote-buttons") do
+      tag.button("", class: "button vote-button vote score-neutral", disabled: post.is_vote_locked?, data: { action: "up" }) do
+        tag.span(class: "post-vote-up-#{post.id} score-#{post.is_voted_up? ? 'positive' : 'neutral'}")
+      end +
+        tag.button("", class: "button vote-button vote score-neutral", disabled: post.is_vote_locked?, data: { action: "down" }) do
+          tag.span(class: "post-vote-down-#{post.id} score-#{post.is_voted_down? ? 'negative' : 'neutral'}")
+        end +
+        tag.button("", class: "button vote-button fav score-neutral", data: { action: "fav", state: post.is_favorited? }) do
+          tag.span(class: "post-favorite-#{post.id} score-neutral#{post.is_favorited? ? ' is-favorited' : ''}")
+        end
+    end
+  end
 end

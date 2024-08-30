@@ -16,6 +16,7 @@ class FavoritesController < ApplicationController
       raise(User::PrivacyModeError) if @user.hide_favorites?
 
       @favorite_set = PostSets::Favorites.new(@user, params[:page], limit: params[:limit])
+      @favorite_set.load_view_counts! # force load view counts all at once
       respond_with(@favorite_set.posts) do |fmt|
         fmt.json do
           render(json: @favorite_set.api_posts)

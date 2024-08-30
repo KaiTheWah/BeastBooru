@@ -17,7 +17,7 @@ module Reports
   # Integer
   def get_post_views(post_id, date = nil)
     return 0 unless enabled?
-    d = date ? date.strftime('%Y-%m-%d') : nil
+    d = date&.strftime("%Y-%m-%d")
     Cache.fetch("pv-#{post_id}-#{d}", expires_in: 1.minute) do
       get("/views/#{post_id}#{"?date=#{d}" if date}")["data"].to_i
     end
@@ -50,19 +50,19 @@ module Reports
   # Hash { post_id => count }
   def get_bulk_post_views(post_ids, date = nil)
     return {} unless enabled?
-    d = date ? date.strftime('%Y-%m-%d') : nil
+    d = date&.strftime("%Y-%m-%d")
     post_ids.each_slice(100).flat_map do |ids|
-      get("/views/bulk?posts=#{ids.join(",")}#{"&date=#{d}" if date}")["data"]
-    end.compact_blank.map { |x| [x["post"], x["count"]] }.to_h
+      get("/views/bulk?posts=#{ids.join(',')}#{"&date=#{d}" if date}")["data"]
+    end.compact_blank.to_h { |x| [x["post"], x["count"]] }
   end
 
   def jwt_signature(url)
     JWT.encode({
-     "iss": "FemboyFans",
-     "iat": Time.now.to_i,
-     "exp": 1.minute.from_now.to_i,
-     "aud": "Reports",
-     "sub": url.split("?").first,
-   }, FemboyFans.config.report_key, "HS256")
+      iss: "FemboyFans",
+      iat: Time.now.to_i,
+      exp: 1.minute.from_now.to_i,
+      aud: "Reports",
+      sub: url.split("?").first,
+    }, FemboyFans.config.report_key, "HS256")
   end
 end

@@ -165,7 +165,7 @@ services:
   # To change this, set the FEMBOYFANS_REPORTS_SERVER env variable
   # For internal access, change the FEMBOYFANS_REPORTS_SERVER_INTERNAL env varable (defaults to http://reports:3000)
   reports:
-    image: ghcr.io/femboyfans/reports:449e7eea62fa0e762c24cd1b9a33176e8f9bc820
+    image: ghcr.io/femboyfans/reports:fcb6dbb10c9a4e6a9483850cf27bd1b03c09595b
     environment:
       - CLICKHOUSE_URL=http://clickhouse:8123
       - REDIS_URL=redis://redis/1

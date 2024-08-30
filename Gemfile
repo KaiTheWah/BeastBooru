@@ -68,3 +68,5 @@ gem "pundit", "~> 2.3"
 gem "net-ftp", "~> 0.3.4"
 
 gem "rakismet", "~> 1.5"
+
+gem "jwt", "~> 2.8"

@@ -1,10 +1,18 @@
-<%# locals: (sig:, type:) %>
+<%# locals: (sig:, url:) %>
 
 <% if FemboyFans.config.reports_enabled? %>
   <%= javascript_tag nonce: true do -%>
     $(function() {
-      $.post("<%= FemboyFans.config.reports_server %>/<%= type %>.json", {
-        sig: "<%= sig %>"
+      $.ajax({
+        url: "<%= FemboyFans.config.reports_server %><%= url %>",
+        type: "POST",
+        headers: {
+          "Authorization": "Bearer <%= Reports.jwt_signature(url) %>",
+          "Content-Type": "application/json"
+        },
+        data: JSON.stringify({
+          msg: "<%= sig %>"
+        })
       });
     });
   <% end -%>

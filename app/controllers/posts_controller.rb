@@ -14,6 +14,7 @@ class PostsController < ApplicationController
     else
       authorize(Post)
       @post_set = PostSets::Post.new(tag_query, params[:page], limit: params[:limit], random: params[:random])
+      @post_set.load_view_counts! # force load view counts all at once
       @votes = PostVote.where(user_id: CurrentUser.user.id, post_id: @post_set.posts.map(&:id))
       @posts = PostsDecorator.decorate_collection(@post_set.posts)
       respond_with(@posts) do |format|

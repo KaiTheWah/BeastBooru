@@ -56,6 +56,8 @@ services:
         condition: service_started
       recommender:
         condition: service_started
+      redis:
+        condition: service_healthy
       reports:
         condition: service_started
     tty: true
@@ -99,6 +101,21 @@ services:
     ports:
       - "${EXPOSED_POSTGRES_PORT:-34518}:5432"
 
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest-alpine
+    cap_add:
+      - NET_ADMIN
+      - IPC_LOCK
+      - SYS_NICE
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    ports:
+      - "${EXPOSED_CLICKHOUSE_PORT:-34520}:8123"
+
   redis:
     image: redis:7.0.10-alpine
     command: redis-server --save 10 1 --loglevel warning
@@ -106,6 +123,8 @@ services:
       - redis_data:/data
     ports:
       - "${EXPOSED_REDIS_PORT:-34519}:6379"
+    healthcheck:
+      test: redis-cli ping
 
   memcached:
     image: memcached:1.5.22-alpine
@@ -146,22 +165,18 @@ services:
   # To change this, set the FEMBOYFANS_REPORTS_SERVER env variable
   # For internal access, change the FEMBOYFANS_REPORTS_SERVER_INTERNAL env varable (defaults to http://reports:3000)
   reports:
-    image: ghcr.io/femboyfans/reports:7773b0aaf70ab47b6d2f30eeae813cda51684603
+    image: ghcr.io/femboyfans/reports:449e7eea62fa0e762c24cd1b9a33176e8f9bc820
     environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=femboyfans
-      - REPORTS_REDIS_URL=redis://redis/1
-      - REPORTS_REPORT_KEY=${FEMBOYFANS_REPORT_KEY:-super_secret_key_for_reports_signature}
-    volumes:
-      - type: bind
-        source: ./config/master.key
-        target: /app/config/master.key
-      - type: bind
-        source: ./config/credentials.yml.enc
-        target: /app/config/credentials.yml.enc
+      - CLICKHOUSE_URL=http://clickhouse:8123
+      - REDIS_URL=redis://redis/1
+      - SECRET_KEY=${FEMBOYFANS_REPORT_KEY:-super_secret_key_for_reports_signature}
     ports:
       - "${EXPOSED_REPORTS_PORT:-3002}:3000"
+    depends_on:
+      clickhouse:
+        condition: service_started
+      redis:
+        condition: service_healthy
 
   # Discord integration
 
@@ -241,6 +256,7 @@ volumes:
   node_modules:
   rubocop_cache:
   recommender_data:
+  clickhouse_data:
 
 networks:
   default:

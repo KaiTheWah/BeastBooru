@@ -23,13 +23,6 @@ module PostSets
       end
     end
 
-    def is_simple_tag?
-      return false if %w[~ *].any? { |c| public_tag_string.include?(c) }
-      return false unless public_tag_string.split.one?
-      return false if public_tag_string.split.any? { |tag| TagQuery::METATAGS.include?(tag.split(":")[0]) }
-      true
-    end
-
     def tag_string
       @tag_string ||= tag_array.uniq.join(" ")
     end

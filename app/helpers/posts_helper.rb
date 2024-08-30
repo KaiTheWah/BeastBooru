@@ -178,23 +178,23 @@ module PostsHelper
     ]
   end
 
-  def generate_report_signature(value)
+  def generate_report_signature(purpose:, **values)
     verifier = ActiveSupport::MessageVerifier.new(FemboyFans.config.report_key, serializer: JSON, digest: "SHA256")
-    verifier.generate("#{value},#{session[:session_id]}")
+    verifier.generate({ ip_address: request.remote_ip, **values }, purpose: purpose)
   end
 
   def view_count_js(post)
-    sig = generate_report_signature(post.id)
-    render(partial: "posts/partials/common/report_js", locals: { sig: sig, type: "post_views" })
+    sig = generate_report_signature(purpose: "view", post_id: post.id)
+    render(partial: "posts/partials/common/report_js", locals: { sig: sig, url: "/views" })
   end
 
-  def missed_post_search_count_js(tags)
-    sig = generate_report_signature(tags)
-    render(partial: "posts/partials/common/report_js", locals: { sig: sig, type: "missed_searches" })
+  def missed_post_search_count_js(tags, page)
+    sig = generate_report_signature(purpose: "missed-search", tags: tags, page: page)
+    render(partial: "posts/partials/common/report_js", locals: { sig: sig, url: "/searches/missed" })
   end
 
-  def post_search_count_js(tags)
-    sig = generate_report_signature("ps-#{tags}")
-    render(partial: "posts/partials/common/report_js", locals: { sig: sig, type: "post_searches" })
+  def post_search_count_js(tags, page)
+    sig = generate_report_signature(purpose: "search", tags: tags, page: page)
+    render(partial: "posts/partials/common/report_js", locals: { sig: sig, url: "/searches" })
   end
 end

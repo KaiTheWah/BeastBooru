@@ -37,5 +37,12 @@ module PostSets
     def presenter
       raise(NotImplementedError)
     end
+
+    def load_view_counts!
+      daily = Reports.get_bulk_post_views(posts.map(&:id), Date.today)
+      total = Reports.get_bulk_post_views(posts.map(&:id))
+      ViewCountCache.add_all!(daily, :daily)
+      ViewCountCache.add_all!(total, :total)
+    end
   end
 end

@@ -45,7 +45,7 @@ class PoolsController < ApplicationController
 
   def update
     @pool = authorize(Pool.find(params[:id]))
-    @pool.update(permitted_attributes(@pool)) # TODO: make sure this doesn't break anything
+    @pool.update(permitted_attributes(@pool))
     notice(@pool.valid? ? "Pool updated" : @pool.errors.full_messages.join("; "))
     respond_with(@pool)
   end

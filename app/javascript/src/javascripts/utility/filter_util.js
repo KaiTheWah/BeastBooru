@@ -22,16 +22,14 @@ FilterUtils.FilterTests = {
   favcount: (token, post) => FilterUtils.compare(post.fav_count, token),
   fav: (_token, post) => post.is_favorited,
 
-  uploader: (token, post) => FilterUtils.FilterTests.user(token, post),
-  user: (token, post) => {
-    // Funky userid: alternative
+  uploader: (token, post) => {
+    // Funky uploaderid: alternative
     // TODO: Don't re-parse this on every run
     if (token.value.startsWith("!"))
       return post.uploader_id === parseInt(token.value.slice(1));
     return post.uploader === token.value;
   },
-  userid: (token, post) => FilterUtils.compare(post.uploader_id, token),
-  username: (token, post) => post.uploader === token.value,
+  uploaderid: (token, post) => FilterUtils.compare(post.uploader_id, token),
 
   pool: (token, post) => post.pools.includes(parseInt(token.value) || 0),
 

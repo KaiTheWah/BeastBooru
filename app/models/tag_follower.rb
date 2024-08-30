@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# TODO: remember to move followers when aliases happen
 class TagFollower < ApplicationRecord
   class AliasedTagError < StandardError; end
   belongs_to :tag

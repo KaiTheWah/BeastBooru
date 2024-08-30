@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_28_151201) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_30_162111) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -54,8 +54,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_28_151201) do
     t.text "other_names", default: [], null: false, array: true
     t.text "urls", default: [], null: false, array: true
     t.boolean "notes_changed", default: false
+    t.bigint "linked_user_id"
     t.index ["artist_id"], name: "index_artist_versions_on_artist_id"
     t.index ["created_at"], name: "index_artist_versions_on_created_at"
+    t.index ["linked_user_id"], name: "index_artist_versions_on_linked_user_id"
     t.index ["name"], name: "index_artist_versions_on_name"
     t.index ["updater_id"], name: "index_artist_versions_on_updater_id"
     t.index ["updater_ip_addr"], name: "index_artist_versions_on_updater_ip_addr"
@@ -1135,6 +1137,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_28_151201) do
   add_foreign_key "api_keys", "users"
   add_foreign_key "artist_urls", "artists"
   add_foreign_key "artist_versions", "artists"
+  add_foreign_key "artist_versions", "users", column: "linked_user_id"
   add_foreign_key "artist_versions", "users", column: "updater_id"
   add_foreign_key "artists", "users", column: "creator_id"
   add_foreign_key "artists", "users", column: "linked_user_id"

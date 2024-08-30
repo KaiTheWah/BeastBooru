@@ -10,6 +10,20 @@ module FemboyFans
       "Femboy Fans"
     end
 
+    def app_url
+      "https://#{domain}"
+    end
+
+    # Displayed on the "Safe" version of the site for non-safe posts
+    def normal_app_name
+      app_name
+    end
+
+    # Displayed on the "Safe" version of the site for non-safe posts
+    def normal_app_url
+      app_url
+    end
+
     def description
       "Your one-stop shop for femboy furries."
     end
@@ -594,7 +608,7 @@ module FemboyFans
     # services will fail if you don't set a valid User-Agent.
     def http_headers
       {
-        user_agent: "#{safe_app_name}/#{version}",
+        user_agent: "#{safe_app_name}/#{version} (https://github.com/FemboyFans/FemboyFans)",
       }
     end
 

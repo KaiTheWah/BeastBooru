@@ -148,7 +148,11 @@ class ForumTopic < ApplicationRecord
     def read_by?(user = nil, mutes = nil)
       user ||= CurrentUser.user
 
-      return true if mutes&.find { |m| m.forum_topic_id == id && m.mute }
+      if mutes.present? && mutes.find { |m| m.forum_topic_id == id && m.mute }.present?
+        return true
+      end
+
+      return true if user_mute(user)
 
       if user.last_forum_read_at && updated_at <= user.last_forum_read_at
         return true

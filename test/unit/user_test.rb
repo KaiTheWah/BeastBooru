@@ -199,16 +199,15 @@ class UserTest < ActiveSupport::TestCase
     end
 
     context "password" do
-      # FIXME: Broken because of special password handling in tests
-      # should "match the confirmation" do
-      #   @user = create(:user)
-      #   @user.old_password = "password"
-      #   @user.password = "zugzug5"
-      #   @user.password_confirmation = "zugzug5"
-      #   @user.save
-      #   @user.reload
-      #   assert(User.authenticate(@user.name, "zugzug5"), "Authentication should have succeeded")
-      # end
+      should "match the confirmation" do
+        @user = create(:user)
+        @user.old_password = "password"
+        @user.password = "zugzug5"
+        @user.password_confirmation = "zugzug5"
+        @user.save
+        @user.reload
+        assert(User.authenticate(@user.name, "zugzug5"), "Authentication should have succeeded")
+      end
 
       should "fail if the confirmation does not match" do
         @user = create(:user)

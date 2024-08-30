@@ -50,7 +50,6 @@ class Artist < ApplicationRecord
       ModAction.log!(is_locked ? :artist_lock : :artist_unlock, self)
     end
     if saved_change_to_linked_user_id?
-      # FIXME: This should also go in artist_versions
       if linked_user_id.present?
         ModAction.log!(:artist_user_link, self, user_id: linked_user_id)
       else
@@ -305,6 +304,7 @@ class Artist < ApplicationRecord
         urls:            url_array,
         other_names:     other_names,
         notes_changed:   saved_change_to_notes?,
+        linked_user_id:  linked_user_id,
       )
     end
 

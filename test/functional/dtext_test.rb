@@ -474,9 +474,9 @@ class DtextTest < ActiveSupport::TestCase
         end
       end
 
-      context "[tn]" do
+      context "[note]" do
         should "parse" do
-          assert_parse_dtext(%(<p class="tn">test</p>), "[tn]test[/tn]")
+          assert_parse_dtext(%(<p class="dtext-note">test</p>), "[note]test[/note]")
         end
       end
 

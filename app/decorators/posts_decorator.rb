@@ -119,12 +119,59 @@ class PostsDecorator < ApplicationDecorator
                       "".html_safe
                     end
 
-    ribbons = template.post_ribbons(post)
-    # ribbons = t.render("posts/partials/index/ribbons", post: post).html_safe
-    vote_buttons = template.post_vote_buttons(post)
-    # vote_buttons = t.render("posts/partials/index/vote_buttons", post: post, vote: vote).html_safe
+    ribbons = ribbons(template)
+    vote_buttons = vote_buttons(template)
     template.tag.article(**article_attrs) do
       img_contents + desc_contents + ribbons + vote_buttons
+    end
+  end
+
+  def ribbons(template)
+    template.tag.div(class: "ribbons") do # rubocop:disable Metrics/BlockLength
+      [if post.parent_id.present?
+         if post.has_visible_children?
+           template.tag.div(class: "ribbon left has-parent has-children", title: "Has Parent\nHas Children") do
+             template.tag.span
+           end
+         else
+           template.tag.div(class: "ribbon left has-parent", title: "Has Parent") do
+             template.tag.span
+           end
+         end
+       elsif post.has_visible_children?
+         template.tag.div(class: "ribbon left has-children", title: "Has Children") do
+           template.tag.span
+         end
+       end,
+       if post.is_flagged?
+         if post.is_pending?
+           template.tag.div(class: "ribbon right is-flagged is-pending", title: "Flagged\nPending") do
+             template.tag.span
+           end
+         else
+           template.tag.div(class: "ribbon right is-flagged", title: "Flagged") do
+             template.tag.span
+           end
+         end
+       elsif post.is_pending?
+         template.tag.div(class: "ribbon right is-pending", title: "Pending") do
+           template.tag.span
+         end
+       end,].join.html_safe
+    end
+  end
+
+  def vote_buttons(template)
+    template.tag.div(id: "vote-buttons") do
+      template.tag.button("", class: "button vote-button vote score-neutral", disabled: post.is_vote_locked?, data: { action: "up" }) do
+        template.tag.span(class: "post-vote-up-#{post.id} score-#{post.is_voted_up? ? 'positive' : 'neutral'}")
+      end +
+        template.tag.button("", class: "button vote-button vote score-neutral", disabled: post.is_vote_locked?, data: { action: "down" }) do
+          template.tag.span(class: "post-vote-down-#{post.id} score-#{post.is_voted_down? ? 'negative' : 'neutral'}")
+        end +
+        template.tag.button("", class: "button vote-button fav score-neutral", data: { action: "fav", state: post.is_favorited? }) do
+          template.tag.span(class: "post-favorite-#{post.id} score-neutral#{post.is_favorited? ? ' is-favorited' : ''}")
+        end
     end
   end
 end

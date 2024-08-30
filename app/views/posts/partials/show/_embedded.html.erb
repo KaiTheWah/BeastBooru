@@ -5,7 +5,7 @@
 <% elsif post.safeblocked? -%>
   <%# TODO: convert name & url to config option %>
   <p>This image is unavailable in safe mode (<%= FemboyFans.config.app_name %>). Go
-    to <%= link_to("FemboyFans", "https://femboy.fan/posts/#{post.id}") %> or disable safe mode to view.</p>
+    to <%= link_to(FemboyFans.config.normal_app_name, FemboyFans.config.normal_app_url) %> or disable safe mode to view.</p>
 <% elsif post.is_video? -%>
   <%= render("posts/partials/show/video", post: post) -%>
 <% elsif !post.is_image? -%>

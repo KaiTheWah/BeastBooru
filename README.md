@@ -40,7 +40,7 @@
     ```
     docker compose run --rm --no-deps femboyfans /app/bin/presetup
     docker compose run --rm -e SEED_POST_COUNT=100 femboyfans /app/bin/setup
-    docker compose run --rm reports /app/bin/setup
+    docker compose run --rm reports npm run migrate
     docker compose up
     ```
     After running the commands once only `docker compose up` is needed to bring up the containers.

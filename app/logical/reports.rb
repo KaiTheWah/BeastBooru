@@ -21,6 +21,8 @@ module Reports
     Cache.fetch("pv-#{post_id}-#{d}", expires_in: 1.minute) do
       get("/views/#{post_id}#{"?date=#{d}" if date}")["data"].to_i
     end
+  rescue Faraday::ConnectionFailed, Faraday::TimeoutError
+    0
   end
 
   # Hash { "post" => 0, "count" => 0 }[]
@@ -29,6 +31,8 @@ module Reports
     Cache.fetch("pv-rank-#{date}", expires_in: 1.minute) do
       get("/views/rank?date=#{date.strftime('%Y-%m-%d')}&limit=#{limit}")["data"]
     end
+  rescue Faraday::ConnectionFailed, Faraday::TimeoutError
+    []
   end
 
   # Hash { "tag" => "name", "count" => 0 }[]
@@ -37,6 +41,8 @@ module Reports
     Cache.fetch("ps-rank-#{date}", expires_in: 1.minute) do
       get("/searches/rank?date=#{date.strftime('%Y-%m-%d')}&limit=#{limit}")["data"]
     end
+  rescue Faraday::ConnectionFailed, Faraday::TimeoutError
+    []
   end
 
   # Hash { "tag" => "name", "count" => 0 }[]
@@ -45,6 +51,8 @@ module Reports
     Cache.fetch("ms-rank", expires_in: 1.minute) do
       get("/searches/missed/rank?limit=#{limit}")["data"]
     end
+  rescue Faraday::ConnectionFailed, Faraday::TimeoutError
+    []
   end
 
   # Hash { post_id => count }
@@ -54,6 +62,8 @@ module Reports
     post_ids.each_slice(100).flat_map do |ids|
       get("/views/bulk?posts=#{ids.join(',')}#{"&date=#{d}" if date}")["data"]
     end.compact_blank.to_h { |x| [x["post"], x["count"]] }
+  rescue Faraday::ConnectionFailed, Faraday::TimeoutError
+    {}
   end
 
   def jwt_signature(url)

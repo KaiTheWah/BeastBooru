@@ -14,7 +14,9 @@ class ForumTopicsController < ApplicationController
 
     respond_with(@forum_topics) do |format|
       format.html do
-        @forum_topics = @forum_topics.includes(:creator, :updater).load
+        @forum_topics = @forum_topics.includes(:creator, :updater, :category, posts: :creator).load
+        # TODO: revisit muting, it may need to be further optimized or removed due to performance issues
+        @mutes = ForumTopicStatus.where(forum_topic: @forum_topics, user: CurrentUser.user, mute: true).load
       end
     end
   end

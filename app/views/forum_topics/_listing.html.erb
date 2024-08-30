@@ -5,7 +5,7 @@
       <span class="sticky">Sticky:</span>
     <% end %>
 
-    <% unless topic.read_by?(CurrentUser.user) %>
+    <% unless topic.read_by?(CurrentUser.user, @mutes) %>
       <span class="new">NEW</span>
     <% end %>
 

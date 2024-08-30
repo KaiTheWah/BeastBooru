@@ -145,10 +145,10 @@ class ForumTopic < ApplicationRecord
   end
 
   module VisitMethods
-    def read_by?(user = nil)
+    def read_by?(user = nil, mutes = nil)
       user ||= CurrentUser.user
 
-      return true if user_mute(user)
+      return true if mutes&.find { |m| m.forum_topic_id == id && m.mute }
 
       if user.last_forum_read_at && updated_at <= user.last_forum_read_at
         return true
@@ -185,6 +185,7 @@ class ForumTopic < ApplicationRecord
   end
 
   module MuteMethods
+    # TODO: revisit muting, it may need to be further optimized or removed due to performance issues
     def user_mute(user)
       statuses.where(user_id: user.id, mute: true).first
     end

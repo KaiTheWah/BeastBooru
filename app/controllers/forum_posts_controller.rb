@@ -7,8 +7,12 @@ class ForumPostsController < ApplicationController
 
   def index
     @query = authorize(ForumPost).visible(CurrentUser.user).search(search_params(ForumPost))
-    @forum_posts = @query.includes(:topic).paginate(params[:page], limit: params[:limit])
-    respond_with(@forum_posts)
+    @forum_posts = @query.paginate(params[:page], limit: params[:limit])
+    respond_with(@forum_posts) do |format|
+      format.html do
+        @forum_posts = @forum_posts.includes(:creator, topic: :category).load
+      end
+    end
   end
 
   def show

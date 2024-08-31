@@ -232,10 +232,12 @@ class ForumTopic < ApplicationRecord
 
   def hide!
     update(is_hidden: true)
+    ModAction.without_logging { original_post&.hide! }
   end
 
   def unhide!
     update(is_hidden: false)
+    ModAction.without_logging { original_post&.unhide! }
   end
 
   def update_original_post

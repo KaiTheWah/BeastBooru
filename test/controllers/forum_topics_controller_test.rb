@@ -197,6 +197,17 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         @forum_topic.reload
         assert(@forum_topic.is_hidden?)
       end
+
+      should "create edit history" do
+        assert_difference("EditHistory.count", 2) do
+          put_auth hide_forum_topic_path(@forum_topic), @mod
+        end
+        assert_equal("hide", EditHistory.last.edit_type)
+      end
+
+      should "restrict access" do
+        assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| put_auth hide_forum_topic_path(@forum_topic), user }
+      end
     end
 
     context "unhide action" do
@@ -210,6 +221,10 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         @forum_topic.reload
         assert_not(@forum_topic.is_hidden?)
       end
+
+      should "restrict access" do
+        assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| put_auth unhide_forum_topic_path(@forum_topic), user }
+      end
     end
 
     context "lock action" do
@@ -218,6 +233,10 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(forum_topic_path(@forum_topic))
         @forum_topic.reload
         assert(@forum_topic.is_locked?)
+      end
+
+      should "restrict access" do
+        assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| put_auth lock_forum_topic_path(@forum_topic), user }
       end
     end
 
@@ -232,6 +251,10 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         @forum_topic.reload
         assert_not(@forum_topic.is_locked?)
       end
+
+      should "restrict access" do
+        assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| put_auth unlock_forum_topic_path(@forum_topic), user }
+      end
     end
 
     context "sticky action" do
@@ -240,6 +263,10 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(forum_topic_path(@forum_topic))
         @forum_topic.reload
         assert(@forum_topic.is_sticky?)
+      end
+
+      should "restrict access" do
+        assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| put_auth sticky_forum_topic_path(@forum_topic), user }
       end
     end
 
@@ -253,6 +280,10 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(forum_topic_path(@forum_topic))
         @forum_topic.reload
         assert_not(@forum_topic.is_sticky?)
+      end
+
+      should "restrict access" do
+        assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| put_auth unsticky_forum_topic_path(@forum_topic), user }
       end
     end
 
@@ -287,6 +318,10 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("You cannot move topics into categories the topic creator cannot create within.", @response.parsed_body["message"])
         @forum_topic.reload
         assert_equal(@category.id, @forum_topic.category.id)
+      end
+
+      should "restrict access" do
+        assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| put_auth hide_forum_topic_path(as(@mod) { create(:forum_topic) }), user, params: { forum_topic: { category_id: create(:forum_category).id } } }
       end
     end
 

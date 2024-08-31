@@ -60,5 +60,5 @@
 <%= numbered_paginator(@edit_histories) %>
 
 <% content_for(:page_title) do %>
-  Edit History for <%= @original.html_name %>
+  Edit History <%= "for #{@original.html_name}" if @original.present? %>
 <% end %>

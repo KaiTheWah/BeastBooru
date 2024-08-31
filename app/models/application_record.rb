@@ -38,9 +38,9 @@ class ApplicationRecord < ActiveRecord::Base
         column = column_for_attribute(attribute)
         case column.sql_type_metadata.type
         when :boolean
-          boolean_attribute_matches(attribute, value, **)
+          boolean_attribute_matches(attribute, value)
         when :integer, :datetime
-          numeric_attribute_matches(attribute, value, **)
+          numeric_attribute_matches(attribute, value)
         when :string, :text
           text_attribute_matches(attribute, value, **)
         else

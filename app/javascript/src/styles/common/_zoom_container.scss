@@ -7,8 +7,7 @@ div#zoom-container {
   & > img {
     max-width: calc(50vw - 50px);
     max-height: 80vh;
-    background: #00000090;
-    background-position: center center;
+    background: #00000090 center center;
     background-size: contain;
 
     /*
@@ -21,8 +20,7 @@ div#zoom-container {
   & > video#zoom-video {
     max-width: calc(50vw - 50px);
     max-height: 80vh;
-    background: #00000090;
-    background-position: center center;
+    background: #00000090 center center;
     background-size: contain;
   }
 

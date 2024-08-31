@@ -224,11 +224,13 @@ class BulkUpdateRequestImporter
         when :remove_alias
           tag_alias = TagAlias.active.find_by(antecedent_name: token[1], consequent_name: token[2])
           raise(Error, "Alias for #{token[1]} not found") if tag_alias.nil?
+          # noinspection RubyArgCount
           tag_alias.reject!(update_topic: false)
 
         when :remove_implication
           tag_implication = TagImplication.active.find_by(antecedent_name: token[1], consequent_name: token[2])
           raise(Error, "Implication for #{token[1]} not found") if tag_implication.nil?
+          # noinspection RubyArgCount
           tag_implication.reject!(update_topic: false)
 
         when :mass_update

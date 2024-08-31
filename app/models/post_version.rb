@@ -396,6 +396,7 @@ class PostVersion < ApplicationRecord
 
   def serializable_hash(*)
     hash = super
+    # noinspection RubyModifiedFrozenObject
     changes.each { |key, value| key.to_s.include?("tags") && value.is_a?(Array) ? hash[key] = value.join(" ") : hash[key] = value }
     hash
   end

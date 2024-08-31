@@ -48,7 +48,6 @@
       content: "";
       position: absolute;
       left: -1.2em;
-      border: 0.3em solid transparent;
       border-color: transparent var(--color-text) var(--color-text) transparent;
       transform: rotate(45deg);
       bottom: 0.25em;
@@ -69,7 +68,7 @@
     .blacklist-filters {
       // Hide scrollbars when unrolling
       @keyframes hide-scroll {
-        from, to { overflow: hidden; } 
+        from, to { overflow: hidden; }
       }
       animation: hide-scroll 0.1s backwards;
       overflow-x: hidden;
@@ -157,7 +156,7 @@
 
     li {
       &::before {
-        display: none; 
+        display: none;
       }
     }
   }
@@ -169,7 +168,7 @@
       margin-left: 0.75rem;
     }
   }
-  
+
   .blacklist-footer {
     .blacklist-help {
       display: none;

@@ -292,6 +292,7 @@ class User < ApplicationRecord
 
   module PasswordMethods
     def password_token
+      # noinspection RubyArgCount
       Zlib.crc32(bcrypt_password_hash)
     end
 

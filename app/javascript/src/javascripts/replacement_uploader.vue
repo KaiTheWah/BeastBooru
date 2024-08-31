@@ -72,7 +72,6 @@ export default {
       submitting: false,
       submittedReason: undefined,
       canApprove: Utility.meta("current-user-can-approve-posts") === "true",
-      uploadAsPending: false,
     };
   },
   mounted() {

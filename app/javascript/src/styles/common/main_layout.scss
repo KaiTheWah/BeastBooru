@@ -6,14 +6,11 @@ div#page {
   border-radius: $border-radius-full;
   overflow: visible;
   margin: 0 1rem;
-  padding: $padding-050;
-
-  background-color: $base-color-foreground;
   background-color: themed("color-foreground");
   background-image: themed("image-foreground");
   background-position: themed("image-foreground-position");
   background-repeat: themed("image-foreground-repeat");
-  padding-bottom: themed("content-padding-bottom");
+  padding: $padding-050 $padding-050 themed("content-padding-bottom");
 
   // Fix failure to contain contents in bounding box.
   &:after {
@@ -34,7 +31,7 @@ div#page {
     h1 {
       font-size: $h2-size;
     }
-    
+
     p:last-child {
       margin-bottom: 0;
     }

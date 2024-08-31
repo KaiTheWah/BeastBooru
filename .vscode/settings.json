@@ -14,10 +14,10 @@
   "editor.insertSpaces": true,
   "editor.rulers": [100],
   "editor.formatOnSave": false,
-  
+
   // Eslint shenanigans
   "eslint.useFlatConfig": true,
   "eslint.validate": [
     "javascript"
-  ],
+  ]
 }

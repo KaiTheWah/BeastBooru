@@ -21,7 +21,7 @@ class PostPresenter < Presenter
     options[:stats] ||= !options[:avatar] && !options[:inline]
 
     locals = {
-      post:        post,
+      post: post,
     }
 
     locals[:article_attrs] = {

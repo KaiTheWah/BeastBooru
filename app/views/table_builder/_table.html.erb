@@ -14,7 +14,7 @@
 
   <tbody>
     <% table.items.each_with_index do |item, i| %>
-      <%= # noinspection RubyArgCount
+      <%=          # noinspection RubyArgCount
           tag.tr(**table.all_row_attributes(item, i)) do %>
         <% table.columns.each_with_index do |column, j| %>
           <%= tag.td(**column.body_attributes) do %>

@@ -450,7 +450,7 @@ class Post < ApplicationRecord
     def should_process_tags?
       @removed_tags ||= []
 
-      tag_string_changed? || locked_tags_changed? || tag_string_diff.present? || @removed_tags.length > 0 || added_tags.length > 0
+      tag_string_changed? || locked_tags_changed? || tag_string_diff.present? || !@removed_tags.empty? || !added_tags.empty?
     end
 
     def tag_array

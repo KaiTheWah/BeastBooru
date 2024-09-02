@@ -112,14 +112,16 @@ module PostsHelper
     positive = user.positive_feedback_count
     neutral = user.neutral_feedback_count
     negative = user.negative_feedback_count
+    deleted = CurrentUser.user.is_staff? ? user.deleted_feedback_count : 0
 
-    return "" unless positive > 0 || neutral > 0 || negative > 0
+    return "" if (positive + neutral + negative + deleted) == 0
     positive_html = %(<span class="user-feedback-positive">#{positive}</span>).html_safe if positive > 0
     neutral_html = %(<span class="user-feedback-neutral">#{neutral}</span>).html_safe if neutral > 0
     negative_html = %(<span class="user-feedback-negative">#{negative}</span>).html_safe if negative > 0
+    deleted_html = %(<span class="user-feedback-deleted">#{deleted}</span>).html_safe if deleted > 0
+    list_html = "#{positive_html} #{neutral_html} #{negative_html} #{deleted_html}".strip
 
-    list = "#{positive_html} #{neutral_html} #{negative_html}".strip
-    link_to(%{(#{list})}.html_safe, user_feedbacks_path(search: { user_id: user.id }))
+    link_to(%{(#{list_html})}.html_safe, user_feedbacks_path(search: { user_id: user.id }))
   end
 
   private

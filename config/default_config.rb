@@ -395,8 +395,12 @@ module FemboyFans
       1_000
     end
 
-    def set_post_limit(_user) # rubocop:disable Naming/AccessorMethodName
-      10_000
+    def set_post_limit(user) # rubocop:disable Naming/AccessorMethodName
+      if user.is_admin?
+        Float::INFINITY
+      else
+        10_000
+      end
     end
 
     def disapproval_message_max_size

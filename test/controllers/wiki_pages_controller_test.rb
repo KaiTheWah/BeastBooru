@@ -138,6 +138,22 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(ogtitle, @wiki_page.reload.title)
       end
 
+      should "set protection level" do
+        put_auth wiki_page_path(@wiki_page), @mod, params: { wiki_page: { protection_level: User::Levels::JANITOR } }
+        assert_equal(User::Levels::JANITOR, @wiki_page.reload.protection_level)
+      end
+
+      should "update protection level" do
+        @wiki_page.update_column(:protection_level, User::Levels::TRUSTED)
+        put_auth wiki_page_path(@wiki_page), @mod, params: { wiki_page: { protection_level: User::Levels::JANITOR } }
+        assert_equal(User::Levels::JANITOR, @wiki_page.reload.protection_level)
+      end
+
+      should "not allow setting protection level above editor's level" do
+        put_auth wiki_page_path(@wiki_page), @mod, params: { wiki_page: { protection_level: User::Levels::ADMIN } }
+        assert_nil(@wiki_page.reload.protection_level)
+      end
+
       should "respect protections" do
         @wiki_page.update_column(:protection_level, User::Levels::ADMIN)
         assert_access(User::Levels::ADMIN, success_response: :redirect) { |user| put_auth wiki_page_path(@wiki_page), user, params: { wiki_page: { body: SecureRandom.hex(6) } } }

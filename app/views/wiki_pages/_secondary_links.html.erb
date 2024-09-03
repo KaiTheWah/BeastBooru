@@ -22,6 +22,7 @@
       <%= subnav_link_to("History", wiki_page_versions_path(search: { wiki_page_id: @wiki_page.id })) %>
       <%= subnav_link_to_if(policy(@wiki_page).update?, "Edit", edit_wiki_page_path(@wiki_page), data: { shortcut: "e" }) %>
       <%= subnav_link_to_if(policy(@wiki_page).destroy?, "Delete", wiki_page_path(@wiki_page), method: :delete, data: { confirm: "Are you sure you want to delete this wiki page?" }) %>
+      <%= subnav_link_to_if(policy(@wiki_page).merge?, "Merge", merge_wiki_page_path(@wiki_page)) %>
       <%= subnav_link_to_if(TicketPolicy.new(CurrentUser.user, @wiki_page).create?, "Report", model_new_ticket_path(model: @wiki_page)) %>
     <% end %>
   <% elsif @wiki_page_version %>

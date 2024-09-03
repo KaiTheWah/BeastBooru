@@ -1,6 +1,10 @@
 <h1>Wiki Page: <%= link_to(@thispage.title, wiki_page_path(@thispage.wiki_page)) %></h1>
 
-<% if @thispage.visible? %>
+<% if @thispage.merged_from_id.present? %>
+  <div class="wiki-page-merge-from-history">
+    Merged from <%= link_to(@thispage.merged_from_title, mod_actions_path(search: { subject_id: @thispage.merged_from_id, subject_type: "WikiPage" })) %>
+  </div>
+<% else %>
   <p>Showing differences between <%= compact_time @thispage.updated_at %> (<%= link_to_user @thispage.updater %>) and <%= compact_time @otherpage.updated_at %> (<%= link_to_user @otherpage.updater %>)</p>
 
   <% if @thispage.parent != @otherpage.parent %>
@@ -23,8 +27,6 @@
   <div>
     <%= text_diff(@thispage.body, @otherpage.body) %>
   </div>
-<% else %>
-  <p>The artist requested removal of this page.</p>
 <% end %>
 
 <%= render "wiki_pages/secondary_links" %>

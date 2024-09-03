@@ -388,6 +388,7 @@ Rails.application.routes.draw do
   resources :wiki_pages, constraints: id_name_constraint do
     member do
       put :revert
+      resource :merge, controller: "wiki_pages/merges", as: "merge_wiki_page", only: %i[show create]
     end
     collection do
       get :search

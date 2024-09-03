@@ -32,7 +32,7 @@ class ModAction < ApplicationRecord
     pool_name
     pattern old_pattern note hidden
     type old_type
-    wiki_page wiki_page_title old_title wiki_page_id protection_level
+    wiki_page wiki_page_title old_title wiki_page_id protection_level target_wiki_page_id target_wiki_page_title
     category_name old_category_name
     prompt old_prompt title
     artist_name
@@ -480,6 +480,10 @@ class ModAction < ApplicationRecord
     wiki_page_delete:                           {
       text: ->(mod, _user) { "Deleted wiki page [[#{mod.wiki_page_title}]]" },
       json: %i[wiki_page_title],
+    },
+    wiki_page_merge:                            {
+      text: ->(mod, _user) { "Merged wiki page [b]#{mod.wiki_page_title}[/b] into \"#{mod.target_wiki_page_title}\":#{url.wiki_page_path(id: mod.target_wiki_page_id)}" },
+      json: %i[wiki_page_title target_wiki_page_id target_wiki_page_title],
     },
     wiki_page_protect:                          {
       text: ->(mod, _user) { "Restricted editing [[#{mod.wiki_page_title}]] to [#{User::Levels.id_to_name(mod.protection_level)}](/help/accounts##{User::Levels.id_to_name(mod.protection_level).downcase}) users" },

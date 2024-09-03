@@ -2,6 +2,7 @@
 
 class WikiPage < ApplicationRecord
   class RevertError < StandardError; end
+  class MergeError < StandardError; end
 
   INTERNAL_PREFIXES = %w[internal: help:].freeze
   META_PREFIXES = %w[internal: help: howto: tag_group:].freeze
@@ -38,7 +39,7 @@ class WikiPage < ApplicationRecord
   after_save :log_save
   after_save :update_help_page, if: :saved_change_to_title?
 
-  attr_accessor :edit_reason, :parent_name, :parent_anchor
+  attr_accessor :edit_reason, :parent_name, :parent_anchor, :target_wiki_page_id, :target_wiki_page_title
 
   has_dtext_links :body
 
@@ -126,9 +127,30 @@ class WikiPage < ApplicationRecord
     end
   end
 
+  module MergeMethods
+    def merge_into!(wiki_page)
+      theircount = wiki_page.versions.count
+      ourcount = versions.count
+      transaction do
+        versions.each do |version|
+          version.wiki_page = wiki_page
+          version.save!
+        end
+        reload
+        if (theircount + ourcount) != wiki_page.versions.count
+          raise(MergeError, "Expected version count did not match")
+        end
+        ModAction.log!(:wiki_page_merge, self, wiki_page_title: title, target_wiki_page_id: wiki_page.id, target_wiki_page_title: wiki_page.title)
+        destroy!
+        wiki_page.create_new_version(merged_from_id: id, merged_from_title: title, reason: "Merge from #{title}")
+      end
+    end
+  end
+
   include HelpPageMethods
   include LogMethods
   include RestrictionMethods
+  include MergeMethods
   extend SearchMethods
 
   def user_not_limited
@@ -264,7 +286,7 @@ class WikiPage < ApplicationRecord
     saved_change_to_title? || saved_change_to_body? || saved_change_to_protection_level? || saved_change_to_parent?
   end
 
-  def create_new_version
+  def create_new_version(extra = {})
     versions.create(
       updater_id:       CurrentUser.user.id,
       updater_ip_addr:  CurrentUser.ip_addr,
@@ -273,6 +295,7 @@ class WikiPage < ApplicationRecord
       protection_level: protection_level,
       parent:           parent,
       reason:           edit_reason,
+      **extra,
     )
   end
 

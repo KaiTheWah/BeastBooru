@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddMergeColumns < ActiveRecord::Migration[7.1]
+class AddMergeColumnsToForums < ActiveRecord::Migration[7.1]
   def change
     # Foreign key intentionally omitted so we don't interfere with destroying
     add_reference(:forum_topics, :merge_target, foreign_key: false)

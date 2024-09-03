@@ -38,6 +38,20 @@ module ModActions
         )
       end
 
+      should "format wiki_page_merge correctly" do
+        @target = create(:wiki_page)
+        @wiki.merge_into!(@target)
+
+        assert_matches(
+          actions:                %w[wiki_page_merge wiki_page_delete],
+          text:                   "Merged wiki page [b]#{@wiki.title}[/b] into \"#{@target.title}\":#{wiki_page_path(@target)}",
+          subject:                @wiki,
+          wiki_page_title:        @wiki.title,
+          target_wiki_page_id:    @target.id,
+          target_wiki_page_title: @target.title,
+        )
+      end
+
       should "format wiki_page_rename correctly" do
         @original = @wiki.dup
         @wiki.update!(title: "aaa")

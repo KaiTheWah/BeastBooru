@@ -12946,6 +12946,43 @@ paths:
           $ref: "#/components/responses/AccessDenied"
         404:
           $ref: "#/components/responses/NotFound"
+  /wiki_pages/{id}/merge.json:
+    post:
+      summary: Merge Wiki Page
+      tags:
+        - Wiki Pages
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the wiki page.
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              properties:
+                target_wiki_page_id:
+                  type: number
+                target_wiki_page_title:
+                  type: string
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WikiPage"
+        403:
+          $ref: "#/components/responses/AccessDenied"
+        404:
+          $ref: "#/components/responses/NotFound"
   /wiki_page/{id}/revert.json:
     post:
       summary: Revert Wiki Page

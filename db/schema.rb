@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_09_03_030722) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_03_075408) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -1119,7 +1119,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_03_030722) do
     t.string "reason"
     t.string "parent"
     t.integer "protection_level"
+    t.bigint "merged_from_id"
+    t.string "merged_from_title"
     t.index ["created_at"], name: "index_wiki_page_versions_on_created_at"
+    t.index ["merged_from_id"], name: "index_wiki_page_versions_on_merged_from_id"
     t.index ["updater_ip_addr"], name: "index_wiki_page_versions_on_updater_ip_addr"
     t.index ["wiki_page_id"], name: "index_wiki_page_versions_on_wiki_page_id"
   end

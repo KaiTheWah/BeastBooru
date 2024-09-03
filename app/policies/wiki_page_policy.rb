@@ -17,6 +17,10 @@ class WikiPagePolicy < ApplicationPolicy
     update?
   end
 
+  def merge?
+    user.is_admin?
+  end
+
   def permitted_attributes
     attr = %i[body edit_reason]
     attr += %i[parent] if user.is_trusted?
@@ -32,6 +36,10 @@ class WikiPagePolicy < ApplicationPolicy
     attr = super
     attr += %i[title] if user.is_janitor?
     attr
+  end
+
+  def permitted_attributes_for_merge
+    %i[target_wiki_page_id target_wiki_page_title]
   end
 
   def permitted_search_params

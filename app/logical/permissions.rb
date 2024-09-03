@@ -11,7 +11,7 @@ module Permissions
     users/email_notifications users/password_resets users/passwords users/login_reminders users/deletions users/email_changes
     static application sessions emails api_documentation
   ].freeze
-  IGNORED_ACTIONS = %w[new edit search diff show_or_new custom_style edit_user edit_blacklist confirm_move_favorites request_password_reset].freeze
+  IGNORED_ACTIONS = %w[new edit search diff show_or_new custom_style edit_user edit_blacklist request_password_reset].freeze
   IGNORED_ROUTES = %w[users:create users:destroy users:home posts:favorites popular:index users:upload_limit].freeze
   PLURAL_ACTIONS = %w[index reorder].freeze
 

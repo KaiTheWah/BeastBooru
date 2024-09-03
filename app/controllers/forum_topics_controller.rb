@@ -157,21 +157,6 @@ class ForumTopicsController < ApplicationController
     respond_with(@forum_topic)
   end
 
-  def confirm_move
-    authorize(@forum_topic)
-    @categories = ForumCategory.visible.select { |cat| cat != @forum_topic.category && cat.can_create_within?(CurrentUser.user) && cat.can_create_within?(@forum_topic.creator) }
-  end
-
-  def move
-    authorize(@forum_topic)
-    @category = ForumCategory.find(params.dig(:forum_topic, :category_id))
-    return render_expected_error(403, "You cannot move topics into categories you cannot create within.") unless @category.can_create_within?(CurrentUser.user)
-    return render_expected_error(403, "You cannot move topics into categories the topic creator cannot create within.") unless @category.can_create_within?(@forum_topic.creator)
-    @forum_topic.update(category: @category)
-    notice("Forum topic moved")
-    respond_with(@forum_topic)
-  end
-
   private
 
   def load_topic

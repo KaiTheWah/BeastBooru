@@ -57,10 +57,6 @@ class ForumTopicPolicy < ApplicationPolicy
     min_level?
   end
 
-  def confirm_move?
-    move?
-  end
-
   def move?
     min_level? && user.is_moderator?
   end
@@ -89,6 +85,10 @@ class ForumTopicPolicy < ApplicationPolicy
 
   def permitted_attributes_for_merge
     %i[target_topic_id]
+  end
+
+  def permitted_attributes_for_move
+    %i[category_id]
   end
 
   def permitted_search_params

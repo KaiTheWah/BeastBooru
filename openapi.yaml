@@ -6671,7 +6671,7 @@ paths:
         404:
           $ref: "#/components/responses/NotFound"
   /forum_topics/{id}/move.json:
-    put:
+    post:
       summary: Move Forum Topic
       tags:
         - Forum Topics
@@ -8956,7 +8956,7 @@ paths:
         404:
           $ref: "#/components/responses/NotFound"
   /posts/{id}/move_favorites.json:
-    put:
+    post:
       summary: Move Post Favorites
       tags:
         - Posts

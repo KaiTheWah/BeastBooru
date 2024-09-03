@@ -49,10 +49,6 @@ class PostPolicy < ApplicationPolicy
     unbanned? && user.is_approver?
   end
 
-  def confirm_move_favorites?
-    move_favorites?
-  end
-
   def move_favorites?
     unbanned? && user.is_approver?
   end

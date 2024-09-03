@@ -175,8 +175,6 @@ Rails.application.routes.draw do
       put :unlock
       put :sticky
       put :unsticky
-      get :confirm_move
-      post :move
       put :subscribe
       put :unsubscribe
       put :mute
@@ -184,6 +182,7 @@ Rails.application.routes.draw do
       resource :merge, controller: "forum_topics/merges", as: "merge_forum_topic", only: %i[show create destroy] do
         get :undo
       end
+      resource :move, controller: "forum_topics/moves", as: "move_forum_topic", only: %i[show create]
     end
     collection do
       put :mark_all_as_read
@@ -291,13 +290,12 @@ Rails.application.routes.draw do
       put :expunge
       get :delete
       put :undelete
-      get :confirm_move_favorites
-      put :move_favorites
       put :regenerate_thumbnails
       put :regenerate_videos
       post :add_to_pool
       post :remove_from_pool
       get "/frame/:frame", to: "posts#frame", as: "frame"
+      resource :move_favorites, controller: "posts/move_favorites", as: "move_favorites_post", only: %i[show create]
     end
   end
   resources(:qtags, path: "q", only: %i[show])

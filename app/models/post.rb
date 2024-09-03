@@ -1205,6 +1205,11 @@ class Post < ApplicationRecord
       self.down_score = array.count { |x| x =~ /down/ }
       self.score = up_score - down_score
     end
+
+    def voted_users
+      voted_user_ids = vote_string.scan(/\d+/).map(&:to_i)
+      User.find(voted_user_ids)
+    end
   end
 
   module CountMethods

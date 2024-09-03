@@ -21,6 +21,10 @@ module ForumTopics
         should "render" do
           get_auth merge_forum_topic_path(@topic), @admin
         end
+
+        should "restrict access" do
+          assert_access(User::Levels::MODERATOR) { |user| get_auth merge_forum_topic_path(@topic), user }
+        end
       end
 
       context "create action" do
@@ -40,6 +44,11 @@ module ForumTopics
           assert_equal({ "old_topic_id" => @topic.id, "old_topic_title" => @topic.title, "new_topic_id" => @target.id, "new_topic_title" => @target.title }, EditHistory.last.extra_data)
           assert_equal("forum_topic_merge", ModAction.last.action)
         end
+
+        should "restrict access" do
+          @topics = create_list(:forum_topic, User::Levels.constants.length)
+          assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| post_auth merge_forum_topic_path(@topics.shift), user, params: { forum_topic: { target_topic_id: @target.id } } }
+        end
       end
 
       context "undo action" do
@@ -49,6 +58,12 @@ module ForumTopics
 
         should "render" do
           get_auth undo_merge_forum_topic_path(@topic), @admin
+        end
+
+        should "restrict access" do
+          @topics = create_list(:forum_topic, User::Levels.constants.length)
+          @topics.each { |t| t.merge_into!(@target) }
+          assert_access(User::Levels::MODERATOR) { |user| get_auth undo_merge_forum_topic_path(@topics.shift), user }
         end
       end
 
@@ -77,6 +92,12 @@ module ForumTopics
           @target.destroy!
           delete_auth merge_forum_topic_path(@topic), @admin
           assert_response(422)
+        end
+
+        should "restrict access" do
+          @topics = create_list(:forum_topic, User::Levels.constants.length)
+          @topics.each { |t| t.merge_into!(@target) }
+          assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| delete_auth merge_forum_topic_path(@topics.shift), user }
         end
       end
     end

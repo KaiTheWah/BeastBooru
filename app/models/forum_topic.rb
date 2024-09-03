@@ -25,7 +25,7 @@ class ForumTopic < ApplicationRecord
 
   attribute :category_id, :integer, default: -> { FemboyFans.config.default_forum_category }
 
-  attr_accessor :is_merging
+  attr_accessor :is_merging, :target_topic_id
 
   def validate_not_aibur
     return if CurrentUser.is_moderator? || !original_post&.is_aibur?
@@ -260,7 +260,7 @@ class ForumTopic < ApplicationRecord
 
   def editable_by?(user)
     return true if user.is_admin?
-    return false unless visible?(user) && original_post.editable_by?(user)
+    return false unless visible?(user) && original_post&.editable_by?(user)
     creator_id == user.id
   end
 

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PostsController < ApplicationController
-  skip_before_action :api_check, only: %i[delete destroy undelete move_favorites expunge approve unapprove]
   respond_to :html, :json
 
   def index
@@ -134,17 +133,6 @@ class PostsController < ApplicationController
   def undelete
     @post = authorize(Post.find(params[:id]))
     @post.undelete!
-    respond_with(@post)
-  end
-
-  def confirm_move_favorites
-    @post = authorize(Post.find(params[:id]))
-  end
-
-  def move_favorites
-    @post = authorize(Post.find(params[:id]))
-    @post.give_favorites_to_parent
-    @post.give_votes_to_parent
     respond_with(@post)
   end
 

@@ -213,54 +213,6 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "confirm_move_favorites action" do
-      should "render" do
-        as(@user) do
-          @parent = create(:post)
-          @child = create(:post, parent: @parent)
-        end
-        users = create_list(:user, 2)
-        users.each do |u|
-          FavoriteManager.add!(user: u, post: @child)
-          @child.reload
-        end
-
-        get_auth confirm_move_favorites_post_path(@child.id), @admin
-      end
-
-      should "restrict access" do
-        assert_access([User::Levels::JANITOR, User::Levels::ADMIN, User::Levels::OWNER]) { |user| get_auth confirm_move_favorites_post_path(@post), user }
-      end
-    end
-
-    context "move_favorites action" do
-      should "work" do
-        as(@user) do
-          @parent = create(:post)
-          @child = create(:post, parent: @parent)
-        end
-        users = create_list(:user, 2)
-        users.each do |u|
-          FavoriteManager.add!(user: u, post: @child)
-          @child.reload
-        end
-
-        put_auth move_favorites_post_path(@child.id), @admin
-        assert_redirected_to(@child)
-        perform_enqueued_jobs(only: TransferFavoritesJob)
-        @parent.reload
-        @child.reload
-        as(@admin) do
-          assert_equal(users.map(&:id).sort, @parent.favorited_users.map(&:id).sort)
-          assert_equal([], @child.favorited_users.map(&:id))
-        end
-      end
-
-      should "restrict access" do
-        assert_access([User::Levels::JANITOR, User::Levels::ADMIN, User::Levels::OWNER], success_response: :redirect) { |user| put_auth move_favorites_post_path(@post), user }
-      end
-    end
-
     context "expunge action" do
       should "work" do
         put_auth expunge_post_path(@post), @admin, params: { format: :json }

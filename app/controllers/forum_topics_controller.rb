@@ -27,7 +27,6 @@ class ForumTopicsController < ApplicationController
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
     @forum_posts = ForumPost.permitted(CurrentUser.user).includes(topic: [:category]).search(topic_id: @forum_topic.id).reorder("forum_posts.id").paginate(params[:page])
-    @original_forum_post_id = @forum_topic.original_post.id
     respond_with(@forum_topic)
   end
 

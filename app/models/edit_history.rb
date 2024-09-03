@@ -4,6 +4,9 @@ class EditHistory < ApplicationRecord
   belongs_to :versionable, polymorphic: true
   belongs_to :user
 
+  VALUES = %i[old_topic_id old_topic_title new_topic_id new_topic_title].freeze
+  store_accessor :extra_data, *VALUES
+
   EDIT_MAP = {
     hide:         "Hidden",
     unhide:       "Unhidden",
@@ -13,6 +16,8 @@ class EditHistory < ApplicationRecord
     wark_record:  "Marked For Record",
     mark_ban:     "Marked For Ban",
     unmark:       "Unmarked",
+    merge:        "Merged",
+    unmerge:      "Unmerged",
   }.freeze
 
   KNOWN_TYPES = %i[
@@ -29,7 +34,11 @@ class EditHistory < ApplicationRecord
     mark_record
     mark_ban
     unmark
+    merge
+    unmerge
   ].freeze
+
+  CONTENTFUL_TYPES = %w[original edit].freeze
 
   def pretty_edit_type
     edit_type.titleize
@@ -45,19 +54,25 @@ class EditHistory < ApplicationRecord
     previous = previous_version(versions)
     return previous if previous.present? && previous.is_contentful?
     # we might be on a page that doesn't contain the most recent contentful edit, query to try to find it
-    EditHistory.where(versionable_id: versionable_id, versionable_type: versionable_type, edit_type: %w[original edit]).and(EditHistory.where(EditHistory.arel_table[:version].lt(version))).last
+    EditHistory.where(versionable_id: versionable_id, versionable_type: versionable_type, edit_type: CONTENTFUL_TYPES).and(EditHistory.where(EditHistory.arel_table[:version].lt(version))).last
   end
 
   def text_content
-    if is_contentful?
+    case edit_type
+    when *CONTENTFUL_TYPES
       return subject if subject.present?
-      return body
+      body
+    when "merge"
+      %(<b>Merged into <a href="/forum_topics/#{new_topic_id}">#{new_topic_title}</a> from <a href="/forum_topics/#{old_topic_id}">#{old_topic_title}</a>.</b>).html_safe
+    when "unmerge"
+      %(<b> Unmerged <a href="/forum_topics/#{new_topic_id}">#{new_topic_title}</a> from <a href="/forum_topics/#{old_topic_id}">#{old_topic_title}</a>.</b>).html_safe
+    else
+      "<b>#{EDIT_MAP[edit_type.to_sym] || pretty_edit_type}</b>".html_safe
     end
-    "<b>#{EDIT_MAP[edit_type.to_sym] || pretty_edit_type}</b>".html_safe
   end
 
   def is_contentful?
-    %w[original edit].include?(edit_type)
+    CONTENTFUL_TYPES.include?(edit_type)
   end
 
   def html_name
@@ -119,6 +134,14 @@ class EditHistory < ApplicationRecord
       where(edit_type: "original", version: 1).first
     end
 
+    def merged
+      where(edit_type: "merge")
+    end
+
+    def unmerged
+      where(edit_type: "unmerge")
+    end
+
     def search(params)
       q = super
 
@@ -154,5 +177,9 @@ class EditHistory < ApplicationRecord
 
   def visible?(user = CurrentUser.user)
     user.is_moderator?
+  end
+
+  def json_keys
+    VALUES
   end
 end

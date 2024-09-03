@@ -40,6 +40,11 @@
         <%= subnav_link_to "Sticky", sticky_forum_topic_path(@forum_topic), method: :put, data: { confirm: "Are you sure you want to sticky this forum topic?" } %>
       <% end %>
       <%= subnav_link_to_if(ftpolicy.confirm_move?, "Move", confirm_move_forum_topic_path(@forum_topic)) %>
+      <% if @forum_topic.is_merged? %>
+        <%= subnav_link_to_if(ftpolicy.unmerge?, "Undo Merge", undo_merge_forum_topic_path(@forum_topic)) %>
+      <% else %>
+        <%= subnav_link_to_if(ftpolicy.merge?, "Merge", merge_forum_topic_path(@forum_topic)) %>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

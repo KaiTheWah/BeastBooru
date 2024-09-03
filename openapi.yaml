@@ -34,10 +34,24 @@ x-constants:
     - post_replacement_rejection_reason_create
     - post_replacement_rejection_reason_delete
     - post_replacement_rejection_reasons_reorder
+    - post_replacement_rejection_reason_update
+    - forum_category_create
+    - forum_category_delete
+    - forum_category_update
+    - forum_post_delete
+    - forum_post_hide
+    - forum_post_unhide
+    - forum_post_update
+    - forum_topic_delete
+    - forum_topic_hide
+    - forum_topic_lock
+    - forum_topic_merge
+    - forum_topic_move
     - forum_topic_stick
     - forum_topic_update
     - forum_topic_unhide
     - forum_topic_unlock
+    - forum_topic_unmerge
     - forum_topic_unstick
     - help_create
     - help_delete
@@ -72,6 +86,8 @@ x-constants:
     - user_upload_limit_change
     - user_feedback_create
     - user_feedback_delete
+    - user_feedback_undelete
+    - user_feedback_destroy
     - user_feedback_update
     - wiki_page_delete
     - wiki_page_protect
@@ -1017,6 +1033,10 @@ components:
         - updated_at
         - category_id
         - last_post_created_at
+        - merge_target_id
+        - merged_at
+        - creator_name
+        - updater_name
       properties:
         id:
           type: number
@@ -1045,6 +1065,15 @@ components:
         last_post_created_at:
           type: ["string", "null"]
           format: date-time
+        merge_target_id:
+          type: ["number", "null"]
+        merged_at:
+          type: ["string", "null"]
+          format: date-time
+        creator_name:
+          type: string
+        updater_name:
+          type: string
     FullUser:
       allOf:
         - $ref: "#/components/schemas/User"
@@ -1395,7 +1424,7 @@ components:
         forum_topic_title:
           type: string
           description: |
-            Valid for: `forum_topic_delete`, `forum_topic_hide`, `forum_topic_lock`, `forum_topic_move`, `forum_topic_stick`, `forum_topic_update`, `forum_topic_update`, `forum_topic_unhide`, `forum_topic_unlock`, `forum_topic_unstick`
+            Valid for: `forum_topic_delete`, `forum_topic_hide`, `forum_topic_lock`, `forum_topic_move`, `forum_topic_stick`, `forum_topic_update`, `forum_topic_update`, `forum_topic_unhide`, `forum_topic_unlock`, `forum_topic_unstick`, `forum_topic_merge`, `forum_topic_unmerge`
         pool_name:
           type: string
           description: |
@@ -1474,6 +1503,22 @@ components:
           type: string
           description: |
             Valid for:`wiki_page_protect`, `wiki_page_unprotect`
+        old_topic_id:
+          type: number
+          description: |
+            Valid for: `forum_topic_merge`, `forum_topic_unmerge`
+        old_topic_title:
+          type: string
+          description: |
+            Valid for: `forum_topic_merge`, `forum_topic_unmerge`
+        new_topic_id:
+          type: number
+          description: |
+            Valid for: `forum_topic_merge`, `forum_topic_unmerge`
+        new_topic_title:
+          type: string
+          description: |
+            Valid for: `forum_topic_merge`, `forum_topic_unmerge`
     NewsUpdate:
       type: object
       required:
@@ -6554,6 +6599,63 @@ paths:
         - Forum Topics
       security:
         - basicAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the forum topic.
+          schema:
+            type: number
+      responses:
+        204:
+          description: Success
+        403:
+          $ref: "#/components/responses/AccessDenied"
+        404:
+          $ref: "#/components/responses/NotFound"
+  /forum_topics/{id}/merge.json:
+    post:
+      summary: Merge Forum Topic
+      tags:
+        - Forum Topics
+      security:
+        - basicAuth: []
+      description: You must be Moderator+.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the forum topic.
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - target_topic_id
+              properties:
+                target_topic_id:
+                  type: number
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForumTopic"
+        403:
+          $ref: "#/components/responses/AccessDenied"
+        404:
+          $ref: "#/components/responses/NotFound"
+    delete:
+      summary: Unmerge Forum Topic
+      tags:
+        - Forum Topics
+      security:
+        - basicAuth: []
+      description: You must be Moderator+.
       parameters:
         - name: id
           in: path

@@ -348,7 +348,7 @@ class ApplicationRecord < ActiveRecord::Base
             new.save!
           end
 
-          define_method(:save_version) do |edit_type = "edit"|
+          define_method(:save_version) do |edit_type = "edit", extra_data = {}|
             EditHistory.transaction do
               our_next_version = next_version
               if our_next_version == 0
@@ -367,6 +367,7 @@ class ApplicationRecord < ActiveRecord::Base
               version.subject = subject
               version.user_id = CurrentUser.id
               version.edit_type = edit_type
+              version.extra_data = extra_data
               version.save!
             end
           end

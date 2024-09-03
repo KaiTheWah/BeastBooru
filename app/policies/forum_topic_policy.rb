@@ -69,6 +69,14 @@ class ForumTopicPolicy < ApplicationPolicy
     true
   end
 
+  def merge?
+    min_level? && user.is_moderator?
+  end
+
+  def unmerge?
+    min_level? && user.is_moderator?
+  end
+
   def min_level?
     !record.is_a?(ForumTopic) || record.visible?(user)
   end
@@ -79,8 +87,16 @@ class ForumTopicPolicy < ApplicationPolicy
     attr
   end
 
+  def permitted_attributes_for_merge
+    %i[target_topic_id]
+  end
+
   def permitted_search_params
     super + %i[title title_matches category_id is_sticky is_locked is_hidden order]
+  end
+
+  def api_attributes
+    super + %i[creator_name updater_name]
   end
 
   def html_data_attributes

@@ -4,10 +4,10 @@ class ForumPost < ApplicationRecord
   include UserWarnable
   simple_versioning
   mentionable
-  attr_readonly :topic_id
   belongs_to_creator counter_cache: "forum_post_count"
   belongs_to_updater
   belongs_to :topic, class_name: "ForumTopic"
+  belongs_to :original_topic, class_name: "ForumTopic", optional: true
   belongs_to :warning_user, class_name: "User", optional: true
   has_many :votes, class_name: "ForumPostVote"
   has_many :tickets, as: :model
@@ -28,7 +28,7 @@ class ForumPost < ApplicationRecord
   validate :validate_creator_is_not_limited, on: :create
   validate :validate_not_aibur, if: :will_save_change_to_is_hidden?
   after_save :delete_topic_if_original_post
-  after_update(if: ->(rec) { !rec.saved_change_to_is_hidden? && rec.updater_id != rec.creator_id }) do |rec|
+  after_update(if: ->(rec) { !rec.saved_change_to_is_hidden? && rec.updater_id != rec.creator_id && !rec.is_merging }) do |rec|
     ModAction.log!(:forum_post_update, rec, forum_topic_id: rec.topic_id, user_id: rec.creator_id)
   end
   after_update(if: ->(rec) { rec.saved_change_to_is_hidden? }) do |rec|
@@ -38,7 +38,7 @@ class ForumPost < ApplicationRecord
     ModAction.log!(:forum_post_delete, rec, forum_topic_id: rec.topic_id, user_id: rec.creator_id)
   end
 
-  attr_accessor :bypass_limits
+  attr_accessor :bypass_limits, :is_merging
 
   has_dtext_links :body
 
@@ -289,5 +289,9 @@ class ForumPost < ApplicationRecord
 
   def visible?(user = CurrentUser.user)
     topic.visible?(user) && (user.is_moderator? || !is_hidden? || user.id == creator_id)
+  end
+
+  def is_merged?
+    merged_at.present?
   end
 end

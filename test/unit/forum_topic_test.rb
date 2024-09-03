@@ -195,5 +195,43 @@ class ForumTopicTest < ActiveSupport::TestCase
         assert_equal(@topic.reload.is_hidden, true)
       end
     end
+
+    context "merge_into!" do
+      should "merge the topic into the target topic" do
+        @target = create(:forum_topic)
+        @post = @topic.original_post
+        assert_difference(%w[EditHistory.merged.count ModAction.count], 1) do
+          @topic.merge_into!(@target)
+        end
+        assert_equal(@target.id, @topic.merge_target_id)
+        assert_equal(@target.id, @post.reload.topic_id)
+        assert_equal({ "old_topic_id" => @topic.id, "old_topic_title" => @topic.title, "new_topic_id" => @target.id, "new_topic_title" => @target.title }, EditHistory.last.extra_data)
+        assert_equal("forum_topic_merge", ModAction.last.action)
+      end
+    end
+
+    context "undo_merge!" do
+      setup do
+        @target = create(:forum_topic)
+        @post = @topic.original_post
+        @topic.merge_into!(@target)
+      end
+
+      should "undo the topic merge" do
+        assert_difference(%w[EditHistory.unmerged.count ModAction.count], 1) do
+          @topic.undo_merge!
+        end
+        assert_nil(@topic.merge_target_id)
+        assert_nil(@topic.merged_at)
+        assert_equal(@topic.id, @post.reload.topic_id)
+        assert_equal({ "old_topic_id" => @target.id, "old_topic_title" => @target.title, "new_topic_id" => @topic.id, "new_topic_title" => @topic.title }, EditHistory.last.extra_data)
+        assert_equal("forum_topic_unmerge", ModAction.last.action)
+      end
+
+      should "fail if the target no longer exists" do
+        @target.destroy!
+        assert_raises(ForumTopic::MergeError, "Merge target does not exist") { @topic.reload.undo_merge! }
+      end
+    end
   end
 end

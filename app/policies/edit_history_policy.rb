@@ -15,6 +15,10 @@ class EditHistoryPolicy < ApplicationPolicy
     params
   end
 
+  def api_attributes
+    super - %i[extra_data] + record.json_keys
+  end
+
   def html_data_attributes
     super + %i[edit_type is_contentful?]
   end

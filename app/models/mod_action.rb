@@ -28,7 +28,7 @@ class ModAction < ApplicationRecord
     duration
     expires_at old_expires_at
     forum_category_id old_forum_category_id forum_category_name old_forum_category_name can_view old_can_view can_create old_can_create
-    forum_topic_id forum_topic_title
+    forum_topic_id forum_topic_title old_topic_id old_topic_title new_topic_id new_topic_title
     pool_name
     pattern old_pattern note hidden
     type old_type
@@ -249,6 +249,10 @@ class ModAction < ApplicationRecord
       text: ->(mod, user) { "Locked topic ##{mod.subject_id} (with title #{mod.forum_topic_title}) by #{user}" },
       json: %i[forum_topic_title user_id],
     },
+    forum_topic_merge:                          {
+      text: ->(mod, user) { "Merged topic ##{mod.subject_id} (with title #{mod.forum_topic_title}) by #{user} into topic ##{mod.new_topic_id} (with title #{mod.new_topic_title})" },
+      json: %i[forum_topic_title user_id new_topic_id new_topic_title],
+    },
     forum_topic_move:                           {
       text: ->(mod, user) { "Moved topic ##{mod.subject_id} (with title #{mod.forum_topic_title}) by #{user} from #{mod.old_forum_category_name} to #{mod.forum_category_name}" },
       json: %i[forum_topic_title user_id forum_category_id old_forum_category_id forum_category_name old_forum_category_name],
@@ -268,6 +272,10 @@ class ModAction < ApplicationRecord
     forum_topic_unlock:                         {
       text: ->(mod, user) { "Unlocked topic ##{mod.subject_id} (with title #{mod.forum_topic_title}) by #{user}" },
       json: %i[forum_topic_title user_id],
+    },
+    forum_topic_unmerge:                        {
+      text: ->(mod, user) { "Unmerged topic ##{mod.subject_id} (with title #{mod.forum_topic_title}) by #{user} from topic ##{mod.old_topic_id} (with title #{mod.old_topic_title})" },
+      json: %i[forum_topic_title user_id old_topic_id old_topic_title],
     },
     forum_topic_unstick:                        {
       text: ->(mod, user) { "Unstickied topic ##{mod.subject_id} (with title #{mod.forum_topic_title}) by #{user}" },

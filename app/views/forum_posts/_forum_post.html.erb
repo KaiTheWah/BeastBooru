@@ -30,6 +30,7 @@
       </div>
       <%= render "application/update_notice", record: forum_post %>
       <%= render "application/warned_notice", record: forum_post %>
+      <%= render "forum_posts/partials/common/merged_notice", record: forum_post %>
       <div class="content-menu">
         <menu>
           <% if CurrentUser.user.is_member? && !@forum_topic&.is_stale_for?(CurrentUser.user) && params[:controller] != "forum_posts" %>

@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 class ForumTopic < ApplicationRecord
+  class MergeError < StandardError; end
+
   belongs_to_creator
   belongs_to_updater
   belongs_to :category, class_name: "ForumCategory"
+  belongs_to :merge_target, class_name: "ForumTopic", optional: true
   has_many :posts, -> { order("forum_posts.id asc") }, class_name: "ForumPost", foreign_key: "topic_id", dependent: :destroy
   has_one :original_post, -> { order("forum_posts.id asc") }, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
   has_many :statuses, class_name: "ForumTopicStatus"
@@ -11,16 +14,18 @@ class ForumTopic < ApplicationRecord
   validate :category_valid
   validates :title, :creator_id, presence: true
   validates_associated :original_post
-  validates :original_post, presence: true
+  validates :original_post, presence: true, unless: :is_merged?
   validates :title, length: { minimum: 1, maximum: 250 }
   validate :category_allows_creation, on: :create
   validate :validate_not_aibur, if: :will_save_change_to_is_hidden?
   accepts_nested_attributes_for :original_post
-  after_update :update_original_post
+  after_update :update_original_post, unless: :is_merging
   after_destroy :log_delete
-  after_commit :log_save, on: %i[create update]
+  after_commit :log_save, on: %i[create update], unless: :is_merging
 
   attribute :category_id, :integer, default: -> { FemboyFans.config.default_forum_category }
+
+  attr_accessor :is_merging
 
   def validate_not_aibur
     return if CurrentUser.is_moderator? || !original_post&.is_aibur?
@@ -195,11 +200,62 @@ class ForumTopic < ApplicationRecord
     end
   end
 
+  module MergeMethods
+    def merge_into!(topic)
+      raise(MergeError, "Topic is already merged") if is_merged?
+      time = Time.now
+      transaction do
+        posts.find_each do |post|
+          post.topic = topic
+          post.original_topic = self
+          post.merged_at = time
+          post.is_merging = true
+          post.save!
+          post.save_version("merge", { old_topic_id: id, old_topic_title: title, new_topic_id: topic.id, new_topic_title: topic.title })
+        end
+        self.merge_target = topic
+        self.merged_at = time
+        self.is_hidden = true
+        self.is_merging = true
+        save!
+        ModAction.log!(:forum_topic_merge, self, forum_topic_title: title, user_id: creator_id, new_topic_id: topic.id, new_topic_title: topic.title)
+      end
+    end
+
+    def undo_merge!
+      raise(MergeError, "Topic is not merged") unless is_merged?
+      raise(MergeError, "Merge target does not exist") unless ForumTopic.exists?(id: merge_target_id)
+
+      transaction do
+        merge_target.posts.where(original_topic: self).find_each do |post|
+          post.topic = self
+          post.original_topic = nil
+          post.merged_at = nil
+          post.is_merging = true
+          post.save!
+          post.save_version("unmerge", { old_topic_id: merge_target.id, old_topic_title: merge_target.title, new_topic_id: id, new_topic_title: title })
+        end
+        target = merge_target
+        self.merge_target = nil
+        self.merged_at = nil
+        self.is_hidden = false
+        self.is_merging = true
+        save!
+        ModAction.log!(:forum_topic_unmerge, self, forum_topic_title: title, user_id: creator_id, old_topic_id: target.id, old_topic_title: target.title)
+      end
+    end
+
+    def is_merged?
+      merge_target_id.present?
+    end
+  end
+
   include LogMethods
   include CategoryMethods
   include VisitMethods
   include SubscriptionMethods
   include MuteMethods
+  include MergeMethods
   extend SearchMethods
 
   def editable_by?(user)

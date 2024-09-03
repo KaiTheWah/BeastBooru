@@ -52,6 +52,22 @@ module ModActions
         )
       end
 
+      should "format forum_topic_merge correctly" do
+        @target = create(:forum_topic)
+        set_count!
+        @topic.merge_into!(@target)
+
+        assert_matches(
+          actions:           %w[forum_topic_merge forum_post_update],
+          text:              "Merged topic ##{@topic.id} (with title #{@topic.title}) by #{user(@user)} into topic ##{@target.id} (with title #{@target.title})",
+          subject:           @topic,
+          forum_topic_title: @topic.title,
+          user_id:           @user.id,
+          new_topic_id:      @target.id,
+          new_topic_title:   @target.title,
+        )
+      end
+
       should "format forum_topic_move correctly" do
         old_category = @topic.category
         category = create(:forum_category)
@@ -119,6 +135,23 @@ module ModActions
           subject:           @topic,
           forum_topic_title: @topic.title,
           user_id:           @user.id,
+        )
+      end
+
+      should "format forum_topic_unmerge correctly" do
+        @target = create(:forum_topic)
+        @topic.merge_into!(@target)
+        set_count!
+        @topic.undo_merge!
+
+        assert_matches(
+          actions:           %w[forum_topic_unmerge],
+          text:              "Unmerged topic ##{@topic.id} (with title #{@topic.title}) by #{user(@user)} from topic ##{@target.id} (with title #{@target.title})",
+          subject:           @topic,
+          forum_topic_title: @topic.title,
+          user_id:           @user.id,
+          old_topic_id:      @target.id,
+          old_topic_title:   @target.title,
         )
       end
 

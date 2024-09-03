@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_30_162111) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_03_030722) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -239,6 +239,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_30_162111) do
     t.inet "ip_addr", null: false
     t.integer "user_id", null: false
     t.text "edit_type", default: "original", null: false
+    t.jsonb "extra_data", default: {}, null: false
     t.index ["user_id"], name: "index_edit_histories_on_user_id"
     t.index ["versionable_id", "versionable_type"], name: "index_edit_histories_on_versionable_id_and_versionable_type"
   end
@@ -308,9 +309,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_30_162111) do
     t.integer "notified_mentions", default: [], null: false, array: true
     t.boolean "is_spam", default: false, null: false
     t.string "tag_change_request_type"
+    t.bigint "original_topic_id"
+    t.datetime "merged_at"
     t.index "lower(body) gin_trgm_ops", name: "index_forum_posts_on_lower_body_trgm", using: :gin
     t.index "to_tsvector('english'::regconfig, body)", name: "index_forum_posts_on_to_tsvector_english_body", using: :gin
     t.index ["creator_id"], name: "index_forum_posts_on_creator_id"
+    t.index ["original_topic_id"], name: "index_forum_posts_on_original_topic_id"
     t.index ["topic_id"], name: "index_forum_posts_on_topic_id"
   end
 
@@ -350,10 +354,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_30_162111) do
     t.integer "category_id", default: 0, null: false
     t.inet "creator_ip_addr", null: false
     t.datetime "last_post_created_at"
+    t.bigint "merge_target_id"
+    t.datetime "merged_at"
     t.index "lower((title)::text) gin_trgm_ops", name: "index_forum_topics_on_lower_title_trgm", using: :gin
     t.index "to_tsvector('english'::regconfig, (title)::text)", name: "index_forum_topics_on_to_tsvector_english_title", using: :gin
     t.index ["creator_id"], name: "index_forum_topics_on_creator_id"
     t.index ["is_sticky", "updated_at"], name: "index_forum_topics_on_is_sticky_and_updated_at"
+    t.index ["merge_target_id"], name: "index_forum_topics_on_merge_target_id"
     t.index ["updated_at"], name: "index_forum_topics_on_updated_at"
   end
 

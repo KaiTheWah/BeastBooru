@@ -181,6 +181,9 @@ Rails.application.routes.draw do
       put :unsubscribe
       put :mute
       put :unmute
+      resource :merge, controller: "forum_topics/merges", as: "merge_forum_topic", only: %i[show create destroy] do
+        get :undo
+      end
     end
     collection do
       put :mark_all_as_read

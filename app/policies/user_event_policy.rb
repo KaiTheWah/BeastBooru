@@ -2,10 +2,12 @@
 
 class UserEventPolicy < ApplicationPolicy
   def index?
-    user.is_admin?
+    unbanned?
   end
 
   def permitted_search_params
-    super + %i[category user_id user_name ip_addr user_agent session_id]
+    attr = super + %i[category user_id user_name ip_addr user_agent]
+    attr += %i[session_id] if user.is_admin?
+    attr
   end
 end

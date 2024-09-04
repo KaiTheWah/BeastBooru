@@ -14,13 +14,11 @@ module FemboyFans
       "https://#{domain}"
     end
 
-    # Displayed on the "Safe" version of the site for non-safe posts
-    def normal_app_name
+    def canonical_app_name
       app_name
     end
 
-    # Displayed on the "Safe" version of the site for non-safe posts
-    def normal_app_url
+    def canonical_app_url
       app_url
     end
 

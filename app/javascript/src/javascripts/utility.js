@@ -134,6 +134,23 @@ Utility.set_query_params = function (string, params) {
   return url.toString();
 };
 
+Utility.printPage = function (url) {
+  let iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  iframe.onload = () => iframe.contentWindow.print();
+  document.body.appendChild(iframe);
+};
+
+Utility.copyToClipboard = async function (text, message = "Copied!") {
+  try {
+    await navigator.clipboard.writeText(text);
+    Utility.notice(message);
+  } catch {
+    Utility.error("Couldn't copy to clipboard");
+  }
+};
+
 $.fn.selectEnd = function () {
   return this.each(function () {
     this.focus();

@@ -39,7 +39,7 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "a valid user deletion" do
     setup do
-      @user = create(:trusted_user, created_at: 2.weeks.ago)
+      @user = create(:trusted_user, created_at: 2.weeks.ago, mfa_secret: MFA.generate_secret)
       CurrentUser.user = @user
 
       @post = create(:post)
@@ -61,6 +61,10 @@ class UserDeletionTest < ActiveSupport::TestCase
 
     should "blank out the email" do
       assert_empty(@user.email)
+    end
+
+    should "remove the MFA secret" do
+      assert_nil(@user.mfa_secret)
     end
 
     should "rename the user" do

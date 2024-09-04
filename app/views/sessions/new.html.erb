@@ -1,26 +1,13 @@
 <section>
   <h1>Sign in</h1>
-  <%= form_tag(session_path, class: "simple_form") do %>
-    <%= hidden_field_tag :"session[url]", params[:url] %>
 
-    <div class="input">
-      <label for="name">Username</label>
-      <%= text_field_tag :"session[name]" %>
-    </div>
-
-    <div class="input">
-      <label for="password">Password</label>
-      <%= password_field_tag :"session[password]" %>
-    </div>
-
-    <div class="input">
-      <%= check_box_tag :"session[remember]", "1", true %>
-      <label for="session_remember">Remember</label>
-    </div>
-
-    <div class="input">
-      <%= submit_tag "Submit", data: { disable_with: "Signing in..." } %>
-    </div>
+  <%= custom_form_for(:session, url: session_path) do |f| %>
+    <%= f.input(:url, as: :hidden, input_html: { value: params[:url] }) %>
+    <%= f.input(:type, as: :hidden, input_html: { value: "login" }) %>
+    <%= f.input(:name, label: "Username") %>
+    <%= f.input(:password, label: "Password") %>
+    <%= f.input(:remember, as: :boolean, label: "Remember", input_html: { checked: true }) %>
+    <%= f.submit("Sign in") %>
   <% end %>
 </section>
 

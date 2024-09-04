@@ -43,6 +43,7 @@ group :production do
 end
 
 group :development do
+  gem "puma"
   gem "debug", require: false
   gem "rubocop", require: false
   gem "rubocop-erb", require: false
@@ -70,3 +71,7 @@ gem "net-ftp", "~> 0.3.4"
 gem "rakismet", "~> 1.5"
 
 gem "jwt", "~> 2.8"
+
+gem "rotp", "~> 6.3"
+
+gem "rqrcode", "~> 2.2"

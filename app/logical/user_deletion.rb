@@ -49,6 +49,8 @@ class UserDeletion
       profile_artinfo:  "",
       custom_style:     "",
       level:            User::Levels::MEMBER,
+      mfa_secret:       nil,
+      backup_codes:     [],
     )
   end
 

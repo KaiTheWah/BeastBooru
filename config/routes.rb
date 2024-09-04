@@ -319,7 +319,10 @@ Rails.application.routes.draw do
     end
   end
   resource :session, only: %i[new create destroy confirm_password] do
-    get :confirm_password, on: :collection
+    collection do
+      get :confirm_password
+      post :verify_mfa
+    end
   end
   resources :stats, only: %i[index]
   resources :tags, constraints: id_name_constraint, only: %i[index show edit update] do
@@ -379,6 +382,9 @@ Rails.application.routes.draw do
       resource :revert, controller: "users/reverts", as: "user_revert", only: %i[new create]
       resources :events, controller: "users/events", as: "user_events", only: %i[index]
       resources :sessions, controller: "users/sessions", as: "user_sessions", only: %i[index]
+      resource :mfa, controller: "users/mfa", as: "user_mfa", only: %i[edit update destroy] do
+        resource :backup_codes, controller: "users/mfa/backup_codes", only: %i[show create]
+      end
     end
     member do
       put :delete

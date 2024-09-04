@@ -55,7 +55,7 @@
 </div>
 
 <div id="share-modal" style="display: none; text-align: center;">
-  <a href="#" id="share-link" data-clipboard-action="copy" data-clipboard-target="#dmail-share-key"></a>
+  <a href="javascript:void(0)" id="share-link" data-clipboard-action="copy" data-clipboard-target="#dmail-share-key"></a>
 
   <p style="margin-top: 1rem;">This link can be shared with staff members to allow them to view this dmail.</p>
   <span style="display: none;" id="dmail-share-key"><%= @dmail.key %></span>
@@ -83,8 +83,7 @@
               $(this).dialog("close");
             },
             "Copy": function() {
-              navigator.clipboard.writeText($link.attr("href"))
-                .then(() => Danbooru.notice("Link copied to clipboard."), () => Danbooru.error("Failed to copy to clipboard."));
+              Danbooru.Utility.copyToClipboard($link.attr("href"), "Link link copied to clipboard.");
              }
            }
         });

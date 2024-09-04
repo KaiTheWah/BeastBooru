@@ -1098,6 +1098,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_03_075408) do
     t.string "title"
     t.integer "unread_notification_count", default: 0, null: false
     t.integer "followed_tag_count", default: 0, null: false
+    t.string "mfa_secret"
+    t.datetime "mfa_last_used_at"
+    t.string "backup_codes", array: true
     t.index "lower((email)::text)", name: "index_user_lower_email"
     t.index "lower((name)::text)", name: "index_users_on_name", unique: true
     t.index "lower(profile_about) gin_trgm_ops", name: "index_users_on_lower_profile_about_trgm", using: :gin

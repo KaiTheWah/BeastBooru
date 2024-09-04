@@ -2,6 +2,7 @@
 
 class User < ApplicationRecord
   class Error < StandardError; end
+  class MFAError < StandardError; end
 
   class PrivilegeError < StandardError
     attr_accessor :message
@@ -508,6 +509,52 @@ class User < ApplicationRecord
     end
   end
 
+  module MFAMethods
+    MAX_BACKUP_CODES = 6
+    # number of dash delimited sections
+    BACKUP_CODE_PARTS = 2
+    # length of each section
+    BACKUP_CODE_SECTION_LENGTH = 4
+
+    def mfa
+      @mfa ||= MFA.new(mfa_secret, username: name, last_used_at: mfa_last_used_at) if mfa_secret.present?
+    end
+
+    def update_mfa_secret!(secret, request)
+      with_lock do
+        update!(mfa_secret: secret)
+        remove_instance_variable(:@mfa) if instance_variable_defined?(:@mfa)
+
+        if mfa_secret_before_last_save.nil?
+          UserEvent.create_from_request!(self, :mfa_enable, request)
+          regenerate_backup_codes!(request)
+        elsif secret.nil?
+          UserEvent.create_from_request!(self, :mfa_disable, request)
+          update!(backup_codes: nil)
+        else
+          UserEvent.create_from_request!(self, :mfa_update, request)
+        end
+      end
+    end
+
+    def verify_backup_code(code)
+      return false unless backup_codes.present? && backup_codes.include?(code)
+      self.backup_codes -= [code]
+      save!
+    end
+
+    def generate_backup_codes(max_codes: MAX_BACKUP_CODES, parts: BACKUP_CODE_PARTS, length: BACKUP_CODE_SECTION_LENGTH)
+      max_codes.times.map { parts.times.map { SecureRandom.hex(length / 2) }.join("-") }
+    end
+
+    def regenerate_backup_codes!(request, max_codes: MAX_BACKUP_CODES, parts: BACKUP_CODE_PARTS, length: BACKUP_CODE_SECTION_LENGTH)
+      with_lock do
+        update!(backup_codes: generate_backup_codes(max_codes: max_codes, parts: parts, length: length))
+        UserEvent.create_from_request!(self, :backup_codes_generate, request)
+      end
+    end
+  end
+
   module LimitMethods
     def younger_than(duration)
       return false if FemboyFans.config.disable_age_checks?
@@ -983,6 +1030,7 @@ class User < ApplicationRecord
   include LogChanges
   include FollowerMethods
   include NotificationMethods
+  include MFAMethods
   extend SearchMethods
   extend ThrottleMethods
 

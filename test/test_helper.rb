@@ -100,8 +100,16 @@ class ActiveSupport::TestCase # rubocop:disable Style/ClassAndModuleChildren
 end
 
 class ActionDispatch::IntegrationTest # rubocop:disable Style/ClassAndModuleChildren
-  def method_authenticated(method_name, url, user, options)
+  def login_as(user)
     post(session_path, params: { session: { name: user.name, password: user.password } })
+
+    if user.mfa.present?
+      post(verify_mfa_session_path, params: { mfa: { user_id: user.signed_id(purpose: :verify_mfa), code: user.mfa.code } })
+    end
+  end
+
+  def method_authenticated(method_name, url, user, options)
+    login_as(user)
     send(method_name, url, **options)
   end
 

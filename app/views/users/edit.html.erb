@@ -6,7 +6,7 @@
     | <%= link_to "Advanced", "#advanced-settings" %>
     | <%= link_to "Enhancements", "#enhancement-settings" %>
     <% if CurrentUser.user.id == @user.id %>
-      | <%= link_to "Change password", edit_user_password_path(user_id: @user.id), id: "change-password" %>
+      | <%= link_to "Security", "#security-settings" %>
       | <%= link_to "Delete account", users_deletion_path, id: "delete-account" %>
     <% end %>
   </h2>
@@ -126,6 +126,33 @@
                 hint: "When enabled, clicking on a forum topic will take you to the most recent post.") %>
   </fieldset>
 
+  <fieldset id="security-settings-section">
+    <div class="input">
+      <label>Password</label>
+
+      <p><%= link_to "Change your password", edit_user_password_path(user_id: @user.id) %></p>
+    </div>
+
+    <div class="input">
+      <label>Events</label>
+      <span class="hint">Events related to your account, such as logins, email changes, 2FA changes, etc.</span>
+      <p><%= link_to("View", user_events_path(search: { user_id: @user.id })) %></p>
+    </div>
+
+    <div class="input">
+      <label>Two-Factor Authentication</label>
+      <span class="hint">Protect your account by requiring both your password and a security code to login.</span>
+      <p>
+        <% if @user.mfa.present? %>
+          <span class="text-green">Enabled</span>
+        <% else %>
+          <span class="text-red">Disabled</span>
+        <% end %>
+        (<%= link_to("Manage", edit_user_mfa_path) %>)
+      </p>
+    </div>
+  </fieldset>
+
   <%= f.button(:submit, "Submit") %>
 <% end %>
 
@@ -136,11 +163,11 @@
 <% content_for(:html_header) do %>
   <%= javascript_tag nonce: true do -%>
     $(function() {
-      $("#advanced-settings-section,#enhancement-settings-section").hide();
-      $("#edit-options a:not(#delete-account):not(#change-password)").on("click", function(e) {
+      $("#advanced-settings-section,#enhancement-settings-section,#security-settings-section").hide();
+      $("#edit-options a:not(#delete-account)").on("click", function(e) {
         var $target = $(e.target);
         $("h2 a").removeClass("active");
-        $("#basic-settings-section,#advanced-settings-section,#enhancement-settings-section").hide();
+        $("#basic-settings-section,#advanced-settings-section,#enhancement-settings-section,#security-section").hide();
         $target.addClass("active");
         $($target.attr("href") + "-section").show();
         e.preventDefault();

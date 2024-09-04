@@ -102,6 +102,7 @@ GEM
     bootsnap (1.18.3)
       msgpack (~> 1.2)
     builder (3.2.4)
+    chunky_png (1.4.0)
     concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
     crack (1.0.0)
@@ -215,6 +216,8 @@ GEM
     psych (5.1.2)
       stringio
     public_suffix (5.0.4)
+    puma (6.4.2)
+      nio4r (~> 2.0)
     pundit (2.3.1)
       activesupport (>= 3.0.0)
     racc (1.7.3)
@@ -286,6 +289,11 @@ GEM
     retriable (3.1.2)
     rexml (3.3.6)
       strscan
+    rotp (6.3.0)
+    rqrcode (2.2.0)
+      chunky_png (~> 1.0)
+      rqrcode_core (~> 1.0)
+    rqrcode_core (1.2.0)
     rubocop (1.63.5)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -399,6 +407,7 @@ DEPENDENCIES
   opensearch-ruby
   pg
   pitchfork
+  puma
   pundit (~> 2.3)
   rails (~> 7.1.0)
   rakismet (~> 1.5)
@@ -408,6 +417,8 @@ DEPENDENCIES
   responders
   retriable
   rexml (>= 3.3.6)
+  rotp (~> 6.3)
+  rqrcode (~> 2.2)
   rubocop
   rubocop-erb
   rubocop-rails

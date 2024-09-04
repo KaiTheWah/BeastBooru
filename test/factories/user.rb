@@ -65,5 +65,10 @@ FactoryBot.define do
       can_approve_posts { true }
       can_manage_aibur { true }
     end
+
+    factory(:user_with_mfa) do
+      mfa_secret { MFA.generate_secret }
+      backup_codes { generate_backup_codes }
+    end
   end
 end

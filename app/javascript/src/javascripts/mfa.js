@@ -10,11 +10,11 @@ class MFA {
 
   static init_backup_codes (mfaBackupCodes) {
     $(".print-backup-codes-link").on("click", function (event) {
-      event.presentDefault();
+      event.preventDefault();
       Utility.printPage("/users/mfa/backup_codes.txt");
     });
     $(".copy-backup-codes-link").on("click", function (event) {
-      event.presentDefault();
+      event.preventDefault();
       Utility.copyToClipboard(mfaBackupCodes);
     });
   }

@@ -29,7 +29,11 @@ class PostEvent < ApplicationRecord
     comment_unlocked:        22,
     changed_bg_color:        23,
     changed_thumbnail_frame: 24,
+    appeal_created:          25,
+    appeal_approved:         26,
+    appeal_rejected:         27,
   }
+
   MOD_ONLY_SEARCH_ACTIONS = [
     actions[:comment_disabled],
     actions[:comment_enabled],

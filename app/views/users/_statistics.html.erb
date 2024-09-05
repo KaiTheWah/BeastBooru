@@ -157,6 +157,11 @@
             <span>Rejected</span>
             <span><%= link_to(user.post_replacement_rejected_count, post_replacements_path(search: { creator_id: user.id, status: "rejected" })) %></span>
           <% end %>
+
+          <% if user.post_appealed_count > 0 %>
+            <span>Appealed</span>
+            <span><%= link_to(user.post_appealed_count, post_appeals_path(search: { creator_id: user.id })) %></span>
+          <% end %>
         <% end %>
       </div>
     </div>

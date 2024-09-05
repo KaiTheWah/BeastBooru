@@ -25,7 +25,7 @@ class ElasticPostQueryBuilder < ElasticQueryBuilder
 
   def hide_deleted_posts?
     return false if @always_show_deleted
-    return false if q[:status].in?(%w[deleted active any all])
+    return false if q[:status].in?(%w[deleted active any all modqueue appealed])
     return false if q[:status_must_not].in?(%w[deleted active any all])
     true
   end
@@ -70,8 +70,10 @@ class ElasticPostQueryBuilder < ElasticQueryBuilder
       must.push({ term: { pending: true } })
     elsif q[:status] == "flagged"
       must.push({ term: { flagged: true } })
+    elsif q[:status] == "appealed"
+      must.push({ term: { appealed: true } })
     elsif q[:status] == "modqueue"
-      must.push(match_any({ term: { pending: true } }, { term: { flagged: true } }))
+      must.push(match_any({ term: { pending: true } }, { term: { flagged: true } }, { term: { appealed: true } }))
     elsif q[:status] == "deleted"
       must.push({ term: { deleted: true } })
     elsif q[:status] == "active"
@@ -84,8 +86,10 @@ class ElasticPostQueryBuilder < ElasticQueryBuilder
       must_not.push({ term: { pending: true } })
     elsif q[:status_must_not] == "flagged"
       must_not.push({ term: { flagged: true } })
+    elsif q[:status_must_not] == "appealed"
+      must_not.push({ term: { appealed: true } })
     elsif q[:status_must_not] == "modqueue"
-      must_not.push(match_any({ term: { pending: true } }, { term: { flagged: true } }))
+      must_not.push(match_any({ term: { pending: true } }, { term: { flagged: true } }, { term: { appealed: true } }))
     elsif q[:status_must_not] == "deleted"
       must_not.push({ term: { deleted: true } })
     elsif q[:status_must_not] == "active"

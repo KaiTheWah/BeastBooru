@@ -70,6 +70,7 @@ class Post < ApplicationRecord
   has_many :flags, class_name: "PostFlag", dependent: :destroy
   has_many :votes, class_name: "PostVote", dependent: :destroy
   has_many :notes, dependent: :destroy
+  has_many :appeals, class_name: "PostAppeal", dependent: :destroy
   has_many :comments, -> { includes(:creator, :updater).order("comments.is_sticky DESC, comments.id") }, dependent: :destroy
   has_many :children, -> { order("posts.id") }, class_name: "Post", foreign_key: "parent_id"
   has_many :approvals, class_name: "PostApproval", dependent: :destroy
@@ -82,6 +83,7 @@ class Post < ApplicationRecord
                 :automated_edit
 
   has_many :versions, -> { order("post_versions.id ASC") }, class_name: "PostVersion", dependent: :destroy
+  scope :expired, -> { pending.where("posts.created_at < ?", PostPruner::MODERATION_WINDOW.days.ago) }
 
   IMAGE_TYPES = %i[original large preview crop].freeze
 
@@ -322,7 +324,19 @@ class Post < ApplicationRecord
 
   module ApprovalMethods
     def is_approvable?
-      !is_status_locked? && is_pending? && approver.nil?
+      !is_status_locked? && (is_pending? || is_appealed?) && approver.nil?
+    end
+
+    def is_appealable?
+      is_deleted? && !is_appealed?
+    end
+
+    def is_appealed?
+      is_deleted? && appeals.pending.any?
+    end
+
+    def is_active?
+      !is_pending? && !is_deleted?
     end
 
     def unflag!
@@ -346,7 +360,7 @@ class Post < ApplicationRecord
       # Prevent unapproving self approvals by someone else
       return false if approver.nil? && uploader != user
       # Allow unapproval when the post is not pending anymore and is not at risk of auto deletion
-      !is_pending? && !is_deleted? && created_at.after?(PostPruner::DELETION_WINDOW.days.ago)
+      !is_pending? && !is_deleted? && created_at.after?(PostPruner::MODERATION_WINDOW.days.ago)
     end
 
     def approve!(approver = CurrentUser.user)
@@ -1414,7 +1428,7 @@ class Post < ApplicationRecord
         transaction do
           flag = flags.create(reason: reason, reason_name: "deletion", is_resolved: false, is_deletion: true, force_flag: force_flag)
 
-          if flag.errors.any?
+          if flag.errors.any? && !force_flag
             raise(PostFlag::Error, flag.errors.full_messages.join("; "))
           end
 
@@ -1468,6 +1482,7 @@ class Post < ApplicationRecord
         save
         approvals.create(user: CurrentUser.user)
         PostEvent.add(id, CurrentUser.user, :undeleted)
+        appeals.pending.map(&:approve!)
       end
       move_files_on_undelete
       User.where(id: uploader_id).update_all("post_deleted_count = post_deleted_count - 1")

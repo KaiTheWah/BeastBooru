@@ -239,6 +239,7 @@ Rails.application.routes.draw do
       get :random
       get :uploaders
       resources :approvals, controller: "posts/approvals", as: "post_approvals", only: %i[index create destroy]
+      resources :appeals, controller: "posts/appeals", as: "post_appeals", only: %i[index show new create destroy]
       resources :deleted, controller: "posts/deleted", as: "deleted_posts", only: %i[index]
       resources :deletion_reasons, controller: "posts/deletion_reasons", as: "post_deletion_reasons", only: %i[index new create edit update destroy] do
         post :reorder, on: :collection

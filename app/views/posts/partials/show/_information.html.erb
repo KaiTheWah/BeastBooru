@@ -45,19 +45,15 @@
   </li>
   <li>
     Status:
-    <% if post.is_pending? %>
+    <% if @post.is_pending? %>
       Pending
-    <% end %>
-
-    <% if post.is_deleted? %>
-      Deleted
-    <% end %>
-
-    <% if post.is_flagged? %>
+    <% elsif @post.is_flagged? %>
       Flagged
-    <% end %>
-
-    <% if !post.is_pending? && !post.is_deleted? %>
+    <% elsif @post.is_appealed? %>
+      Appealed
+    <% elsif @post.is_deleted? %>
+      Deleted
+    <% else %>
       Active
     <% end %>
   </li>

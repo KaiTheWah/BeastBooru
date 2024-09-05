@@ -347,7 +347,7 @@ div#c-posts {
       border: 1px solid themed("color-foreground");
     }
 
-    &.notice-no-shortcuts, &.notice-flagged, &.notice-deleted {
+    &.notice-no-shortcuts, &.notice-flagged, &.notice-deleted, &.notice-appealed {
       background-color: themed("color-danger-darken-10");
       border: 1px solid themed("color-foreground");
     }
@@ -804,7 +804,7 @@ div#image-and-nav {
 }
 
 body[data-user-can-approve-posts="true"] .notice {
-  &.notice-flagged, &.notice-deleted, &.notice-pending {
+  &.notice-flagged, &.notice-deleted, &.notice-pending, &.notice-appealed {
     .button {
       font-size: 1.25rem;
       line-height: 1.5rem;

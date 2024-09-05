@@ -60,8 +60,10 @@ class PostQueryBuilder
       relation = relation.where("posts.is_pending = TRUE")
     elsif q[:status] == "flagged"
       relation = relation.where("posts.is_flagged = TRUE")
+    elsif q[:status] == "appealed"
+      relation = relation.joins(:appeals).where("post_appeals.status = #{PostAppeal.statuses['pending']}")
     elsif q[:status] == "modqueue"
-      relation = relation.where("posts.is_pending = TRUE OR posts.is_flagged = TRUE")
+      relation = relation.left_joins(:appeals).where("posts.is_pending = TRUE OR posts.is_flagged = TRUE OR (post_appeals.id IS NOT NULL AND post_appeals.status = #{PostAppeal.statuses['pending']})")
     elsif q[:status] == "deleted"
       relation = relation.where("posts.is_deleted = TRUE")
     elsif q[:status] == "active"
@@ -72,8 +74,10 @@ class PostQueryBuilder
       relation = relation.where("posts.is_pending = FALSE")
     elsif q[:status_must_not] == "flagged"
       relation = relation.where("posts.is_flagged = FALSE")
+    elsif q[:status_must_not] == "appealed"
+      relation = relation.left_joins(:appeals).where("post_appeals.id IS NULL OR post_appeals.status != #{PostAppeal.statuses['pending']}")
     elsif q[:status_must_not] == "modqueue"
-      relation = relation.where("posts.is_pending = FALSE AND posts.is_flagged = FALSE")
+      relation = relation.left_joins(:appeals).where("posts.is_pending = FALSE AND posts.is_flagged = FALSE AND (post_appeals.id IS NULL OR post_appeals.status != #{PostAppeal.statuses['pending']})")
     elsif q[:status_must_not] == "deleted"
       relation = relation.where("posts.is_deleted = FALSE")
     elsif q[:status_must_not] == "active"

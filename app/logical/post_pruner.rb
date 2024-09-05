@@ -1,23 +1,26 @@
 # frozen_string_literal: true
 
 class PostPruner
-  DELETION_WINDOW = 7
+  MODERATION_WINDOW = 7
 
   def prune!
     Post.without_timeout do
-      prune_pending!
+      CurrentUser.as_system do
+        prune_pending!
+        prune_appealed!
+      end
     end
   end
 
   protected
 
   def prune_pending!
-    CurrentUser.as_system do
-      Post.where("is_deleted = ? and is_pending = ? and created_at < ?", false, true, DELETION_WINDOW.days.ago).find_each do |post|
-        post.delete!("Unapproved in #{DELETION_WINDOW} days")
-      rescue PostFlag::Error
-        # swallow
-      end
+    Post.pending.undeleted.expired.find_each do |post|
+      post.delete!("Unapproved in #{MODERATION_WINDOW} days", force: true)
     end
+  end
+
+  def prune_appealed!
+    PostAppeal.pending.expired.find_each(&:reject!)
   end
 end

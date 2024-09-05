@@ -132,7 +132,12 @@ class PostsController < ApplicationController
 
   def undelete
     @post = authorize(Post.find(params[:id]))
+    appeal = @post.is_appealed?
     @post.undelete!
+    if appeal && request.format.html?
+      notice("Post appeal accepted")
+      return redirect_back(fallback_location: post_path(@post))
+    end
     respond_with(@post)
   end
 

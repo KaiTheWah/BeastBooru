@@ -24,7 +24,7 @@ class StaticController < ApplicationController
   end
 
   def avoid_posting
-    @page = view_context.safe_wiki("help:avoid_posting_notice")
+    @page = view_context.safe_wiki(FemboyFans.config.avoid_posting_notice_wiki_page)
   end
 
   def not_found

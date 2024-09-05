@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_09_03_075408) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_04_232217) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -503,6 +503,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_03_075408) do
     t.index ["creator_id"], name: "index_pools_on_creator_id"
     t.index ["name"], name: "index_pools_on_name"
     t.index ["updated_at"], name: "index_pools_on_updated_at"
+  end
+
+  create_table "post_appeals", force: :cascade do |t|
+    t.bigint "post_id", null: false
+    t.bigint "creator_id", null: false
+    t.inet "creator_ip_addr", null: false
+    t.string "reason", default: "", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["creator_id"], name: "index_post_appeals_on_creator_id"
+    t.index ["post_id"], name: "index_post_appeals_on_post_id"
   end
 
   create_table "post_approvals", id: :serial, force: :cascade do |t|
@@ -1101,6 +1113,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_03_075408) do
     t.string "mfa_secret"
     t.datetime "mfa_last_used_at"
     t.string "backup_codes", array: true
+    t.integer "post_appealed_count", default: 0
     t.index "lower((email)::text)", name: "index_user_lower_email"
     t.index "lower((name)::text)", name: "index_users_on_name", unique: true
     t.index "lower(profile_about) gin_trgm_ops", name: "index_users_on_lower_profile_about_trgm", using: :gin
@@ -1211,6 +1224,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_03_075408) do
   add_foreign_key "pool_versions", "pools"
   add_foreign_key "pool_versions", "users", column: "updater_id"
   add_foreign_key "pools", "users", column: "creator_id"
+  add_foreign_key "post_appeals", "posts"
+  add_foreign_key "post_appeals", "users", column: "creator_id"
   add_foreign_key "post_approvals", "posts"
   add_foreign_key "post_approvals", "users"
   add_foreign_key "post_deletion_reasons", "users", column: "creator_id"

@@ -179,6 +179,9 @@ x-constants:
     - comment_unlocked
     - changed_bg_color
     - changed_thumbnail_frame
+    - appeal_created
+    - appeal_approved
+    - appeal_rejected
   - &ratings
     - s
     - q
@@ -2063,6 +2066,37 @@ components:
           type: ["number", "null"]
         upload_url:
           type: string
+    PostAppeal:
+      type: object
+      required:
+        - id
+        - post_id
+        - creator_id
+        - reason
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: number
+        post_id:
+          type: number
+        creator_id:
+          type: number
+        reason:
+          type: string
+        status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - rejected
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     PostApproval:
       type: object
       required:
@@ -8870,6 +8904,135 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Post"
+        404:
+          $ref: "#/components/responses/NotFound"
+  # Post Appeals
+  /posts/appeals.json:
+    get:
+      summary: Search Post Appeals
+      tags:
+        - Post Appeals
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/id"
+        - name: search[order]
+          in: query
+          schema:
+            type: string
+            enum:
+              - id_asc
+              - id_desc
+        - name: search[reason_matches]
+          in: query
+          schema:
+            type: string
+        - name: search[post_tags_match]
+          in: query
+          schema:
+            type: string
+        - name: search[post_id]
+          in: query
+          schema:
+            type: number
+        - name: search[status]
+          in: query
+          schema:
+            type: string
+            enum:
+              - pending
+              - approved
+              - rejected
+        - name: search[creator_id]
+          in: query
+          schema:
+            type: number
+        - name: search[creator_name]
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostAppeal"
+    post:
+      summary: Appeal Post
+      tags:
+        - Post Appeals
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - post_id
+              properties:
+                post_id:
+                  type: number
+                reason:
+                  type: string
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostAppeal"
+        400:
+          $ref: "#/components/responses/MessageError"
+        403:
+          $ref: "#/components/responses/AccessDenied"
+        404:
+          $ref: "#/components/responses/NotFound"
+  /posts/appeals/{id}.json:
+    get:
+      summary: Get Post Appeal
+      tags:
+        - Post Appeals
+      security:
+        - basicAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the post appeal.
+          schema:
+            type: number
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostAppeal"
+        404:
+          $ref: "#/components/responses/NotFound"
+    delete:
+      summary: Reject Post Appeal
+      tags:
+        - Post Appeals
+      security:
+        - basicAuth: []
+      description: You must have the "Approve Posts" permission. Note approving is simply undeleting the post.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the post appeal.
+          schema:
+            type: number
+      responses:
+        204:
+          description: Success
+        403:
+          $ref: "#/components/responses/AccessDenied"
         404:
           $ref: "#/components/responses/NotFound"
   # Post Approvals

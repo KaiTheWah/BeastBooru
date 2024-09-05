@@ -37,6 +37,10 @@ class PostFlag < ApplicationRecord
       where("is_resolved = ?", false)
     end
 
+    def deletion
+      where(is_deletion: true)
+    end
+
     def for_creator(user_id)
       where("creator_id = ?", user_id)
     end

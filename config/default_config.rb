@@ -256,6 +256,10 @@ module FemboyFans
       150
     end
 
+    def post_appeal_limit
+      5
+    end
+
     def post_flag_limit
       20
     end
@@ -579,14 +583,23 @@ module FemboyFans
       "internal:replacement_notice"
     end
 
+    def avoid_posting_notice_notice_wiki_page
+      "internal:avoid_posting_notice"
+    end
+
+    def appeal_notice_wiki_page
+      "internal:appeal_notice"
+    end
+
     # The number of posts displayed per page.
     def records_per_page
       100
     end
 
     def can_user_see_post?(user, post)
-      return false if post.is_deleted? && !user.is_janitor?
-      true
+      # TODO: appealed posts should be visible, but this makes it far too easy to get the contents of deleted posts at a moments notice
+      return true if user.is_janitor? # || post.is_appealed?
+      !post.is_deleted?
     end
 
     def user_needs_login_for_post?(_post)

@@ -93,7 +93,6 @@ These wik/help pages are expected to exist, as they are linked to or used in var
 * internal:replacement_notice
 * howto:sites_and_sources
 * howto:tag_genders
-* about:mod_queue
 
 #### Help Pages
 * accounts
@@ -108,6 +107,7 @@ These wik/help pages are expected to exist, as they are linked to or used in var
 * flagging
 * forums
 * global_blacklist
+* modqueue
 * notes
 * pools
 * post_relationships

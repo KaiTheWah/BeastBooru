@@ -598,6 +598,8 @@ class User < ApplicationRecord
                          :general_bypass_throttle?, 7.days)
     create_user_throttle(:post_edit, -> { FemboyFans.config.post_edit_limit - PostVersion.for_user(id).where("updated_at > ?", 1.hour.ago).count },
                          :general_bypass_throttle?, 7.days)
+    create_user_throttle(:post_appeal, -> { FemboyFans.config.post_appeal_limit - PostAppeal.for_user(id).where("updated_at > ?", 1.hour.ago).count },
+                         :general_bypass_throttle?, 7.days)
     create_user_throttle(:wiki_edit, -> { FemboyFans.config.wiki_edit_limit - WikiPageVersion.for_user(id).where("updated_at > ?", 1.hour.ago).count },
                          :general_bypass_throttle?, 7.days)
     create_user_throttle(:pool, -> { FemboyFans.config.pool_limit - Pool.for_user(id).where("created_at > ?", 1.hour.ago).count },

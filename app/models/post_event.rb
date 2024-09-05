@@ -65,7 +65,7 @@ class PostEvent < ApplicationRecord
       q = super
 
       if params[:post_id].present?
-        q = q.where("post_id = ?", params[:post_id].to_i)
+        q = q.where(post_id: params[:post_id])
       end
 
       q = q.where_user(:creator_id, :creator, params) do |condition, user_ids|
@@ -79,7 +79,7 @@ class PostEvent < ApplicationRecord
         if !CurrentUser.is_moderator? && MOD_ONLY_SEARCH_ACTIONS.include?(actions[params[:action]])
           raise(User::PrivilegeError)
         end
-        q = q.where("action = ?", actions[params[:action]])
+        q = q.where(action: actions[params[:action]])
       end
 
       q.apply_basic_order(params)

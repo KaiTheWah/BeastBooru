@@ -63,7 +63,7 @@ class WikiPage < ApplicationRecord
 
   module SearchMethods
     def titled(title)
-      find_by(title: title&.downcase&.tr(" ", "_"))
+      find_by(title: WikiPage.normalize_name(title))
     end
 
     def recent
@@ -263,6 +263,10 @@ class WikiPage < ApplicationRecord
     else
       self.parent_name = parent
     end
+  end
+
+  def self.normalize_name(name)
+    name&.downcase&.tr(" ", "_")
   end
 
   def skip_secondary_validations=(value)

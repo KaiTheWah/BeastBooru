@@ -352,6 +352,7 @@ class Post < ApplicationRecord
     def unapprove!
       PostEvent.add(id, CurrentUser.user, :unapproved)
       update(approver: nil, is_pending: true)
+      uploader.notify_for_upload(self, :post_unapprove) if uploader_id != CurrentUser.id
     end
 
     def is_unapprovable?(user)
@@ -372,6 +373,7 @@ class Post < ApplicationRecord
         PostEvent.add(id, CurrentUser.user, :approved)
         approvals.create(user: approver)
         update(approver: approver, is_pending: false)
+        uploader.notify_for_upload(self, :post_approve) if uploader_id != CurrentUser.id
       end
     end
   end
@@ -1440,6 +1442,7 @@ class Post < ApplicationRecord
           decrement_tag_post_counts
           move_files_on_delete
           PostEvent.add(id, CurrentUser.user, :deleted, { reason: reason })
+          uploader.notify_for_upload(self, :post_delete) if uploader_id != CurrentUser.id
         end
       end
 
@@ -1482,7 +1485,8 @@ class Post < ApplicationRecord
         save
         approvals.create(user: CurrentUser.user)
         PostEvent.add(id, CurrentUser.user, :undeleted)
-        appeals.pending.map(&:approve!)
+        appeals.pending.map(&:accept!)
+        uploader.notify_for_upload(self, :post_undelete) if uploader_id != CurrentUser.id
       end
       move_files_on_undelete
       User.where(id: uploader_id).update_all("post_deleted_count = post_deleted_count - 1")

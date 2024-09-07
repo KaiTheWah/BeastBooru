@@ -26,7 +26,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def permitted_attributes_for_update
-    attr = super + %i[enable_hover_zoom_form]
+    attr = super + %i[enable_hover_zoom_form] + [upload_notifications: []]
     attr += %i[profile_about profile_artinfo avatar_id] if unbanned? # Prevent editing when banned
     attr += %i[enable_compact_uploader] if CurrentUser.post_active_count >= FemboyFans.config.compact_uploader_minimum_posts
     attr
@@ -56,7 +56,7 @@ class UserPolicy < ApplicationPolicy
         updated_at email last_logged_in_at last_forum_read_at
         recent_tags comment_threshold default_image_size
         favorite_tags blacklisted_tags time_zone per_page
-        custom_style favorite_count followed_tags_list
+        custom_style upload_notifications favorite_count followed_tags_list
         api_regen_multiplier api_burst_limit remaining_api_limit
         statement_timeout favorite_limit
         tag_query_limit has_mail?

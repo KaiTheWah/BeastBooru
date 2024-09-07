@@ -195,6 +195,7 @@ class PostReplacement < ApplicationRecord
       processor = UploadService::Replacer.new(post: post, replacement: self)
       processor.process!(penalize_current_uploader: penalize_current_uploader)
       PostEvent.add(post.id, CurrentUser.user, :replacement_accepted, { replacement_id: id, old_md5: post.md5, new_md5: md5 })
+      creator.notify_for_upload(self, :replacement_approve) if creator_id != CurrentUser.id
       post.update_index
     end
 
@@ -227,6 +228,7 @@ class PostReplacement < ApplicationRecord
         end
         new_upload
       end
+      creator.notify_for_upload(self, :replacement_promote) if creator_id != CurrentUser.id
       post.update_index
       upload
     end
@@ -240,6 +242,7 @@ class PostReplacement < ApplicationRecord
       PostEvent.add(post.id, user, :replacement_rejected, { replacement_id: id })
       update(status: "rejected", rejector: user, rejection_reason: reason)
       User.where(id: creator_id).update_all("post_replacement_rejected_count = post_replacement_rejected_count + 1")
+      creator.notify_for_upload(self, :replacement_reject) if creator_id != CurrentUser.id
       post.update_index
     end
   end

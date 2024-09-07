@@ -59,6 +59,7 @@ module Posts
           assert(@post.reload.is_deleted?)
           assert_not(@post.reload.is_appealed?)
           assert_equal("appeal_rejected", PostEvent.last.action)
+          assert_equal(true, @appeal.creator.notifications.appeal_reject.exists?)
         end
 
         should "restrict access" do
@@ -67,7 +68,7 @@ module Posts
         end
       end
 
-      context "approving" do
+      context "accepting" do
         should "work" do
           @appeal = create(:post_appeal, post: @post)
           assert_difference("PostEvent.count", 2) do
@@ -76,7 +77,8 @@ module Posts
           end
           assert(@post.reload.is_active?)
           assert_not(@post.reload.is_appealed?)
-          assert_equal(%w[undeleted appeal_approved], PostEvent.last(2).map(&:action))
+          assert_equal(%w[undeleted appeal_accepted], PostEvent.last(2).map(&:action))
+          assert_equal(true, @appeal.creator.notifications.appeal_accept.exists?)
         end
 
         should "restrict access" do

@@ -140,6 +140,7 @@ class User < ApplicationRecord
   attr_accessor :password, :old_password, :validate_email_format, :is_admin_edit
 
   after_initialize :initialize_attributes, if: :new_record?
+  before_validation :sanitize_upload_notifications, if: :will_save_change_to_upload_notifications?
 
   validates :email, presence: { if: :enable_email_verification? }
   validates :email, uniqueness: { case_sensitive: false, if: :enable_email_verification? }
@@ -166,6 +167,7 @@ class User < ApplicationRecord
   validates :profile_about, length: { maximum: FemboyFans.config.user_about_max_size }
   validates :profile_artinfo, length: { maximum: FemboyFans.config.user_about_max_size }
   validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map(&:name) }
+  validates :upload_notifications, inclusion: { in: -> { User.upload_notifications_options } }
   before_create :promote_to_owner_if_first_user
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
@@ -1129,6 +1131,19 @@ class User < ApplicationRecord
 
   def self.email_not_verified
     where("bit_prefs & :value != :value", { value: Preferences::EMAIL_VERIFIED })
+  end
+
+  def self.upload_notifications_options
+    %w[post_delete post_undelete post_approve post_unapprove appeal_accept appeal_reject replacement_approve replacement_reject replacement_promote]
+  end
+
+  def notify_for_upload(model, type)
+    return unless upload_notifications.include?(type.to_s)
+    notifications.create!(category: type, data: { post_id: model.respond_to?(:post_id) ? model.post_id : nil, "#{model.class.name.underscore}_id": model.id }.compact_blank)
+  end
+
+  def sanitize_upload_notifications
+    self.upload_notifications = upload_notifications.compact_blank.uniq
   end
 
   def self.available_includes

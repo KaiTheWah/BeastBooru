@@ -53,6 +53,7 @@ module Posts
 
           assert_equal @response.parsed_body["location"], post_path(@post)
           assert_equal %w[approved original], @post.replacements.last(2).pluck(:status)
+          assert_equal(false, @user.notifications.replacement_approve.exists?)
         end
 
         should "not automatically approve replacements by approvers if as_pending=true" do
@@ -115,13 +116,15 @@ module Posts
 
       context "reject action" do
         should "reject replacement" do
-          put_auth reject_post_replacement_path(@replacement), @user
+          janitor = create(:janitor_user)
+          put_auth reject_post_replacement_path(@replacement), janitor
           assert_redirected_to(post_path(@post))
           @replacement.reload
           @post.reload
           assert_equal(@replacement.status, "rejected")
-          assert_equal(@replacement.rejector_id, @user.id)
+          assert_equal(@replacement.rejector_id, janitor.id)
           assert_not_equal(@post.md5, @replacement.md5)
+          assert_equal(true, @replacement.creator.notifications.replacement_reject.exists?)
         end
 
         should "reject replacement with a reason" do
@@ -157,12 +160,13 @@ module Posts
 
       context "approve action" do
         should "replace post" do
-          put_auth approve_post_replacement_path(@replacement), @user
+          put_auth approve_post_replacement_path(@replacement), create(:janitor_user)
           assert_redirected_to post_path(@post)
           @replacement.reload
           @post.reload
-          assert_equal @replacement.md5, @post.md5
-          assert_equal @replacement.status, "approved"
+          assert_equal(@replacement.md5, @post.md5)
+          assert_equal(@replacement.status, "approved")
+          assert_equal(true, @replacement.creator.notifications.replacement_approve.exists?)
         end
 
         should "restrict access" do
@@ -175,13 +179,14 @@ module Posts
 
       context "promote action" do
         should "create post" do
-          post_auth promote_post_replacement_path(@replacement), @user
+          post_auth promote_post_replacement_path(@replacement), create(:janitor_user)
           last_post = Post.last
           assert_redirected_to post_path(last_post)
           @replacement.reload
           @post.reload
-          assert_equal @replacement.md5, last_post.md5
-          assert_equal @replacement.status, "promoted"
+          assert_equal(@replacement.md5, last_post.md5)
+          assert_equal(@replacement.status, "promoted")
+          assert_equal(true, @replacement.creator.notifications.replacement_promote.exists?)
         end
 
         should "restrict access" do

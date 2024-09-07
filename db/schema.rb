@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_09_04_232217) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_06_184638) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -1114,6 +1114,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_04_232217) do
     t.datetime "mfa_last_used_at"
     t.string "backup_codes", array: true
     t.integer "post_appealed_count", default: 0
+    t.string "upload_notifications", default: [], null: false, array: true
     t.index "lower((email)::text)", name: "index_user_lower_email"
     t.index "lower((name)::text)", name: "index_users_on_name", unique: true
     t.index "lower(profile_about) gin_trgm_ops", name: "index_users_on_lower_profile_about_trgm", using: :gin

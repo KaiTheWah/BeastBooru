@@ -177,16 +177,17 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "destroy action" do
-      should "render" do
-        post_auth post_path(@post), @admin, params: { reason: "xxx", format: "js", _method: "delete" }
+      should "work" do
+        delete_auth post_path(@post), @admin, params: { reason: "xxx" }
         assert(@post.reload.is_deleted?)
+        assert_equal(true, @post.uploader.notifications.post_delete.exists?)
       end
 
       should "work even if the deleter has flagged the post previously" do
         as(@user) do
           PostFlag.create(post: @post, reason: "aaa", is_resolved: false)
         end
-        post_auth post_path(@post), @admin, params: { reason: "xxx", format: "js", _method: "delete" }
+        delete_auth post_path(@post), @admin, params: { reason: "xxx" }
         assert(@post.reload.is_deleted?)
       end
 
@@ -206,6 +207,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_not(@post.reload.is_deleted?)
+        assert_equal(true, @post.uploader.notifications.post_undelete.exists?)
       end
 
       should "restrict access" do

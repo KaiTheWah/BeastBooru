@@ -30,7 +30,7 @@ class PostEvent < ApplicationRecord
     changed_bg_color:        23,
     changed_thumbnail_frame: 24,
     appeal_created:          25,
-    appeal_approved:         26,
+    appeal_accepted:         26,
     appeal_rejected:         27,
   }
 

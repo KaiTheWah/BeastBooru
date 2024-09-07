@@ -3,10 +3,10 @@ import Utility from "./utility";
 const Notification = {};
 
 Notification.add_to_links = function () {
-  $("#notification-list tbody tr").each((_, tr) => {
+  $("#notifications-table tbody tr").each((_, tr) => {
     const $tr = $(tr);
     const id = $tr.attr("data-id");
-    $tr.find(".notification-content a").each((_, link) => {
+    $tr.find(".notification-column a").each((_, link) => {
       const $link = $(link);
       const url = new URL($link.attr("href"), window.location.origin);
       const params = new URLSearchParams(url.search);

@@ -107,6 +107,7 @@ module FemboyFans
       user.hover_zoom_shift           = true
       user.hover_zoom_sticky_shift    = true
       user.go_to_recent_forum_post    = true
+      user.upload_notifications       = User.upload_notifications_options
     end
 
     def default_blacklist

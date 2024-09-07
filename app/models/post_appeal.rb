@@ -13,7 +13,7 @@ class PostAppeal < ApplicationRecord
 
   enum status: {
     pending:  0,
-    approved: 1,
+    accepted: 1,
     rejected: 2,
   }
 
@@ -40,14 +40,16 @@ class PostAppeal < ApplicationRecord
     errors.add(:post, "cannot be appealed") unless post.is_appealable?
   end
 
-  def approve!
-    update!(status: :approved)
-    PostEvent.add(post_id, CurrentUser.user, :appeal_approved)
+  def accept!
+    update!(status: :accepted)
+    PostEvent.add(post_id, CurrentUser.user, :appeal_accepted)
+    creator.notify_for_upload(self, :appeal_accept) if creator_id != CurrentUser.id
   end
 
   def reject!
     update!(status: :rejected)
     PostEvent.add(post_id, CurrentUser.user, :appeal_rejected)
+    creator.notify_for_upload(self, :appeal_reject) if creator_id != CurrentUser.id
   end
 
   module SearchMethods

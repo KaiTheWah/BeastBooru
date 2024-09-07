@@ -180,7 +180,7 @@ x-constants:
     - changed_bg_color
     - changed_thumbnail_frame
     - appeal_created
-    - appeal_approved
+    - appeal_accepted
     - appeal_rejected
   - &ratings
     - s
@@ -216,6 +216,16 @@ x-constants:
     - feedback_create
     - feedback_update
     - feedback_delete
+  - &upload-notifications
+    - post_delete
+    - post_undelete
+    - post_approve
+    - post_unapprove
+    - appeal_accept
+    - appeal_reject
+    - replacement_approve
+    - replacement_reject
+    - replacement_promote
 
 components:
   securitySchemes:
@@ -619,6 +629,7 @@ components:
             - show_post_uploader
             - go_to_recent_forum_post
             - disable_colors
+            - upload_notifications
           properties:
             recent_tags:
               type: ["string", "null"]
@@ -698,6 +709,11 @@ components:
               type: boolean
             disable_colors:
               type: boolean
+            upload_notifications:
+              type: array
+              items:
+                type: string
+                enum: *upload-notifications
     DMail:
       type: object
       required:
@@ -12431,6 +12447,11 @@ paths:
                   type: boolean
                 disable_colors:
                   type: boolean
+            upload_notifications:
+              type: array
+              items:
+                type: string
+                enum: *upload-notifications
       responses:
         201:
           description: Success

@@ -149,6 +149,15 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "autoapprove uploads by approvers" do
+        assert_difference("Upload.count", 1) do
+          file = fixture_file_upload("test.jpg")
+          post_auth uploads_path, create(:janitor_user), params: { upload: { file: file, tag_string: "aaa", rating: "q", source: "aaa" } }
+        end
+        assert_equal(false, Post.last.is_pending?)
+        assert_equal(false, @user.notifications.post_approve.exists?)
+      end
+
       context "with a previously destroyed post" do
         setup do
           @admin = create(:admin_user)

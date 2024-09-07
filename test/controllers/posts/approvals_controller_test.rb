@@ -33,6 +33,7 @@ module Posts
           assert_response :success
           @post.reload
           assert_not(@post.reload.is_pending?)
+          assert_equal(true, @post.uploader.notifications.post_approve.exists?)
         end
 
         should "restrict access" do
@@ -53,6 +54,7 @@ module Posts
           delete_auth post_approval_path(@post), @admin, params: { format: :json }
           assert_response :success
           assert(@post.reload.is_pending?)
+          assert_equal(true, @post.uploader.notifications.post_unapprove.exists?)
         end
 
         should "not work if user is not approver" do

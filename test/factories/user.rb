@@ -14,6 +14,7 @@ FactoryBot.define do
     created_at { Time.now }
     last_logged_in_at { Time.now }
     email_verified { true }
+    upload_notifications { User.upload_notifications_options }
 
     factory(:anonymous_user) do
       level { User::Levels::ANONYMOUS }

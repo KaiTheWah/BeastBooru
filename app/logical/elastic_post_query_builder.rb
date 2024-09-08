@@ -179,6 +179,10 @@ class ElasticPostQueryBuilder < ElasticQueryBuilder
       must.push({ term: { artverified: q[:artverified] } })
     end
 
+    if q.include?(:artverified)
+      must.push({ term: { artverified: q[:artverified] } })
+    end
+
     add_tag_string_search_relation(q[:tags])
 
     case q[:order]

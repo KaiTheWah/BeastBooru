@@ -422,7 +422,7 @@ class ModAction < ApplicationRecord
     },
 
     ### User ###
-    user_ban:                      {
+    user_ban:                                   {
       text: ->(_mod, user) { "Banned #{user}" },
       json: %i[user_id],
     },
@@ -454,7 +454,7 @@ class ModAction < ApplicationRecord
       text: ->(mod, user) { "Changed upload limit of #{user} from #{mod.old_upload_limit} to #{mod.upload_limit}" },
       json: %i[user_id old_upload_limit upload_limit],
     },
-    user_unban:                      {
+    user_unban:                                 {
       text: ->(_mod, user) { "Unbanned #{user}" },
       json: %i[user_id],
     },

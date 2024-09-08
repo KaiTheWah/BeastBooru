@@ -68,7 +68,7 @@ module ModActions
           actions:   %w[user_level_change],
           text:      "Changed #{user(@target)} level from #{@original.level_string} to #{@target.level_string}",
           subject:   @target,
-          user_id: @target.id,
+          user_id:   @target.id,
           old_level: @original.level_string,
           level:     @target.level_string,
         )
@@ -103,7 +103,7 @@ module ModActions
           actions:          %w[user_upload_limit_change],
           text:             "Changed upload limit of #{user(@target)} from #{@original.base_upload_limit} to #{@target.base_upload_limit}",
           subject:          @target,
-          user_id: @target.id,
+          user_id:          @target.id,
           old_upload_limit: @original.base_upload_limit,
           upload_limit:     @target.base_upload_limit,
         )
@@ -119,7 +119,7 @@ module ModActions
           text:    "Unbanned #{user(@target)}",
           subject: @target,
           user_id: @target.id,
-          )
+        )
       end
     end
   end

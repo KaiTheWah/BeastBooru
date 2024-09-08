@@ -78,7 +78,7 @@ class Ban < ApplicationRecord
   end
 
   def user_name
-    return unless user_id.present?
+    return if user_id.blank?
     if association(:user).loaded?
       user.name
     end

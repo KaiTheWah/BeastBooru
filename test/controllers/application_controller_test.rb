@@ -183,6 +183,12 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           assert_equal("Account is permanently banned", @response.parsed_body["message"])
           assert_equal(@user.recent_ban.as_json, @response.parsed_body["ban"])
         end
+
+        should "not allow acknowledging the ban" do
+          get acknowledge_bans_path(user_id: @user.signed_id(purpose: :acknowledge_ban), commit: "Acknowledge")
+          assert_response(403)
+          assert_equal(true, @user.reload.is_banned?)
+        end
       end
 
       context "temporarily" do
@@ -196,6 +202,28 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           assert_response 403
           assert_equal("Account is banned for 3 days", @response.parsed_body["message"])
           assert_equal(@user2.recent_ban.as_json, @response.parsed_body["ban"])
+        end
+
+        should "not allow acknowledging the ban before it expires" do
+          get acknowledge_bans_path(user_id: @user2.signed_id(purpose: :acknowledge_ban), commit: "Acknowledge")
+          assert_response(403)
+          assert_equal(true, @user2.reload.is_banned?)
+        end
+
+        should "allow acknowledging the ban after it expires" do
+          travel_to(4.days.from_now) do
+            get acknowledge_bans_path(user_id: @user2.signed_id(purpose: :acknowledge_ban), commit: "Acknowledge")
+            assert_redirected_to(new_session_path)
+          end
+          assert_equal(false, @user2.reload.is_banned?)
+        end
+
+        should "not automatically unban after the ban expires" do
+          travel_to(4.days.from_now) do
+            get_auth posts_path, @user2
+            assert_redirected_to(acknowledge_bans_path(user_id: @user2.signed_id(purpose: :acknowledge_ban)))
+          end
+          assert_equal(true, @user2.reload.is_banned?)
         end
       end
     end

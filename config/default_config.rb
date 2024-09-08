@@ -592,6 +592,10 @@ module FemboyFans
       "internal:appeal_notice"
     end
 
+    def ban_notice_wiki_page
+      "internal:ban_notice"
+    end
+
     # The number of posts displayed per page.
     def records_per_page
       100

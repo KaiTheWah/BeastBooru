@@ -47,4 +47,19 @@ class BansController < ApplicationController
     notice("Ban destroyed")
     respond_with(@ban)
   end
+
+  def acknowledge
+    @user = User.find_signed!(params[:user_id], purpose: :acknowledge_ban)
+    @ban = @user.recent_ban
+    return render_expected_error(403, "You are not banned") unless @user.is_banned?
+    if params[:commit] == "Acknowledge"
+      return render_expected_error(403, "Your ban has not expired") unless @ban.expired?
+      @user.unban!
+      redirect_to(new_session_path, notice: "Your ban has been removed, please log in again")
+    else
+      @notice = view_context.safe_wiki(FemboyFans.config.ban_notice_wiki_page).body
+                            .gsub("%BAN_REASON%", @ban.reason)
+                            .gsub("%BAN_USER%", view_context.link_to_user(@ban.banner))
+    end
+  end
 end

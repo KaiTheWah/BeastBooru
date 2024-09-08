@@ -38,7 +38,6 @@ class SessionLoader
       load_remember_token
     end
 
-    CurrentUser.user.unban! if CurrentUser.user.ban_expired?
     if CurrentUser.user.is_banned?
       raise(BannedError, CurrentUser.user.recent_ban)
     end

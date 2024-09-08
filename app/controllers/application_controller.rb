@@ -82,6 +82,7 @@ class ApplicationController < ActionController::Base
             ban:     exception.try(:ban),
           }, status: status)
         end
+        return redirect_to(acknowledge_bans_path(user_id: CurrentUser.user.signed_id(purpose: :acknowledge_ban))) if CurrentUser.user.ban_expired?
       end
       render_expected_error(status, exception.message)
     when ActionController::InvalidAuthenticityToken

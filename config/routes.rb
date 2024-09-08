@@ -107,7 +107,9 @@ Rails.application.routes.draw do
       resources :urls, only: %i[index], controller: "artists/urls", as: "artist_urls"
     end
   end
-  resources :bans
+  resources :bans do
+    get :acknowledge, on: :collection
+  end
   resources :bulk_update_requests do
     member do
       post :approve

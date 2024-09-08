@@ -25,6 +25,10 @@ class BanPolicy < ApplicationPolicy
     super + %i[banner_id banner_name user_id user_name reason_matches expired order]
   end
 
+  def api_attributes
+    super + %i[expired?]
+  end
+
   def html_data_attributes
     super + %i[expired?]
   end

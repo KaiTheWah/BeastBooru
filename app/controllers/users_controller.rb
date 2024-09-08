@@ -116,4 +116,12 @@ class UsersController < ApplicationController
     @css = CustomCss.parse(CurrentUser.user.custom_style)
     expires_in(10.years)
   end
+
+  def unban
+    @user = authorize(User.find(params[:id]))
+    return render_expected_error(422, "User is not banned") unless @user.is_banned?
+    @user.unban!
+    notice("User unbanned")
+    respond_with(@user)
+  end
 end

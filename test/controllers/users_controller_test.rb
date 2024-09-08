@@ -223,5 +223,22 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_access(User::Levels::MEMBER, anonymous_response: :forbidden) { |user| get_auth custom_style_users_path(format: :css), user }
       end
     end
+
+    context "unban action" do
+      should "work" do
+        mod = create(:moderator_user)
+        as(mod) { @user.ban! }
+        assert_equal(true, @user.reload.is_banned?)
+        assert_difference({ "Ban.count" => 0, "ModAction.count" => 1 }) do
+          put_auth unban_user_path(@user), mod
+          assert_redirected_to user_path(@user)
+        end
+        assert_equal(false, @user.reload.is_banned?)
+      end
+
+      should "restrict access" do
+        assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| put_auth unban_user_path(create(:banned_user)), user }
+      end
+    end
   end
 end

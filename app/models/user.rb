@@ -219,9 +219,18 @@ class User < ApplicationRecord
       end
     end
 
-    def unban!
+    def ban!
+      return false if is_banned?
+      self.level = Levels::BANNED
+      ModAction.log!(:user_ban, self, user_id: id)
+      save(validate: false)
+    end
+
+    def unban!(ack: false)
+      return false unless is_banned?
       self.level = Levels::MEMBER
-      save
+      ModAction.log!(:user_unban, self, user_id: id) unless ack
+      save(validate: false)
     end
 
     def ban_expired?

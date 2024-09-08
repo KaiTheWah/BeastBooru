@@ -13,6 +13,10 @@ class UserPolicy < ApplicationPolicy
     unbanned?
   end
 
+  def unban?
+    user.is_moderator?
+  end
+
   def permitted_attributes
     %i[
       password old_password password_confirmation

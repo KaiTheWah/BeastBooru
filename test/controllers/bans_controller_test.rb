@@ -63,15 +63,17 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "work" do
-        assert_difference({ "Ban.count" => 1, "ModAction.count" => 2 }) do
-          post_auth bans_path, @mod, params: { ban: { duration: 60, reason: "xxx", user_id: @user.id } }
+        user = create(:user)
+        assert_difference({ "Ban.count" => 1, "ModAction.count" => 3 }) do
+          post_auth bans_path, @mod, params: { ban: { duration: 60, reason: "xxx", user_id: user.id } }
+          assert_redirected_to(ban_path(Ban.last))
         end
-        ban = Ban.last
-        assert_redirected_to(ban_path(ban))
+        assert_equal(true, user.reload.is_banned?)
+        assert_equal(%w[user_feedback_create user_ban ban_create], ModAction.last(3).pluck(:action))
       end
 
       should "restrict access" do
-        assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| post_auth bans_path, user, params: { ban: { duration: 60, reason: "xxx", user_id: @user.id } } }
+        assert_access(User::Levels::MODERATOR, success_response: :redirect) { |user| post_auth bans_path, user, params: { ban: { duration: 60, reason: "xxx", user_id: create(:user).id } } }
       end
     end
 

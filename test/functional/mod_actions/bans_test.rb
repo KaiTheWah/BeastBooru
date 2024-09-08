@@ -25,9 +25,10 @@ module ModActions
           assert_matches(
             actions:  %w[ban_create user_feedback_create],
             subject:  @ban,
-            text:     "Banned #{user(@user)} permanently",
+            text:     "Created ban for #{user(@user)} lasting forever with reason:\n[section=Reason]#{@ban.reason}[/section]",
             duration: -1,
             user_id:  @user.id,
+            reason:   @ban.reason,
           )
         end
 
@@ -37,9 +38,10 @@ module ModActions
           assert_matches(
             actions:  %w[ban_create user_feedback_create],
             subject:  @ban,
-            text:     "Banned #{user(@user)} for 1 day",
+            text:     "Created ban for #{user(@user)} lasting 1 day with reason:\n[section=Reason]#{@ban.reason}[/section]",
             duration: 1,
             user_id:  @user.id,
+            reason:   @ban.reason,
           )
         end
 
@@ -51,9 +53,10 @@ module ModActions
           assert_matches(
             actions:  %w[ban_create user_feedback_create],
             subject:  @ban,
-            text:     "Banned #{user(@user)}",
+            text:     "Created ban for #{user(@user)} with reason:\n[section=Reason]#{@ban.reason}[/section]",
             duration: nil,
             user_id:  @user.id,
+            reason:   @ban.reason,
           )
         end
       end
@@ -63,7 +66,7 @@ module ModActions
         assert_matches(
           actions: %w[ban_delete],
           subject: @ban,
-          text:    "Unbanned #{user(@user)}",
+          text:    "Deleted ban for #{user(@user)}",
           user_id: @user.id,
         )
       end
@@ -79,7 +82,7 @@ module ModActions
           assert_matches(
             actions:        %w[ban_update],
             subject:        @ban,
-            text:           "Updated ban ##{@ban.id} for #{user(@user)}",
+            text:           "Updated ban for #{user(@user)}",
             expires_at:     @ban.expires_at&.iso8601,
             old_expires_at: @original.expires_at&.iso8601,
             reason:         @ban.reason,
@@ -95,7 +98,7 @@ module ModActions
             actions:        %w[ban_update],
             subject:        @ban,
             text:           <<~TEXT.strip,
-              Updated ban ##{@ban.id} for #{user(@user)}
+              Updated ban for #{user(@user)}
               Changed expiration from #{format_expires_at(@original.expires_at.iso8601)} to #{format_expires_at(@ban.expires_at&.iso8601)}
             TEXT
             expires_at:     nil,
@@ -113,7 +116,7 @@ module ModActions
             actions:        %w[ban_update],
             subject:        @ban,
             text:           <<~TEXT.strip,
-              Updated ban ##{@ban.id} for #{user(@user)}
+              Updated ban for #{user(@user)}
               Changed reason: [section=Old]#{@original.reason}[/section] [section=New]#{@ban.reason}[/section]
             TEXT
             expires_at:     @ban.expires_at&.iso8601,
@@ -131,7 +134,7 @@ module ModActions
             actions:        %w[ban_update],
             subject:        @ban,
             text:           <<~TEXT.strip,
-              Updated ban ##{@ban.id} for #{user(@user)}
+              Updated ban for #{user(@user)}
               Changed expiration from #{format_expires_at(@original.expires_at.iso8601)} to #{format_expires_at(@ban.expires_at&.iso8601)}
               Changed reason: [section=Old]#{@original.reason}[/section] [section=New]xxx[/section]
             TEXT

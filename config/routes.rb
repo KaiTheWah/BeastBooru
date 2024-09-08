@@ -392,6 +392,7 @@ Rails.application.routes.draw do
     member do
       put :delete
       put :undelete
+      put :unban
     end
   end
   resources :wiki_pages, constraints: id_name_constraint do

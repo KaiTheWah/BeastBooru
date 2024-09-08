@@ -10,7 +10,6 @@ class Ban < ApplicationRecord
   after_create :log_create
   after_update :log_update
   after_destroy :log_delete
-  after_destroy :update_user_on_destroy
   belongs_to :user
   belongs_to :banner, class_name: "User"
   validate :user_is_inferior
@@ -45,12 +44,6 @@ class Ban < ApplicationRecord
     q
   end
 
-  def self.prune!
-    expired.includes(:user).find_each do |ban|
-      ban.user.unban! if ban.user.ban_expired?
-    end
-  end
-
   def initialize_banner_id
     self.banner_id = CurrentUser.id if banner_id.blank?
   end
@@ -81,18 +74,15 @@ class Ban < ApplicationRecord
   end
 
   def update_user_on_create
-    user.level = User::Levels::BANNED
-    # Don't validate in order for deleted users to be bannable
-    user.save(validate: false)
-  end
-
-  def update_user_on_destroy
-    user.level = User::Levels::MEMBER
-    user.save(validate: false)
+    user.ban!
   end
 
   def user_name
-    user&.name
+    return unless user_id.present?
+    if association(:user).loaded?
+      user.name
+    end
+    User.id_to_name(user_id)
   end
 
   def user_name=(username)

@@ -81,22 +81,23 @@ class ModAction < ApplicationRecord
     ban_create:                                 {
       text: ->(mod, user) do
         if mod.duration.is_a?(Numeric) && mod.duration < 0
-          "Banned #{user} permanently"
+          text = "Created ban for #{user} lasting forever with reason:"
         elsif mod.duration
-          "Banned #{user} for #{mod.duration} #{'day'.pluralize(mod.duration)}"
+          text = "Created ban for #{user} lasting #{mod.duration} #{'day'.pluralize(mod.duration)} with reason:"
         else
-          "Banned #{user}"
+          text = "Created ban for #{user} with reason:"
         end
+        "#{text}\n[section=Reason]#{mod.reason}[/section]"
       end,
-      json: %i[duration user_id],
+      json: %i[duration user_id reason],
     },
     ban_delete:                                 {
-      text: ->(_mod, user) { "Unbanned #{user}" },
+      text: ->(_mod, user) { "Deleted ban for #{user}" },
       json: %i[user_id],
     },
     ban_update:                                 {
       text: ->(mod, user) do
-        text = "Updated ban ##{mod.subject_id} for #{user}"
+        text = "Updated ban for #{user}"
         if mod.expires_at != mod.old_expires_at
           format_expires_at = ->(timestamp) { timestamp.nil? ? "never" : DateTime.parse(timestamp).strftime("%Y-%m-%d %H:%M") }
           expires_at = format_expires_at.call(mod.expires_at)
@@ -420,33 +421,42 @@ class ModAction < ApplicationRecord
       },
     },
 
+    ### User ###
+    user_ban:                      {
+      text: ->(_mod, user) { "Banned #{user}" },
+      json: %i[user_id],
+    },
     user_blacklist_change:                      {
       text: ->(_mod, user) { "Edited blacklist of #{user}" },
-      json: %i[],
+      json: %i[user_id],
     },
     user_delete:                                {
       text: ->(_mod, user) { "Deleted user #{user}" },
-      json: %i[],
+      json: %i[user_id],
     },
     user_flags_change:                          {
       text: ->(mod, user) { "Changed #{user} flags. Added: [#{mod.added.join(', ')}] Removed: [#{mod.removed.join(', ')}]" },
-      json: %i[added removed],
+      json: %i[user_id added removed],
     },
     user_level_change:                          {
       text: ->(mod, user) { "Changed #{user} level from #{mod.old_level} to #{mod.level}" },
-      json: %i[level old_level],
+      json: %i[user_id level old_level],
     },
     user_name_change:                           {
       text: ->(_mod, user) { "Changed name of #{user}" },
-      json: %i[],
+      json: %i[user_id],
     },
     user_text_change:                           {
       text: ->(_mod, user) { "Edited profile text of #{user}" },
-      json: %i[],
+      json: %i[user_id],
     },
     user_upload_limit_change:                   {
       text: ->(mod, user) { "Changed upload limit of #{user} from #{mod.old_upload_limit} to #{mod.upload_limit}" },
-      json: %i[old_upload_limit upload_limit],
+      json: %i[user_id old_upload_limit upload_limit],
+    },
+    user_unban:                      {
+      text: ->(_mod, user) { "Unbanned #{user}" },
+      json: %i[user_id],
     },
 
     ### User Feedback ###

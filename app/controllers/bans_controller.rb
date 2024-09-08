@@ -25,11 +25,13 @@ class BansController < ApplicationController
   end
 
   def create
-    @ban = authorize(Ban.new(permitted_attributes(Ban)))
-    @ban.save
+    Ban.transaction do
+      @ban = authorize(Ban.new(permitted_attributes(Ban)))
+      @ban.save
 
-    notice("Ban created") if @ban.valid?
-    respond_with(@ban)
+      notice("Ban created") if @ban.valid?
+      respond_with(@ban)
+    end
   end
 
   def update
@@ -50,11 +52,11 @@ class BansController < ApplicationController
 
   def acknowledge
     @user = User.find_signed!(params[:user_id], purpose: :acknowledge_ban)
-    @ban = @user.recent_ban
     return render_expected_error(403, "You are not banned") unless @user.is_banned?
+    @ban = @user.recent_ban
     if params[:commit] == "Acknowledge"
-      return render_expected_error(403, "Your ban has not expired") unless @ban.expired?
-      @user.unban!
+      return render_expected_error(403, "Your ban has not expired") unless @ban.try(:expired?)
+      @user.unban!(ack: true)
       redirect_to(new_session_path, notice: "Your ban has been removed, please log in again")
     else
       @notice = view_context.safe_wiki(FemboyFans.config.ban_notice_wiki_page).body

@@ -226,6 +226,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, @user2.reload.is_banned?)
         end
       end
+
+      should "not allow acknowledging the ban if it no longer exists" do
+        @user2.recent_ban.delete
+        get acknowledge_bans_path(user_id: @user2.signed_id(purpose: :acknowledge_ban), commit: "Acknowledge")
+        assert_response(403)
+        assert_equal(true, @user2.reload.is_banned?)
+      end
     end
 
     context "the only parameter" do

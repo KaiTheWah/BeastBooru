@@ -22,6 +22,18 @@ module ModActions
           actions: %w[user_blacklist_change],
           text:    "Edited blacklist of #{user(@target)}",
           subject: @target,
+          user_id: @target.id,
+        )
+      end
+
+      should "format user_ban correctly" do
+        @target.ban!
+
+        assert_matches(
+          actions: %w[user_ban],
+          text:    "Banned #{user(@target)}",
+          subject: @target,
+          user_id: @target.id,
         )
       end
 
@@ -32,6 +44,7 @@ module ModActions
           actions: %w[user_delete],
           text:    "Deleted user #{user(@target)}",
           subject: @target,
+          user_id: @target.id,
         )
       end
 
@@ -42,6 +55,7 @@ module ModActions
           actions: %w[user_flags_change],
           text:    "Changed #{user(@target)} flags. Added: [unrestricted uploads] Removed: []",
           subject: @target,
+          user_id: @target.id,
           added:   ["unrestricted uploads"],
           removed: [],
         )
@@ -54,6 +68,7 @@ module ModActions
           actions:   %w[user_level_change],
           text:      "Changed #{user(@target)} level from #{@original.level_string} to #{@target.level_string}",
           subject:   @target,
+          user_id: @target.id,
           old_level: @original.level_string,
           level:     @target.level_string,
         )
@@ -66,6 +81,7 @@ module ModActions
           actions: %w[user_name_change],
           text:    "Changed name of #{user(@target)}",
           subject: @target,
+          user_id: @target.id,
         )
       end
 
@@ -76,6 +92,7 @@ module ModActions
           actions: %w[user_text_change],
           text:    "Edited profile text of #{user(@target)}",
           subject: @target,
+          user_id: @target.id,
         )
       end
 
@@ -86,9 +103,23 @@ module ModActions
           actions:          %w[user_upload_limit_change],
           text:             "Changed upload limit of #{user(@target)} from #{@original.base_upload_limit} to #{@target.base_upload_limit}",
           subject:          @target,
+          user_id: @target.id,
           old_upload_limit: @original.base_upload_limit,
           upload_limit:     @target.base_upload_limit,
         )
+      end
+
+      should "format user_unban correctly" do
+        @target.ban!
+        set_count!
+        @target.unban!
+
+        assert_matches(
+          actions: %w[user_unban],
+          text:    "Unbanned #{user(@target)}",
+          subject: @target,
+          user_id: @target.id,
+          )
       end
     end
   end

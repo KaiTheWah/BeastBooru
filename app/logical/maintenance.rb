@@ -10,7 +10,6 @@ module Maintenance
     ignoring_exceptions { Tag.clean_up_negative_post_counts! }
     ignoring_exceptions { TagAlias.fix_nonzero_post_counts! }
     ignoring_exceptions { TagAlias.update_cached_post_counts_for_all }
-    ignoring_exceptions { Ban.prune! }
     ignoring_exceptions { UserPasswordResetNonce.prune! }
     ignoring_exceptions { StatsUpdater.run! }
     ignoring_exceptions { DiscordReport::JanitorStats.new.run! }

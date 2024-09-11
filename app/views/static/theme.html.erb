@@ -1,94 +1,52 @@
-<p>Theme settings are saved using cookies and javascript. This means that they will not persist across private browsing
-  sessions, or work inside incognito mode on mobile devices.</p>
 
-<h3 class="text-error" id="no_save_warning" style="display:none;">Your device does not allow the site to save theme
-  settings.</h3>
+
+<h3 class="text-error" id="no_save_warning" style="display:none;">
+  Your device does not allow the site to save theme settings.
+</h3>
 <noscript>
   <h3 class="text-error" id="no_save_warning">Your device does not allow the site to save theme settings.</h3>
 </noscript>
 
-<div class="simple_form">
-  <div class="input">
-    <label for="theme_extra">Embellishments</label>
-    <select id="theme_extra">
-      <option value="none">(None)</option>
-      <option value="aurora">Aurora</option>
-      <option value="autumn">Autumn</option>
-      <option value="hexagon">Hexagon</option>
-      <option value="space">Space</option>
-      <option value="spring">Spring</option>
-      <option value="stars">Stars</option>
-      <option value="winter">Eternal Winter</option>
-    </select>
-  </div>
-  <div class="input">
-    <label for="theme_palette">Palette</label>
-    <select id="theme_palette">
-      <option value="default">Default</option>
-      <option value="deut">Protanopia & Deuteranopia</option>
-      <option value="trit">Tritanopia</option>
-    </select>
-  </div>
-  <div class="input">
-    <label for="theme_navbar">Navigation bar location</label>
-    <select id="theme_navbar">
-      <option value="top">Top (default)</option>
-      <option value="bottom">Bottom</option>
-      <option value="both">Both</option>
-      <option value="none">Off (not recommended)</option>
-    </select>
-  </div>
-  <hr>
-  <div class="input">
-    <label for="gestures_enable">Enable Mobile Gestures</label>
-    <select id="gestures_enable">
-      <option value="false">No</option>
-      <option value="true">Yes</option>
-    </select>
-    <div class="hint">Swipe left for next page/image. Swipe right for previous page/image.</div>
-  </div>
-</div>
+<div class="simple_form theme-form">
 
-<%= javascript_tag nonce: true do -%>
-  $(function() {
-    var $body = $(document.body);
-    try {
-      var ls = window.localStorage;
-      ls.setItem('test', 'a');
-      ls.removeItem('test');
-      var extra = ls.getItem('theme-extra') || 'hexagon';
-      var palette = ls.getItem('theme-palette') || 'default';
-      var nav = ls.getItem('theme-nav') || 'top';
-      var emg = ls.getItem('emg') || 'false';
-      $('#theme_name').val("none");
-      $('#theme_extra').val(extra);
-      $('#theme_palette').val(palette);
-      $('#theme_navbar').val(nav);
-      $('#gestures_enable').val(emg);
-    } catch(e) {
-      $("#no_save_warning").show();
-    }
-    $("#theme_extra").on('change', function(e) {
-      var extra = e.target.value;
-      $body.attr('data-th-extra', extra);
-      window.localStorage.setItem('theme-extra', extra);
-    });
-    $("#theme_palette").on('change', function(e) {
-      var palette = e.target.value;
-      $body.attr('data-th-palette', palette);
-      window.localStorage.setItem('theme-palette', palette);
-    });
-    $("#theme_navbar").on('change', function(e) {
-      var pos = e.target.value;
-      $body.attr('data-th-nav', pos);
-      window.localStorage.setItem('theme-nav', pos);
-    });
-    $("#gestures_enable").on('change', function(e) {
-      var emg = e.target.value;
-      window.localStorage.setItem('emg', emg);
-    });
-  });
-<% end -%>
+  <h3>Theme Preferences</h3>
+  <label for="theme_extra">Embellishments</label>
+  <select id="theme_extra">
+    <option value="none">(None)</option>
+    <option value="aurora">Aurora</option>
+    <option value="autumn">Autumn</option>
+    <option value="hexagon">Hexagon</option>
+    <option value="space">Space</option>
+    <option value="spring">Spring</option>
+    <option value="stars">Stars</option>
+    <option value="winter">Eternal Winter</option>
+  </select>
+
+  <h3>Accessibility</h3>
+  <label for="theme_palette">Palette</label>
+  <select id="theme_palette">
+    <option value="default">Default</option>
+    <option value="deut">Protanopia & Deuteranopia</option>
+    <option value="trit">Tritanopia</option>
+  </select>
+
+  <h3>Navigation</h3>
+  <label for="theme_navbar">Navbar location</label>
+  <select id="theme_navbar">
+    <option value="top">Top (default)</option>
+    <option value="bottom">Bottom</option>
+    <option value="both">Both</option>
+    <option value="none">Off (not recommended)</option>
+  </select>
+
+  <label for="theme_gestures">Mobile Gestures</label>
+  <select id="theme_gestures">
+    <option value="false">Disabled</option>
+    <option value="true">Enabled</option>
+  </select>
+  <div class="hint">Swipe left for next page/image. Swipe right for previous page/image.</div>
+
+</div>
 
 <% content_for(:page_title) do %>
   Themes

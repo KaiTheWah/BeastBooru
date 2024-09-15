@@ -8,7 +8,7 @@ module Sources
       end
 
       def domains
-        ["inkbunny.net", "metapix.net"]
+        %w[inkbunny.net metapix.net]
       end
 
       def original_url

@@ -47,10 +47,15 @@ module Sources
         if @parsed_url.domain == "twitter.com" && @parsed_url.query.present?
           @parsed_url.query = nil
         end
-        # Remove photo specifier from links
         split_path = @parsed_url.path.split("/")
-        if @parsed_url.domain == "twitter.com" && split_path.length == 6 && split_path[-2] == "photo"
-          @parsed_url.path = split_path[0..-3].join("/")
+        if @parsed_url.domain == "twitter.com"
+          # Remove photo specifier from links
+          if split_path.length == 6 && split_path[-2] == "photo"
+            @parsed_url.path = split_path[0..-3].join("/")
+          # Remove media & with_replies from links
+          elsif split_path.length == 3 && %w[media with_replies].include?(split_path[1])
+            @parsed_url.path = split_path[1]
+          end
         end
         # Update old direct image URLs
         if @parsed_url.host == "pbs.twimg.com"

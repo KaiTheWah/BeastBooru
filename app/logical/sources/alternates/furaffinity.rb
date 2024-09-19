@@ -17,7 +17,7 @@ module Sources
       def parse
         # Add gallery link, parsed from direct link
         if @url =~ IMAGE_TO_ARTIST
-          @gallery_url = "https://www.furaffinity.net/user/#{$1}"
+          @gallery_url = "https://furaffinity.net/user/#{$1}"
           @direct_url = @url
         end
       end
@@ -38,6 +38,10 @@ module Sources
         # Remove comment anchor
         if @parsed_url.fragment&.start_with?("cid:")
           @parsed_url.fragment = nil
+        end
+
+        if @parsed_url.host.start_with?("www.")
+          @parsed_url.host = @parsed_url.host[4..]
         end
 
         @url = @parsed_url.to_s

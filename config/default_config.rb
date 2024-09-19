@@ -584,7 +584,7 @@ module FemboyFans
       "internal:replacement_notice"
     end
 
-    def avoid_posting_notice_notice_wiki_page
+    def avoid_posting_notice_wiki_page
       "internal:avoid_posting_notice"
     end
 

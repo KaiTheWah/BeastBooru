@@ -448,9 +448,10 @@ class Post < ApplicationRecord
 
     def status_flags
       flags = []
-      flags << "pending" if is_pending?
-      flags << "flagged" if is_flagged?
-      flags << "deleted" if is_deleted?
+      flags << "pending"  if is_pending?
+      flags << "flagged"  if is_flagged?
+      flags << "deleted"  if is_deleted?
+      flags << "appealed" if is_appealed?
       flags.join(" ")
     end
 
@@ -791,12 +792,20 @@ class Post < ApplicationRecord
         tags << "invalid_source"
       end
 
+      if bad_source?
+        tags << "bad_source"
+      end
+
       tags
     end
 
     # should_process_tags?
     def invalid_source?
       source_array.any? { |source| !%r{^-?https?://}.match(source) }
+    end
+
+    def bad_source?
+      Sources::Bad.has_bad_source?(source_array)
     end
 
     def apply_casesensitive_metatags(tags)

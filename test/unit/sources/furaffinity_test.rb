@@ -11,7 +11,7 @@ module Sources
       alternate_should_work(
         "https://www.furaffinity.net/view/27836238/",
         Sources::Alternates::Furaffinity,
-        "https://www.furaffinity.net/view/27836238/",
+        "https://furaffinity.net/view/27836238/",
       )
     end
 
@@ -35,7 +35,7 @@ module Sources
       alternate_should_work(
         "https://www.furaffinity.net/full/27836238/",
         Sources::Alternates::Furaffinity,
-        "https://www.furaffinity.net/view/27836238/",
+        "https://furaffinity.net/view/27836238/",
       )
     end
 
@@ -43,7 +43,7 @@ module Sources
       alternate_should_work(
         "https://www.furaffinity.net/view/27836238/?upload-successful",
         Sources::Alternates::Furaffinity,
-        "https://www.furaffinity.net/view/27836238/",
+        "https://furaffinity.net/view/27836238/",
       )
     end
 
@@ -51,7 +51,7 @@ module Sources
       alternate_should_work(
         "https://www.furaffinity.net/view/27836238/#cid:130552607",
         Sources::Alternates::Furaffinity,
-        "https://www.furaffinity.net/view/27836238/",
+        "https://furaffinity.net/view/27836238/",
       )
     end
   end

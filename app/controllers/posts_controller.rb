@@ -104,12 +104,6 @@ class PostsController < ApplicationController
     respond_with_post_after_update(@post)
   end
 
-  def update_iqdb
-    @post = authorize(Post.find(params[:id]))
-    @post.update_iqdb_async
-    respond_with_post_after_update(@post)
-  end
-
   def delete
     @post = authorize(Post.find(params[:id]))
     @reason = @post.pending_flag&.reason || ""

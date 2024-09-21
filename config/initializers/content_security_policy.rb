@@ -19,7 +19,7 @@ Rails.application.configure do
     policy.font_src(:self)
     policy.img_src(:self, :data, :blob, FemboyFans.config.cdn_domain)
     policy.child_src(:none)
-    policy.form_action(:self, "discord.femboy.fan", "discord.com")
+    policy.form_action(:self)
     # Specify URI for violation reports
     # policy.report_uri "/csp-violation-report-endpoint"
   end

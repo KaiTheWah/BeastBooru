@@ -416,12 +416,6 @@ module FemboyFans
       250
     end
 
-    def discord_site
-    end
-
-    def discord_secret
-    end
-
     # Maximum size of an upload. If you change this, you must also change
     # `client_max_body_size` in your nginx.conf.
     def max_file_size
@@ -730,18 +724,6 @@ module FemboyFans
 
     def image_rescales
       []
-    end
-
-    def janitor_reports_discord_webhook_url
-      nil
-    end
-
-    def moderator_stats_discord_webhook_url
-      nil
-    end
-
-    def aibur_stats_discord_webhook_url
-      nil
     end
 
     def ftp_hostname

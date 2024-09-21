@@ -448,8 +448,6 @@ Rails.application.routes.draw do
   get "/static/takedown", to: "static#takedown", as: "takedown_static"
   get "/static/terms_of_service", to: "static#terms_of_service", as: "terms_of_service"
   get "/static/contact", to: "static#contact", as: "contact"
-  get "/static/discord", to: "static#discord", as: "discord_get"
-  post "/static/discord", to: "static#discord", as: "discord_post"
   get "/static/toggle_mobile_mode", to: "static#toggle_mobile_mode", as: "toggle_mobile_mode"
   get "/static/theme", to: "static#theme", as: "theme"
   get "/static/staff", to: "static#staff", as: "staff"

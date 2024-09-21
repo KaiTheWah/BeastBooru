@@ -10,7 +10,7 @@ info:
 servers:
   - url: "https://zoobooru.org"
     description: "Production Server"
-  - url: "http://localhost:3001"
+  - url: "http://localhost:4000"
     description: "Development server"
 
 x-constants:

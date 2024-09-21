@@ -648,10 +648,6 @@ class User < ApplicationRecord
       is_member? && older_than(7.days)
     end
 
-    def can_discord?
-      is_member? && older_than(7.days)
-    end
-
     def can_view_flagger?(flagger_id)
       is_janitor? || flagger_id == id
     end

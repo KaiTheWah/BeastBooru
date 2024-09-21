@@ -57,21 +57,6 @@ class StaticController < ApplicationController
     redirect_back(fallback_location: posts_path)
   end
 
-  def discord
-    unless CurrentUser.can_discord?
-      raise(User::PrivilegeError, "You must have an account for at least one week in order to join the Discord server.")
-    end
-    if request.post?
-      time = (Time.now + 5.minutes).to_i
-      secret = FemboyFans.config.discord_secret
-      # TODO: Proper HMAC
-      hashed_values = Digest::SHA256.hexdigest("#{CurrentUser.id};#{CurrentUser.name};#{time};#{secret};index")
-      user_hash = "?user_id=#{CurrentUser.id}&user_name=#{CurrentUser.name}&time=#{time}&hash=#{hashed_values}"
-
-      redirect_to(FemboyFans.config.discord_site + user_hash, allow_other_host: true)
-    end
-  end
-
   def robots
     expires_in(1.hour, public: true)
   end

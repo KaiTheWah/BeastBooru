@@ -12,9 +12,6 @@ module Maintenance
     ignoring_exceptions { TagAlias.update_cached_post_counts_for_all }
     ignoring_exceptions { UserPasswordResetNonce.prune! }
     ignoring_exceptions { StatsUpdater.run! }
-    ignoring_exceptions { DiscordReport::JanitorStats.new.run! }
-    ignoring_exceptions { DiscordReport::ModeratorStats.new.run! }
-    ignoring_exceptions { DiscordReport::AiburStats.new.run! }
     ignoring_exceptions { Recommender.train! }
   end
 

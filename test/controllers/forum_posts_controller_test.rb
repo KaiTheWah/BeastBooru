@@ -331,7 +331,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "restrict access" do
-          skip("Does not work in CI") if ENV["CI"]
+          SpamDetector.any_instance.stubs(:spam!).returns(true)
           assert_access(User::Levels::MODERATOR) { |user| put_auth mark_spam_forum_post_path(@forum_post), user }
         end
       end

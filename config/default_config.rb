@@ -30,6 +30,10 @@ module FemboyFans
       "femboy.fan"
     end
 
+    def cdn_domain
+      "static.femboy.fan"
+    end
+
     # Force rating:s on this version of the site.
     def safe_mode?
       false
@@ -500,7 +504,7 @@ module FemboyFans
       # base_url - where to serve files from (default: http://#{hostname}/data)
       # hierarchical: false - store files in a single directory
       # hierarchical: true - store files in a hierarchical directory structure, based on the MD5 hash
-      StorageManager::Local.new(base_dir: Rails.public_path.join("data").to_s, hierarchical: true)
+      StoageManager::Local.new(base_dir: Rails.public_path.join("data").to_s, hierarchical: true)
       # StorageManager::Ftp.new(ftp_hostname, ftp_port, ftp_username, ftp_password, base_dir: "", base_path: "", base_url: "https://static.femboy.fan", hierarchical: true)
 
       # Select the storage method based on the post's id and type (preview, large, or original).

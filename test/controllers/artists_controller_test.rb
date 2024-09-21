@@ -101,7 +101,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
       should "work (with url string)" do
         attributes = attributes_for(:artist)
-        attributes[:url_string] ||= "https://femboy.fan"
+        attributes[:url_string] ||= "https://#{FemboyFans.config.domain}"
         assert_difference(%w[Artist.count ArtistUrl.count], 1) do
           attributes.delete(:is_active)
           post_auth artists_path, @user, params: { artist: attributes }

@@ -48,6 +48,8 @@ services:
     environment:
       <<: *common-env
       RAILS_ENV: development
+      DB_USER: femboyfans
+      DB_NAME: femboyfans_development
     depends_on:
       <<: *common-depends-on
       autocompleted:

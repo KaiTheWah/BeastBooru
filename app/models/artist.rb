@@ -66,6 +66,7 @@ class Artist < ApplicationRecord
       # Subdomains are automatically included. e.g., "twitter.com" matches "www.twitter.com",
       # "mobile.twitter.com" and any other subdomain of "twitter.com".
       SITE_BLACKLIST = [
+        FemboyFans.config.domain,
         "artstation.com/artist", # http://www.artstation.com/artist/serafleur/
         "www.artstation.com", # http://www.artstation.com/serafleur/
         %r{cdn[ab]?\.artstation\.com/p/assets/images/images}i, # https://cdna.artstation.com/p/assets/images/images/001/658/068/large/yang-waterkuma-b402.jpg?1450269769
@@ -98,7 +99,6 @@ class Artist < ApplicationRecord
         "dropbox.com/u", # http://dl.dropbox.com/u/76682289/daitoHP-WP/pict/
         "e-hentai.org", # https://e-hentai.org/tag/artist:spirale
         "e621.net",
-        "femboy.fan",
         "e621.net/post/index/1", # https://e621.net/post/index/1/spirale
         "enty.jp", # https://enty.jp/aizawachihiro888
         "enty.jp/users", # https://enty.jp/users/3766

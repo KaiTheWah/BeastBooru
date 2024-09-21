@@ -8,11 +8,11 @@ class UploadWhitelistTest < ActiveSupport::TestCase
       user = create(:trusted_user)
       CurrentUser.user = user
 
-      @whitelist = create(:upload_whitelist, pattern: "*.femboy.fan/*", note: "femboyfans")
+      @whitelist = create(:upload_whitelist, pattern: "*.#{FemboyFans.config.domain}/*", note: "local")
     end
 
     should "match" do
-      assert_equal([true, nil], UploadWhitelist.is_whitelisted?(Addressable::URI.parse("https://static.femboy.fan/123.png")))
+      assert_equal([true, nil], UploadWhitelist.is_whitelisted?(Addressable::URI.parse("https://#{FemboyFans.config.cdn_domain}/123.png")))
       assert_equal([false, "123.com not in whitelist"], UploadWhitelist.is_whitelisted?(Addressable::URI.parse("https://123.com/what.png")))
     end
 

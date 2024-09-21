@@ -2,15 +2,13 @@
 
 module Sources
   module Bad
-    class FemboyFans < Base
-      DOMAINS = %w[femboy.fan].freeze
-
+    class Local < Base
       def bad?
         true
       end
 
       def self.match?(url)
-        DOMAINS.include?(url.domain)
+        url.domain == FemboyFans.config.domain
       end
     end
   end

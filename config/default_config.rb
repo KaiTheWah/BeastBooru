@@ -64,7 +64,7 @@ module FemboyFans
     end
 
     def anonymous_user_name
-      "anonymous"
+      "Anonymous"
     end
 
     def anonymous_user
@@ -79,9 +79,10 @@ module FemboyFans
 
     def system_user
       User.find_or_create_by!(name: system_user_name, level: User::Levels::SYSTEM) do |user|
-        user.email                = "system@femboy.fan"
+        user.email                = "system@#{domain}"
         user.can_approve_posts    = true
         user.unrestricted_uploads = true
+        user.email_verified       = true
       end
     end
 
@@ -108,6 +109,7 @@ module FemboyFans
       user.hover_zoom_sticky_shift    = true
       user.go_to_recent_forum_post    = true
       user.upload_notifications       = User.upload_notifications_options
+      user.email_verified             = !enable_email_verification?
     end
 
     def default_blacklist
@@ -759,12 +761,13 @@ module FemboyFans
         { name: "Reviewed", text: "Reviewed, thank you." },
         { name: "NAT", text: "Reviewed, no action taken." },
         { name: "Closed", text: "Ticket closed." },
+        { name: "Dismissed", text: "Ticket dismissed." },
         { name: "Old", text: "That comment is from N years ago.\nWe do not punish people for comments older than 3 months." },
         { name: "Reply", text: "I believe that you tried to reply to a comment, but reported it instead.\nPlease, be more careful in the future." },
         { name: "Already", text: "User already received a record for that message." },
         { name: "Banned", text: "This user is already banned." },
         { name: "Blacklist", text: "If you find the contents of that post objectionable, \"blacklist\":/help/blacklisting it." },
-        { name: "Takedown", text: "Artists and character owners may request a takedown here: https://femboy.fan/static/takedown.\nWe do not accept third party takedowns." },
+        { name: "Takedown", text: "Artists and character owners may request a takedown \"here\":/static/takedown.\nWe do not accept third party takedowns." },
       ]
     end
 

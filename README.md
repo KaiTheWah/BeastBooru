@@ -1,18 +1,18 @@
 <div align="center">
   <img src="public/images/github-logo.png" width="150" height="150" align="left">
   <div align="left">
-    <h3>Femboy Fans</h3>
-    <a href="https://github.com/FemboyFans/FemboyFans/releases">
-      <img src="https://img.shields.io/github/v/release/FemboyFans/FemboyFans?label=version&style=flat-square" alt="Releases" />
+    <h3>ZooBooru</h3>
+    <a href="https://github.com/KaiTheWah/ZooBooru/releases">
+      <img src="https://img.shields.io/github/v/release/KaiTheWah/ZooBooru?label=version&style=flat-square" alt="Releases" />
     </a><br />
-    <a href="https://github.com/FemboyFans/FemboyFans/issues">
-      <img src="https://img.shields.io/github/issues/FemboyFans/FemboyFans?label=open issues&style=flat-square" alt="Issues" />
+    <a href="https://github.com/KaiTheWah/ZooBooru/issues">
+      <img src="https://img.shields.io/github/issues/KaiTheWah/ZooBooru?label=open issues&style=flat-square" alt="Issues" />
     </a><br />
-    <a href="https://github.com/FemboyFans/FemboyFans/pulls">
-      <img src="https://img.shields.io/github/issues-pr/FemboyFans/FemboyFans?style=flat-square" alt="Pull Requests" />
+    <a href="https://github.com/KaiTheWah/ZooBooru/pulls">
+      <img src="https://img.shields.io/github/issues-pr/KaiTheWah/ZooBooru?style=flat-square" alt="Pull Requests" />
     </a><br />
-    <a href="https://github.com/FemboyFans/FemboyFans/commits/master/">
-      <img src="https://img.shields.io/github/check-runs/FemboyFans/FemboyFans/master?style=flat-square" alt="GitHub branch check runs" />
+    <a href="https://github.com/KaiTheWah/ZooBooru/commits/master/">
+      <img src="https://img.shields.io/github/check-runs/KaiTheWah/ZooBooru/master?style=flat-square" alt="GitHub branch check runs" />
     </a><br />
   </div>
 </div>
@@ -33,18 +33,18 @@
 ### Installation
 
 1. Download and install the [prerequisites](#prerequisites).
-2. Clone the repo with `git clone https://github.com/FemboyFans/FemboyFans.git`.
+2. Clone the repo with `git clone https://github.com/KaiTheWah/ZooBooru.git`.
 3. `cd` into the repo.
 4. Copy the sample environment file with `cp .env.sample .env`.
 5. Run the following commands:
     ```
-    docker compose run --rm --no-deps femboyfans /app/bin/presetup
-    docker compose run --rm -e SEED_POST_COUNT=100 femboyfans /app/bin/setup
+    docker compose run --rm --no-deps zoobooru /app/bin/presetup
+    docker compose run --rm -e SEED_POST_COUNT=100 zoobooru /app/bin/setup
     docker compose run --rm reports npm run migrate
     docker compose up
     ```
     After running the commands once only `docker compose up` is needed to bring up the containers.
-6. To confirm the installation worked, open the web browser of your choice and enter `http://localhost:3001` into the address bar and see if the website loads correctly. Create an account via http://localhost:3001/users/new. The first created user will automatically be promoted to the "Owner" level.
+6. To confirm the installation worked, open the web browser of your choice and enter `http://localhost:4000` into the address bar and see if the website loads correctly. Create an account via http://localhost:3001/users/new. The first created user will automatically be promoted to the "Owner" level.
 
 Note: When gems or js packages are updated you need to execute `docker compose build` to reflect them in the container.
 
@@ -68,7 +68,7 @@ You're most likely using Windows. Give this a shot, it tells Git to stop trackin
 
 `docker compose run --rm rubocop` to run the linter.
 
-The postgres server accepts outside connections which you can use to access it with a local client. Use `localhost:34518` to connect to a database named `femboyfans_development` with the user `femboyfans`. Leave the password blank, anything will work.
+The postgres server accepts outside connections which you can use to access it with a local client. Use `localhost:34528` to connect to a database named `zoobooru_development` with the user `zoobooru`. Leave the password blank, anything will work.
 
 ## Production Setup
 

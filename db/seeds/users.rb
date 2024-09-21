@@ -7,5 +7,5 @@ require "faker"
 total = 100
 total.times do |i|
   puts "Creating users.. #{i}/#{total}" if i % (total / 10) == 0
-  User.create(name: Faker::Internet.username.tr(" ", "_").tr(".", "_"), email: Faker::Internet.email, password: "femboyfans", password_confirmation: "femboyfans", created_at: 2.weeks.ago)
+  User.create(name: Faker::Internet.username.tr(" ", "_").tr(".", "_"), email: Faker::Internet.email, password: "zoobooru", password_confirmation: "zoobooru", created_at: 2.weeks.ago)
 end

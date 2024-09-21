@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This script populates the database with random data for testing or development purposes.
-# Usage: docker compose run --rm femboyfans /app/bin/populate
+# Usage: docker compose run --rm zoobooru /app/bin/populate
 
 require "faker"
 

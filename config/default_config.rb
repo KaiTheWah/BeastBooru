@@ -7,7 +7,7 @@ module FemboyFans
     end
 
     def app_name
-      "Femboy Fans"
+      "ZooBooru"
     end
 
     def app_url
@@ -23,15 +23,15 @@ module FemboyFans
     end
 
     def description
-      "Your one-stop shop for femboy furries."
+      "Your one-stop shop for zoo content."
     end
 
     def domain
-      "femboy.fan"
+      "zoobooru.org"
     end
 
     def cdn_domain
-      "static.femboy.fan"
+      "static.zoobooru.org"
     end
 
     # Force rating:s on this version of the site.

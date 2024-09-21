@@ -17,7 +17,7 @@ Dir["#{File.dirname(__FILE__)}/*.sql"].each do |file|
   name = File.basename(file)[..-5]
   next if File.exist?("#{target}/#{date}-#{name}.csv.xz")
   contents = File.read(file)
-  system(%{psql -h postgres --username femboyfans -c "COPY (#{contents}) TO STDOUT DELIMITER ',' CSV HEADER;" femboyfans > "#{target}/#{date}-#{name}.csv"}, exception: true)
+  system(%{psql -h postgres --username zoobooru -c "COPY (#{contents}) TO STDOUT DELIMITER ',' CSV HEADER;" zoobooru > "#{target}/#{date}-#{name}.csv"}, exception: true)
   system(%(xz "#{target}/#{date}-#{name}.csv"), exception: true)
   puts("#{name} done")
 rescue RuntimeError => e

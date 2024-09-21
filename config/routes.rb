@@ -84,17 +84,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :takedowns do
-    collection do
-      post :count_matching_posts
-    end
-    member do
-      post :add_by_ids
-      post :add_by_tags
-      post :remove_by_ids
-    end
-  end
-
   resources :artists, constraints: id_name_constraint do
     member do
       put :revert
@@ -445,7 +434,6 @@ Rails.application.routes.draw do
   get "/static/keyboard_shortcuts", to: "static#keyboard_shortcuts", as: "keyboard_shortcuts"
   get "/static/site_map", to: "static#site_map", as: "site_map"
   get "/static/privacy", to: "static#privacy", as: "privacy_policy"
-  get "/static/takedown", to: "static#takedown", as: "takedown_static"
   get "/static/terms_of_service", to: "static#terms_of_service", as: "terms_of_service"
   get "/static/contact", to: "static#contact", as: "contact"
   get "/static/toggle_mobile_mode", to: "static#toggle_mobile_mode", as: "toggle_mobile_mode"

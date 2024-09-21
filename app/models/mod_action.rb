@@ -361,16 +361,6 @@ class ModAction < ApplicationRecord
       json: %i[implication_desc change_desc],
     },
 
-    ### Takedowns ###
-    takedown_process:                           {
-      text: ->(mod, _user) { "Completed takedown ##{mod.subject_id}" },
-      json: %i[],
-    },
-    takedown_delete:                            {
-      text: ->(mod, _user) { "Deleted takedown ##{mod.subject_id}" },
-      json: %i[],
-    },
-
     ### Ticket ###
     ticket_claim:                               {
       text: ->(mod, _user) { "Claimed ticket ##{mod.subject_id}" },

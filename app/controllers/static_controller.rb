@@ -15,10 +15,6 @@ class StaticController < ApplicationController
     @page = view_context.safe_wiki("help:contact")
   end
 
-  def takedown
-    @page = view_context.safe_wiki("help:takedown")
-  end
-
   def staff
     @page = view_context.safe_wiki("help:staff")
   end

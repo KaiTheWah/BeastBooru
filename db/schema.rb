@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_09_06_184638) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_21_065306) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -900,25 +900,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_06_184638) do
     t.index ["name"], name: "index_tags_on_name_trgm", opclass: :gin_trgm_ops, using: :gin
   end
 
-  create_table "takedowns", force: :cascade do |t|
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.integer "creator_id"
-    t.inet "creator_ip_addr", null: false
-    t.integer "approver_id"
-    t.string "status", default: "pending", null: false
-    t.string "vericode", null: false
-    t.string "source", default: "", null: false
-    t.string "email", null: false
-    t.text "reason", default: "", null: false
-    t.boolean "reason_hidden", default: false, null: false
-    t.text "notes", default: "none", null: false
-    t.text "instructions", default: "", null: false
-    t.text "post_ids", default: "", null: false
-    t.text "del_post_ids", default: "", null: false
-    t.integer "post_count", default: 0, null: false
-  end
-
   create_table "tickets", force: :cascade do |t|
     t.integer "creator_id", null: false
     t.inet "creator_ip_addr", null: false
@@ -1273,8 +1254,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_06_184638) do
   add_foreign_key "tag_implications", "users", column: "creator_id"
   add_foreign_key "tag_versions", "tags"
   add_foreign_key "tag_versions", "users", column: "updater_id"
-  add_foreign_key "takedowns", "users", column: "approver_id"
-  add_foreign_key "takedowns", "users", column: "creator_id"
   add_foreign_key "tickets", "users", column: "accused_id"
   add_foreign_key "tickets", "users", column: "creator_id"
   add_foreign_key "tickets", "users", column: "handler_id"

@@ -152,22 +152,6 @@ class DtextTest < ActiveSupport::TestCase
         assert_parse_id_link("ticket #123", "ticket #123", "dtext-ticket-id-link", u(ticket_path(id: 123)))
       end
 
-      should "parse takedown #" do
-        assert_parse_id_link("takedown #123", "takedown #123", "dtext-takedown-id-link", u(takedown_path(id: 123)))
-      end
-
-      should "parse take down #" do
-        assert_parse_id_link("take down #123", "takedown #123", "dtext-takedown-id-link", u(takedown_path(id: 123)))
-      end
-
-      should "parse takedown request #" do
-        assert_parse_id_link("takedown request #123", "takedown #123", "dtext-takedown-id-link", u(takedown_path(id: 123)))
-      end
-
-      should "parse take down request #" do
-        assert_parse_id_link("take down request #123", "takedown #123", "dtext-takedown-id-link", u(takedown_path(id: 123)))
-      end
-
       should "parse avoid posting #" do
         assert_parse_id_link("avoid posting #123", "avoid posting #123", "dtext-avoid-posting-id-link", u(avoid_posting_path(id: 123)))
       end

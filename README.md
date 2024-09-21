@@ -85,8 +85,6 @@ These wik/help pages are expected to exist, as they are linked to or used in var
 * help:home
 * help:privacy_policy
 * help:staff
-* help:takedown
-* help:takedown_verification
 * help:terms_of_service
 * internal:rules_body
 * internal:flag_notice

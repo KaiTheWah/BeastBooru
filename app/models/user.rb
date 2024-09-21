@@ -664,10 +664,6 @@ class User < ApplicationRecord
       is_staff?
     end
 
-    def can_handle_takedowns?
-      is_owner?
-    end
-
     def can_edit_avoid_posting_entries?
       is_owner?
     end

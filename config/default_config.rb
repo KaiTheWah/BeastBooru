@@ -528,11 +528,6 @@ module FemboyFans
           text:   "This post fails to meet the site's standards, be it for artistic worth, image quality, relevancy, or something else.\nKeep in mind that your personal preferences have no bearing on this. If you find the content of a post objectionable, simply \"blacklist\":/help/blacklisting it.",
         },
         {
-          name:   "dnp_artist",
-          reason: "The artist of this post is on the \"avoid posting list\":/static/avoid_posting",
-          text:   "Certain artists have requested that their work is not to be published on this site, and were granted [[avoid_posting|Do Not Post]] status.\nSometimes, that status comes with conditions; see [[conditional_dnp]] for more information",
-        },
-        {
           name:   "pay_content",
           reason: "Paysite, commercial, or subscription content",
           text:   "We do not host paysite or commercial that is under 2 years old.",
@@ -546,11 +541,6 @@ module FemboyFans
           name:   "previously_deleted",
           reason: "Previously deleted",
           text:   "Posts usually get removed for a good reason, and reuploading of deleted content is not acceptable.\nPlease, leave more information in the comments, or simply add the original post as this post's parent.",
-        },
-        {
-          name:   "real_porn",
-          reason: "Real-life pornography",
-          text:   "Posts featuring real-life pornography are not acceptable on this site.",
         },
         {
           name:   "corrupt",
@@ -578,10 +568,6 @@ module FemboyFans
 
     def replacement_notice_wiki_page
       "internal:replacement_notice"
-    end
-
-    def avoid_posting_notice_wiki_page
-      "internal:avoid_posting_notice"
     end
 
     def appeal_notice_wiki_page
@@ -617,7 +603,7 @@ module FemboyFans
 
     # tags excluded when listing artists
     def artist_exclusion_tags
-      %w[avoid_posting conditional_dnp epilepsy_warning sound_warning]
+      %w[epilepsy_warning sound_warning]
     end
 
     # The default headers to be sent with outgoing http requests. Some external

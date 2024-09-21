@@ -67,7 +67,7 @@ class UploadService
       p.framecount = upload.video_framecount(upload.file.path)
       p.upload_url = upload.direct_url
 
-      if !upload.uploader.unrestricted_uploads? || (!upload.uploader.can_approve_posts? && p.avoid_posting_artists.any?) || (!upload.uploader.can_approve_posts? && p.avoid_posting_artists.any?) || upload.upload_as_pending?
+      if !upload.uploader.unrestricted_uploads? || upload.upload_as_pending?
         p.is_pending = true
       end
     end

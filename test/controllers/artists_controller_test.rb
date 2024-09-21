@@ -236,42 +236,5 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         assert_access(User::Levels::MEMBER, success_response: :redirect) { |user| put_auth revert_artist_path(@artist), user, params: { version_id: @artist.versions.first.id } }
       end
     end
-
-    context "with a dnp entry" do
-      setup do
-        @owner_user      = create(:owner_user)
-        CurrentUser.user = @owner_user
-        @avoid_posting = create(:avoid_posting, artist: @artist)
-      end
-
-      should "not allow destroying" do
-        assert_no_difference("Artist.count") do
-          delete_auth artist_path(@artist), @owner_user
-        end
-      end
-
-      # technical restriction
-      should "not allow destroying even if the dnp is inactive" do
-        @avoid_posting.update(is_active: false)
-        assert_no_difference("Artist.count") do
-          delete_auth artist_path(@artist), @owner_user
-        end
-      end
-
-      should "not allow editing protected properties" do
-        @janitor = create(:janitor_user)
-        name = @artist.name
-        other_names = @artist.other_names
-        assert_no_difference("ModAction.count") do
-          put_auth artist_path(@artist), @janitor, params: { artist: { name: "another_name", other_names: "some other names" } }
-        end
-
-        @artist.reload
-        assert_equal(name, @artist.name)
-        assert_equal(other_names, @artist.other_names)
-        assert_equal(name, @artist.wiki_page.reload.title)
-        assert_equal(name, @avoid_posting.reload.artist_name)
-      end
-    end
   end
 end

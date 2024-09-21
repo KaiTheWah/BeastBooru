@@ -96,7 +96,6 @@ These wik/help pages are expected to exist, as they are linked to or used in var
 * accounts
 * api
 * artists
-* avoid_posting
 * blacklisting
 * blocking
 * cheatsheet

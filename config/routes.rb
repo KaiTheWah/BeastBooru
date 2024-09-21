@@ -23,7 +23,6 @@ Rails.application.routes.draw do
     resource :dashboard, only: %i[show]
     resources :exceptions, only: %i[index show]
     resource :reowner, controller: "reowner", only: %i[new create]
-    resource :stuck_dnp, controller: "stuck_dnp", only: %i[new create]
     resources :destroyed_posts, only: %i[index show update]
     resources :staff_notes, only: %i[index]
     resources :danger_zone, only: [:index] do
@@ -65,16 +64,6 @@ Rails.application.routes.draw do
     resource :deletion, only: %i[show destroy]
     resource :email_change, only: %i[new create]
     resource :dmail_filter, only: %i[show edit update]
-  end
-
-  resources :avoid_postings, constraints: id_name_constraint do
-    collection do
-      resources :versions, only: %i[index], controller: "avoid_postings/versions", as: "avoid_posting_versions"
-    end
-    member do
-      put :delete
-      put :undelete
-    end
   end
 
   resources :tickets, except: %i[destroy] do
@@ -439,7 +428,6 @@ Rails.application.routes.draw do
   get "/static/toggle_mobile_mode", to: "static#toggle_mobile_mode", as: "toggle_mobile_mode"
   get "/static/theme", to: "static#theme", as: "theme"
   get "/static/staff", to: "static#staff", as: "staff"
-  get "/static/avoid_posting", to: "static#avoid_posting", as: "avoid_posting_static"
   get "/robots", to: "static#robots", as: "robots"
   get "/route", to: "static#recognize_route", as: "recognize_route"
   root to: "static#home"

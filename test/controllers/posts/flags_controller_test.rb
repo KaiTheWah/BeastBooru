@@ -46,12 +46,12 @@ module Posts
         should "create a new flag" do
           post = create(:post)
           assert_difference("PostFlag.count", 1) do
-            post_auth post_flags_path, @user, params: { format: :json, post_flag: { post_id: post.id, reason_name: "dnp_artist" } }
+            post_auth post_flags_path, @user, params: { format: :json, post_flag: { post_id: post.id, reason_name: "corrupt" } }
           end
         end
 
         should "restrict access" do
-          assert_access(User::Levels::MEMBER, success_response: :redirect) { |user| post_auth post_flags_path, user, params: { post_flag: { post_id: create(:post).id, reason_name: "dnp_artist" } } }
+          assert_access(User::Levels::MEMBER, success_response: :redirect) { |user| post_auth post_flags_path, user, params: { post_flag: { post_id: create(:post).id, reason_name: "corrupt" } } }
         end
       end
     end

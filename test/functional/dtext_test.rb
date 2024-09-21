@@ -152,14 +152,6 @@ class DtextTest < ActiveSupport::TestCase
         assert_parse_id_link("ticket #123", "ticket #123", "dtext-ticket-id-link", u(ticket_path(id: 123)))
       end
 
-      should "parse avoid posting #" do
-        assert_parse_id_link("avoid posting #123", "avoid posting #123", "dtext-avoid-posting-id-link", u(avoid_posting_path(id: 123)))
-      end
-
-      should "parse dnp #" do
-        assert_parse_id_link("dnp #123", "avoid posting #123", "dtext-avoid-posting-id-link", u(avoid_posting_path(id: 123)))
-      end
-
       should "parse issue #" do
         assert_parse_id_link("issue #123", "issue #123", "dtext-github-id-link", "#{FemboyFans.config.source_code_url}/issues/123")
       end

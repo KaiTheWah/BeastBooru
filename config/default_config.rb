@@ -420,16 +420,17 @@ module FemboyFans
 
     def max_file_sizes
       {
-        "jpg"  => 100.megabytes,
-        "png"  => 100.megabytes,
-        "webp" => 100.megabytes,
-        "gif"  => 20.megabytes,
+        "jpg"  => 50.megabytes,
+        "png"  => 50.megabytes,
+        "webp" => 50.megabytes,
+        "gif"  => 50.megabytes,
         "webm" => 100.megabytes,
+        "mp4"  => 100.megabytes,
       }
     end
 
     def max_apng_file_size
-      20.megabytes
+      50.megabytes
     end
 
     def max_mascot_file_sizes
